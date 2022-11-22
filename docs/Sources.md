@@ -1,0 +1,1 @@
+- [NANOAOD object dictionary](https://cms-nanoaod-integration.web.cern.ch/integration/master/mc94X_doc.html)
