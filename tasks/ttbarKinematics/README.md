@@ -41,6 +41,6 @@
 
 # TTree structure
 
-* The first 2 particles of each events are the incoming particles (tipically (?) gluons)
+* The first 2 particles of each events are the incoming particles (gluons)
 * The 3rd particle is the additional parton (NLO montecarlo)
 * Be aware!! The 4th particle could be produced both from the t or the tbar. Look at the electric charges
