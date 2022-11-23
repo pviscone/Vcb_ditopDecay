@@ -1,3 +1,5 @@
+#pragma once
+
 #include "TPad.h"
 #include "TLatex.h"
 #include "TLine.h"
