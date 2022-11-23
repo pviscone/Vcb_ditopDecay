@@ -41,6 +41,28 @@
 
 # TTree structure
 
-* The first 2 particles of each events are the incoming particles (gluons)
-* The 3rd particle is the additional parton (NLO montecarlo)
-* Be aware!! The 4th particle could be produced both from the t or the tbar. Look at the electric charges
+* The first 2 (0,1)particles of each events are the incoming particles (gluons)
+
+* The 3rd (2) particle is the additional parton (NLO montecarlo)
+
+* The 4th and the 5th (3,4)are the $q_-$ and $\bar{q}^{'}_+$ produced by  $t\bar{t}$
+
+* Be aware!! The 6th (5) particle could be produced both from the $t$ or the $\bar{t}$. Look at the electric charges
+  
+  - IF the 6th particle has charge < 0, it comes from a $W^-$
+  
+  - IF the 6th particle has charge  >0, it comes from a $W^+$
+
+The quark in $t \to q W^\pm$ has the opposite charge of the $W^\pm$ and $t$ has the same charge of the $W$ ( so $t \to q_{-}W^+$  or $\bar{t} \to \bar{q}_{+}W^-$ )
+
+
+
+### Observation and doubts
+
+- Event 1008: there is a $c$ in the position 0. So, a $c$ is an incoming particle  
+  
+  - Why a c quark is an incoming particle??
+
+### Questions
+
+- Ci sono modi più veloci di usare root o va bene usare il plain C in questo modo?
