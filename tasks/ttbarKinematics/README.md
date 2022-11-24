@@ -4,18 +4,20 @@
 > 
 > 1. Reconstruct the variables:
 >    
->    - [ ] $M\_t$
+>    - [x] $M\_t$
 >    
->    - [ ] $M\_{\bar{t}}$
+>    - [x] $M\_{\bar{t}}$
 >    
->    - [ ] $M\_{W^+}$
+>    - [x] $M\_{W^+}$
 >    
->    - [ ] $M\_{W^-}$
+>    - [x] $M\_{W^-}$
+>    
+>    - [x]  Divide all in leptonic and hadronic decays
+>    
+>    - [ ] fit a Breit-Wigner for each histogram (this is important to understand the magnitude of the non resonant decay)
 > 
->         Divide the leptonic and the hadronic decays and fit a Breit-Wigner for each histogram (this is important to understand the magnitude of the non resonant decay)
-> 
-> 2. - [ ] Do the same plots for $\eta$ and $p_T$
-> 3. - [ ] Create and histogram containing all the  possible $q\bar{q}$ couples and fill it with the hadronic W decays 
+> 2. - [x] Do the same plots for $\eta$ and $p_T$
+> 3. - [x] Create and histogram containing all the  possible $q\bar{q}$ couples and fill it with the hadronic W decays 
 
 ---
 
@@ -39,7 +41,9 @@
 
 ---
 
-# TTree structure
+# LHEPart_pdgId structure
+
+There are 9 particles (the 6th(5) and the 7th(6) are produced by the same W. The same stans for the 8th(7) and 9th(8) ):
 
 * The first 2 (0,1)particles of each events are the incoming particles (gluons)
 
@@ -55,14 +59,15 @@
 
 The quark in $t \to q W^\pm$ has the opposite charge of the $W^\pm$ and $t$ has the same charge of the $W$ ( so $t \to q_{-}W^+$  or $\bar{t} \to \bar{q}_{+}W^-$ )
 
-
-
 ### Observation and doubts
 
 - Event 1008: there is a $c$ in the position 0. So, a $c$ is an incoming particle  
   
   - Why a c quark is an incoming particle??
 
+- **The Ws decay only in ud,us,cd,cs pais. The motecarlo was generated with some strange cuts???** 
+
 ### Questions
 
 - Ci sono modi più veloci di usare root o va bene usare il plain C in questo modo?
+- Esistono degli header preimpostati per importare lo stile dei plot CMS
