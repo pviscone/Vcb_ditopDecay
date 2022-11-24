@@ -230,8 +230,7 @@ int main() {
     StackHist(histPtWPlusHad, histPtWPlusLept, "W^{+} P_{t}", "p_{t} [GeV]", "./images/pt/PtWPlus.png");
     StackHist(histPtWMinusHad, histPtWMinusLept, "W^{-} P_{t}", "p_{t} [GeV]", "./images/pt/PtWMinus.png");
 
-    StackHist(histWPlusJetDecay, histWMinusJetDecay, "W^{+} Jet Decay", "W^{+} Decay", "./images/WPlusJetDecay.png");
-    StackHist(histWMinusJetDecay, histWPlusJetDecay, "W^{-} Jet Decay", "W^{-} Decay", "./images/WMinusJetDecay.png");
+    StackHist(histWPlusJetDecay, histWMinusJetDecay, "W^{+} Jet Decay", "W^{+} Decay", "./images/WJetDecay.png");
 
     //-------------------------------------------------------------------------------------------------------
     //                                      DONE

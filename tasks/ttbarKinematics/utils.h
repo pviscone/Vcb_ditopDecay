@@ -115,6 +115,7 @@ THStack *StackHist(TH1 *hist1, TH1 *hist2, std::string title, std::string xLabel
     gStyle->SetPalette(70);
     gStyle->SetOptStat(00011111);
 
+    //! Canvas too big
     THStack *hs = new THStack("hs", title.c_str());
     TCanvas *c = new TCanvas("c", "c", 1600, 1200);
 
