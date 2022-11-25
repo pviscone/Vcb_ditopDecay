@@ -117,10 +117,17 @@ THStack *StackHist(TH1 *hist1, TH1 *hist2, std::string title, std::string xLabel
 
     //! Canvas too big
     THStack *hs = new THStack("hs", title.c_str());
-    TCanvas *c = new TCanvas("c", "c", 1600, 1200);
+    TCanvas *c = new TCanvas("c", "c", 1000, 750);
+    TPad *p1 = new TPad("p1","p1",0.1,0.3,0.9,1.);
+    TPad *p2 = new TPad("p2","p2",0.1,0.,0.9,0.34);
+    p1->Draw();
+    p2->Draw();
 
-    hist1->SetMarkerSize(0.5);
-    hist2->SetMarkerSize(0.5);
+    p1->cd();
+
+
+    hist1->SetMarkerSize(0.3);
+    hist2->SetMarkerSize(0.3);
 
     // Set the range on the y axis to be the same for both histograms (and at 1.1 times the maximum value)
     hist1->GetYaxis()->SetRangeUser(0, 1.15 * std::max(hist1->GetMaximum(), hist2->GetMaximum()));
@@ -130,11 +137,11 @@ THStack *StackHist(TH1 *hist1, TH1 *hist2, std::string title, std::string xLabel
     hs->Add(hist1, "sames");
     hs->Add(hist2, "sames");
 
-    hs->Draw("nostack PLC PMC HIST E1");
+    hs->Draw("nostack PLC PMC E1 HIST");
     gPad->Update();
 
     // Axis lavel
-    hs->GetXaxis()->SetTitle(xLabel.c_str());
+/*     hs->GetXaxis()->SetTitle(xLabel.c_str()); */
     hs->GetYaxis()->SetTitle("Counts");
 
     //Title
@@ -163,6 +170,25 @@ THStack *StackHist(TH1 *hist1, TH1 *hist2, std::string title, std::string xLabel
     st2->SetY2NDC(.78);
     c->Modified();
 
+    // Ratio plot
+    p2->cd();
+    TH1F *hist3 = (TH1F *)hist1->Clone("hist3");
+    hist3->Divide(hist2);
+
+    hist3->SetStats(0);
+    hist3->SetTitle("");
+    hist3->GetYaxis()->SetRangeUser(-1,3);
+    hist3->GetYaxis()->SetTitle("Ratio");
+    hist3->SetLineColor(kBlack);
+    hist3->SetMarkerColor(kBlack);
+    hist3->SetMarkerSize(0.5);
+
+    hist3->Draw();
+    gPad->Update();
+
+    TLine *line = new TLine(p2->GetUxmin(),1.,p2->GetUxmax(),1.);
+    line->SetLineColor(kRed);
+    line->Draw();
     //Save and return
     c->SaveAs(savePath.c_str());
     return hs;
