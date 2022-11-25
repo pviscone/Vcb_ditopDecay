@@ -2,7 +2,7 @@
 
 > # TODO
 > 
-> 1. - [ ]  **Set the CMS Plot Style**
+> 1. - [ ] **Set the CMS Plot Style**
 > 
 > 2. Reconstruct the variables:
 >    
@@ -21,10 +21,34 @@
 > 3. - [x] Do the same plots for $\eta$ and $p_T$
 > 
 > 4. - [x] Create and histogram containing all the  possible $q\bar{q}$ couples and fill it with the hadronic W decays 
+> 
+> 5. - [ ] Understand the cuts of montecarlo:
+>      
+>      https://cms-pdmv.cern.ch/mcm/requests?dataset_name=TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8&page=0&shown=127
+>      
+>      In the option fragment there is a script in wich there is a path: 
+>      
+>      /cvmfs/cms.cern.ch/phys_generator/gridpacks/2017/13TeV/powheg/V2/TT_hvq/TT_hdamp_NNPDF31_NNLO_ljets.tgz
+>      
+>      Unpack this file on the cernbox (*huge file*) and copy only the useful info on github.
+>      
+>      (Go to the TWiki and try to understand how to understand how a montecarlo is generated)
 >    
 >    ##### Optional
 >    
 >    - [ ] Multithreaded loop over events
+> 
+> # Fix
+> 
+> - [ ] For the M plots, create another version with a wider scale on the x axis
+> 
+> - [ ] Fix the ratio w jet decay (and rename it in W hadronic decay)
+> 
+> - [ ] Make 2 kind of plots: one divinding for the particle charge (e.g. W+,W-), one dividing for the production (hadronic, leptonic)
+> 
+> # Questions
+> 
+> - Why the gluon fusion production (90%) dominate over the quark production (10%)?
 
 ---
 
@@ -68,13 +92,11 @@ The quark in $t \to q W^\pm$ has the opposite charge of the $W^\pm$ and $t$ has 
 
 ### Observation and doubts
 
-- Event 1008: there is a $c$ in the position 0. So, a $c$ is an incoming particle  
-  
-  - Why a c quark is an incoming particle??
-
 - **The Ws decay only in ud,us,cd,cs pais. The motecarlo was generated with some strange cuts???** 
 
-### Questions
+### Technical doubts
 
 - Ci sono modi più veloci di usare root o va bene usare il plain C in questo modo?
-- Esistono degli header preimpostati per importare lo stile dei plot CMS
+- Esistono degli header preimpostati per importare lo stile dei plot CMS?
+- Come posso fare uno scan filtrando per istanza?
+  - Semplicemente usa le parentesi quadre [idx]
