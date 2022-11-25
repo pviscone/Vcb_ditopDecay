@@ -2,7 +2,9 @@
 
 > # TODO
 > 
-> 1. Reconstruct the variables:
+> 1. - [ ]  **Set the CMS Plot Style**
+> 
+> 2. Reconstruct the variables:
 >    
 >    - [x] $M\_t$
 >    
@@ -12,12 +14,17 @@
 >    
 >    - [x] $M\_{W^-}$
 >    
->    - [x]  Divide all in leptonic and hadronic decays
+>    - [x] Divide all in leptonic and hadronic decays
 >    
 >    - [ ] fit a Breit-Wigner for each histogram (this is important to understand the magnitude of the non resonant decay)
 > 
-> 2. - [x] Do the same plots for $\eta$ and $p_T$
-> 3. - [x] Create and histogram containing all the  possible $q\bar{q}$ couples and fill it with the hadronic W decays 
+> 3. - [x] Do the same plots for $\eta$ and $p_T$
+> 
+> 4. - [x] Create and histogram containing all the  possible $q\bar{q}$ couples and fill it with the hadronic W decays 
+>    
+>    ##### Optional
+>    
+>    - [ ] Multithreaded loop over events
 
 ---
 
