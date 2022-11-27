@@ -12,6 +12,7 @@
 
 #include "../../utils/CMSStyle/CMS_lumi.h"
 #include "../../utils/CMSStyle/tdrstyle.C"
+#include "../../utils/CMSStyle/CMS_lumi.C"
 #include "utils.h"
 
 using namespace ROOT::Math;
@@ -26,6 +27,9 @@ int main() {
     setTDRStyle();
     gROOT->LoadMacro("../../utils/CMSStyle/CMS_lumi.C");
     TH1::SetDefaultSumw2();
+
+    //Draw "Preliminary"
+    writeExtraText = true;
 
     //-------------------------------------------------------------------------------------------------------
     //                                 File,tree and branches status
@@ -128,7 +132,7 @@ int main() {
     PtEtaPhiMVector lorentzVectorTBarHad;
 
 
-    //NofEvents=5000;
+    NofEvents=1000;
     //-------------------------------------------------------------------------------------------------------
     //                                       Loop over the events
     for (int eventNumber = 0; eventNumber < NofEvents; eventNumber++) {

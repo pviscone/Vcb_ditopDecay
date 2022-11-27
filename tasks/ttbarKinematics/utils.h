@@ -2,11 +2,13 @@
 
 #include <Math/Vector4D.h>
 #include <TDatabasePDG.h>
+#include <TFrame.h>
 #include <THStack.h>
 #include <TLegend.h>
 #include <TPaveStats.h>
 #include <TTree.h>
 #include <iostream>
+#include <TAxis.h>
 
 using namespace ROOT::Math;
 
@@ -82,10 +84,10 @@ bool isQuark(int id) {
 
 /**
  * @brief Get the Lorentz Vector object given pt,eta,phi and mass
- * 
- * @param tree 
- * @param instance 
- * @return PtEtaPhiMVector 
+ *
+ * @param tree
+ * @param instance
+ * @return PtEtaPhiMVector
  */
 PtEtaPhiMVector getLorentzVector(TTree *tree, int instance) {
     PtEtaPhiMVector v;
@@ -100,10 +102,10 @@ PtEtaPhiMVector getLorentzVector(TTree *tree, int instance) {
 //----------------------------------------------------------------------
 //----------------------------------------------------------------------
 //                         HISTS
-//TODO Generalize this function to accept any number of histograms (vector of histograms)
+// TODO Generalize this function to accept any number of histograms (vector of histograms)
 /**
  * @brief Function that creates, save and return a THStack object of two histograms
- * 
+ *
  * @param hist1 First histogram to add to the stack
  * @param hist2 Second histogram to add to the stack
  * @param title Title of the final plot
@@ -112,22 +114,34 @@ PtEtaPhiMVector getLorentzVector(TTree *tree, int instance) {
  * @return THStack* Return the THStack object
  */
 THStack *StackHist(TH1 *hist1, TH1 *hist2, std::string title, std::string xLabel, std::string savePath) {
-    gStyle->SetPalette(70);
-    gStyle->SetOptStat(00011111);
+    // gStyle->SetPalette(70);
 
-    //! Canvas too big
+    // Set the colors,size and the stat options
+    gStyle->SetOptStat(00011111);
+    hist1->SetFillColorAlpha(9, 0.15);
+    hist1->SetLineColor(9);
+    hist1->SetMarkerColor(1);
+    hist1->SetMarkerSize(0.3);
+
+    hist2->SetFillColorAlpha(2, 0.2);
+    hist2->SetLineColor(2);
+    hist2->SetMarkerColor(1);
+    hist2->SetMarkerSize(0.3);
+
+    // Create the stack
     THStack *hs = new THStack("hs", title.c_str());
-    TCanvas *c = new TCanvas("c", "c", 1000, 750);
-    TPad *p1 = new TPad("p1","p1",0.1,0.3,0.9,1.);
-    TPad *p2 = new TPad("p2","p2",0.1,0.,0.9,0.34);
+
+    TCanvas *c = new TCanvas("cName", "cName", 50, 50, 800, 700);
+
+    // Create 2 pads
+    TPad *p1 = new TPad("pad1", "pad1", 0, 0.3, 0.95, 1.0);
+    TPad *p2 = new TPad("pad2", "pad2", 0, 0.05, 0.95, 0.3);
     p1->Draw();
     p2->Draw();
 
+    // First pad: THStack
     p1->cd();
-
-
-    hist1->SetMarkerSize(0.3);
-    hist2->SetMarkerSize(0.3);
+    p1->SetBottomMargin(0.); // Upper and lower plot are joined
 
     // Set the range on the y axis to be the same for both histograms (and at 1.1 times the maximum value)
     hist1->GetYaxis()->SetRangeUser(0, 1.15 * std::max(hist1->GetMaximum(), hist2->GetMaximum()));
@@ -137,23 +151,32 @@ THStack *StackHist(TH1 *hist1, TH1 *hist2, std::string title, std::string xLabel
     hs->Add(hist1, "sames");
     hs->Add(hist2, "sames");
 
-    hs->Draw("nostack PLC PMC E1 HIST");
+    hs->Draw("nostack E1 HIST");
     gPad->Update();
 
-    // Axis lavel
-/*     hs->GetXaxis()->SetTitle(xLabel.c_str()); */
-    hs->GetYaxis()->SetTitle("Counts");
+    // Thing to avoid the overlap on the first label
+    hist1->GetYaxis()->SetLabelSize(0.);
+    TAxis *axis = hs->GetYaxis();
+    axis->ChangeLabel(1, -1, -1, -1, -1, -1, " ");
+    axis->SetLabelFont(43); // Absolute font size in pixel (precision 3)
+    axis->SetLabelSize(15);
 
-    //Title
-    TLatex T;
-    T.SetTextFont(42);
-    T.SetTextAlign(21);
-    T.DrawLatexNDC(0.55, 0.96, title.c_str());
+    // THStack axis
+    /*     hs->GetXaxis()->SetTitle(xLabel.c_str()); */
+    hs->GetYaxis()->SetTitle("Events");
+    hs->GetYaxis()->SetLabelOffset(0.01);
 
-    //Legend
-    TLegend *legend = new TLegend(0.16, 0.85, 0.35, 0.95);
-    legend->AddEntry(hist1->GetName(), hist1->GetTitle(), "l");
-    legend->AddEntry(hist2->GetName(), hist2->GetTitle(), "l");
+    // Title
+    TLatex TeX;
+    TeX.SetTextFont(42);
+    TeX.SetTextAlign(21);
+    TeX.DrawLatexNDC(0.55, 0.96, title.c_str());
+
+    // Legend
+    TLegend *legend = new TLegend(0.75, 0.51, 0.95, 0.63);
+    legend->AddEntry(hist1->GetName(), hist1->GetTitle(), "f");
+    legend->AddEntry(hist2->GetName(), hist2->GetTitle(), "f");
+    legend->SetBorderSize(0);
     legend->Draw();
 
     // StatBox
@@ -172,24 +195,55 @@ THStack *StackHist(TH1 *hist1, TH1 *hist2, std::string title, std::string xLabel
 
     // Ratio plot
     p2->cd();
+    p2->SetTopMargin(0);
+    p2->SetBottomMargin(0.2);
     TH1F *hist3 = (TH1F *)hist1->Clone("hist3");
     hist3->Divide(hist2);
 
+    // Ratio plot options
     hist3->SetStats(0);
     hist3->SetTitle("");
-    hist3->GetYaxis()->SetRangeUser(-1,3);
-    hist3->GetYaxis()->SetTitle("Ratio");
     hist3->SetLineColor(kBlack);
     hist3->SetMarkerColor(kBlack);
     hist3->SetMarkerSize(0.5);
-
     hist3->Draw();
     gPad->Update();
 
-    TLine *line = new TLine(p2->GetUxmin(),1.,p2->GetUxmax(),1.);
+    // Y axis ratio plot settings
+    hist3->GetYaxis()->SetRangeUser(-1, 3);
+    hist3->GetYaxis()->SetTitle("Ratio");
+    hist3->GetYaxis()->SetNdivisions(505);
+    hist3->GetYaxis()->SetTitleSize(20);
+    hist3->GetYaxis()->SetTitleFont(43);
+    hist3->GetYaxis()->SetTitleOffset(1.55);
+    hist3->GetYaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
+    hist3->GetYaxis()->SetLabelSize(15);
+
+    // X axis ratio plot settings
+    hist3->GetXaxis()->SetTitleSize(20);
+    hist3->GetXaxis()->SetTitleFont(43);
+    hist3->GetXaxis()->SetTitleOffset(0.7);
+    hist3->GetXaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
+    hist3->GetXaxis()->SetLabelSize(15);
+    gPad->Modified();
+    gPad->Update();
+    c->RedrawAxis();
+
+    // Red line on ratio=1
+    TLine *line = new TLine(p2->GetUxmin(), 1., p2->GetUxmax(), 1.);
     line->SetLineColor(kRed);
     line->Draw();
-    //Save and return
+
+    // Draw CMS on top left
+    int iPos = 11;
+    float iPeriod = 0;
+    CMS_lumi(c, iPeriod, iPos);
+
+    // Save and return
+    c->Update();
+    c->RedrawAxis();
+    c->GetFrame()->Draw();
     c->SaveAs(savePath.c_str());
+
     return hs;
 }
