@@ -1,3 +1,4 @@
+#pragma once
 #include "CMS_lumi.h"
 #include <iostream>
 
