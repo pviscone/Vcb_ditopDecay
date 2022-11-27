@@ -2,7 +2,7 @@
 
 > # TODO
 > 
-> 1. - [ ] **Set the CMS Plot Style**
+> 1. - [ ] **Set the CMS Plot Style** (Partially done (?))
 > 
 > 2. Reconstruct the variables:
 >    
@@ -96,7 +96,7 @@ The quark in $t \to q W^\pm$ has the opposite charge of the $W^\pm$ and $t$ has 
 
 ### Technical doubts
 
-- Ci sono modi più veloci di usare root o va bene usare il plain C in questo modo?
-- Esistono degli header preimpostati per importare lo stile dei plot CMS?
+- Ci sono modi più veloci di usare root o va bene usare il plain C in questo modo? Conviene imparare a usare rdataframe per sfruttare multithreading implicito?
+- 
 - Come posso fare uno scan filtrando per istanza?
   - Semplicemente usa le parentesi quadre [idx]
