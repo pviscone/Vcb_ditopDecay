@@ -40,11 +40,11 @@
 > 
 > # Fix
 > 
-> - [x]  For the M plots, create another version with a wider scale on the x axis
+> - [x] For the M plots, create another version with a wider scale on the x axis
 > 
-> - [x]  Fix the ratio w jet decay (and rename it in W hadronic decay)
+> - [x] Fix the ratio w jet decay (and rename it in W hadronic decay)
 > 
-> - [x]  Make 2 kind of plots: one divinding for the particle charge (e.g. W+,W-), one dividing for the production (hadronic, leptonic)
+> - [x] Make 2 kind of plots: one divinding for the particle charge (e.g. W+,W-), one dividing for the production (hadronic, leptonic)
 > 
 > # Questions
 > 
