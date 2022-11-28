@@ -16,7 +16,7 @@
 >    
 >    - [x] Divide all in leptonic and hadronic decays
 >    
->    - [ ] fit a Breit-Wigner for each histogram (this is important to understand the magnitude of the non resonant decay)
+>    - [x] fit a Breit-Wigner for each histogram (this is important to understand the magnitude of the non resonant decay)
 > 
 > 3. - [x] Do the same plots for $\eta$ and $p_T$
 > 
@@ -36,15 +36,15 @@
 >    
 >    ##### Optional
 >    
->    - [ ] Multithreaded loop over events
+>    - [ ] Multithreaded loop over events (or implement everything using the RDataframes)
 > 
 > # Fix
 > 
-> - [ ] For the M plots, create another version with a wider scale on the x axis
+> - [x]  For the M plots, create another version with a wider scale on the x axis
 > 
-> - [ ] Fix the ratio w jet decay (and rename it in W hadronic decay)
+> - [x]  Fix the ratio w jet decay (and rename it in W hadronic decay)
 > 
-> - [ ] Make 2 kind of plots: one divinding for the particle charge (e.g. W+,W-), one dividing for the production (hadronic, leptonic)
+> - [x]  Make 2 kind of plots: one divinding for the particle charge (e.g. W+,W-), one dividing for the production (hadronic, leptonic)
 > 
 > # Questions
 > 
