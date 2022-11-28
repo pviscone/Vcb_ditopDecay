@@ -49,6 +49,7 @@
 > # Questions
 > 
 > - Why the gluon fusion production (90%) dominate over the quark production (10%)?
+>   
 >   - At the LHC energy the bjorken variable $x=\frac{|q|^2}{2p_{in}^{\mu} q_{\mu} } $ is small and for small X the gluon PDF is much higher than the quark PDF.
 >     
 >     For example, at the Tevatron, the CM energy was 1TeV  and ttbar production was mainly from valence quarks
@@ -134,6 +135,15 @@ The quark in $t \to q W^\pm$ has the opposite charge of the $W^\pm$ and $t$ has 
   tdec/cmass   1.5
   tdec/sin2cabibbo 0.051
   ```
+
+```bash
+runcmsgrid.sh:process="hvq"
+runcmsgrid_par.sh:process="hvq"
+```
+
+Manual powheg-hvq (see page 6 and 7):
+
+https://mobydick.mib.infn.it/~nason/POWHEG/HeavyQuarks/Powheg-hvq-manual-1.01.pdf
 
 ### Technical doubts
 
