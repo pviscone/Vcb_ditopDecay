@@ -49,6 +49,9 @@
 > # Questions
 > 
 > - Why the gluon fusion production (90%) dominate over the quark production (10%)?
+>   - At the LHC energy the bjorken variable $x=\frac{|q|^2}{2p_{in}^{\mu} q_{\mu} } $ is small and for small X the gluon PDF is much higher than the quark PDF.
+>     
+>     For example, at the Tevatron, the CM energy was 1TeV  and ttbar production was mainly from valence quarks
 
 ---
 
@@ -92,7 +95,45 @@ The quark in $t \to q W^\pm$ has the opposite charge of the $W^\pm$ and $t$ has 
 
 ### Observation and doubts
 
-- **The Ws decay only in ud,us,cd,cs pais. The motecarlo was generated with some strange cuts???** 
+- **The Ws decay only in ud,us,cd,cs pais. The motecarlo was generated with some strange cuts???** :
+  
+  Probably only the Cabibbo mixing is enabled.
+  
+  In TT_hdamp_NNPDF31_NNLO_ljets/poweg.input there is:
+  
+  ```fortran
+  topdecaymode 11111   ! an integer of 5 digits that are either 0, or 2, representing in 
+                       ! the order the maximum number of the following particles(antiparticles)
+                       ! in the final state: e  mu tau up charm
+                       ! For example
+                       ! 22222    All decays (up to 2 units of everything)
+                       ! 20000    both top go into b l nu (with the appropriate signs)
+                       ! 10011    one top goes into electron (or positron), the other into (any) hadrons,
+                       !          or one top goes into charm, the other into up
+                       ! 00022    Fully hadronic
+                       ! 00002    Fully hadronic with two charms
+                       ! 00011    Fully hadronic with a single charm
+                       ! 00012    Fully hadronic with at least one charm
+  
+  semileptonic 1      ! uncomment if you want to filter out only semileptonic events. For example,
+                       ! with topdecaymode 10011 and semileptonic 1 you get only events with one top going
+                       ! to an electron or positron, and the other into any hadron.
+  
+  ! Parameters for the generation of spin correlations in t tbar decays
+  tdec/wmass 80.4  ! W mass for top decay
+  tdec/wwidth 2.141
+  tdec/bmass 4.8
+  tdec/twidth  1.31 ! 1.33 using PDG LO formula
+  tdec/elbranching 0.108
+  tdec/emass 0.00051
+  tdec/mumass 0.1057
+  tdec/taumass 1.777
+  tdec/dmass   0.100
+  tdec/umass   0.100
+  tdec/smass   0.200
+  tdec/cmass   1.5
+  tdec/sin2cabibbo 0.051
+  ```
 
 ### Technical doubts
 
