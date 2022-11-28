@@ -175,11 +175,12 @@ THStack *StackHist(TH1 *hist1, TH1 *hist2, std::string title, std::string xLabel
     // Title
     TLatex TeX;
     TeX.SetTextFont(42);
+    TeX.SetTextSize(0.038);
     TeX.SetTextAlign(21);
     TeX.DrawLatexNDC(0.55, 0.97, title.c_str());
 
     // Legend
-    TLegend *legend = new TLegend(0.75, 0.51, 0.95, 0.68);
+    TLegend *legend = new TLegend(0.79, 0.52, 0.92, 0.64);
     legend->AddEntry(hist1->GetName(), hist1->GetTitle(), "f");
     legend->AddEntry(hist2->GetName(), hist2->GetTitle(), "f");
 
@@ -197,19 +198,19 @@ THStack *StackHist(TH1 *hist1, TH1 *hist2, std::string title, std::string xLabel
 
         f1->SetNpx(500);
         f1->SetLineColor(2);
-        f1->SetLineWidth(1);
+        f1->SetLineWidth(2);
 
         f2->SetNpx(500);
         f2->SetLineColor(9);
-        f2->SetLineWidth(1);
+        f2->SetLineWidth(2);
 
         f1->Draw("same");
         f2->Draw("same");
 
         std::string leg1=hist1->GetTitle();
-        leg1+="\\mbox{ BW fit}";
+        leg1+=" BW fit";
         std::string leg2 = hist2->GetTitle();
-        leg2 += "\\mbox{ BW fit}";
+        leg2 += " BW fit";
 
         legend->AddEntry("f1", leg1.c_str(), "l");
         legend->AddEntry("f2", leg2.c_str(), "l");
