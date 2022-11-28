@@ -71,26 +71,26 @@ int main() {
     int nBinsTopWide = nBinsTop*binWideMultiplier;
     int nBinsWWide = nBinsW*binWideMultiplier;
 
-    TH1F *histMTLept = new TH1F("histMTLept", "t \\to l \\nu;M_{t}\\  [GeV];Counts", nBinsTop, massTopmin, massTopmax);
-    TH1F *histMTHad = new TH1F("histMTHad", "t \\to q \\bar{q};M_{t}\\  [GeV];Counts", nBinsTop, massTopmin, massTopmax);
+    TH1F *histMTLept = new TH1F("histMTLept", "t#rightarrow l#nu;M_{t} [GeV];Counts", nBinsTop, massTopmin, massTopmax);
+    TH1F *histMTHad = new TH1F("histMTHad", "t#rightarrow q#bar{q};M_{t}  [GeV];Counts", nBinsTop, massTopmin, massTopmax);
 
-    TH1F *histMT = new TH1F("histMT", "t;M_{t} \\ [GeV]; Counts", nBinsTop, massTopmin, massTopmax);
-    TH1F *histMTBar = new TH1F("histMTBar", "\\bar{t}; M_{\\bar{t}} \\ [GeV];Counts", nBinsTop, massTopmin, massTopmax);
+    TH1F *histMT = new TH1F("histMT", "t;M_{t} [GeV]; Counts", nBinsTop, massTopmin, massTopmax);
+    TH1F *histMTBar = new TH1F("histMTBar", "#bar{t}; M_{#bar{t}} [GeV];Counts", nBinsTop, massTopmin, massTopmax);
 
-    TH1F *histMTLeptWide = new TH1F("histMTLeptWide", "t \\to l \\nu;M_{t}\\  [GeV];Counts", nBinsTopWide, massTopminWide, massTopmaxWide);
-    TH1F *histMTHadWide = new TH1F("histMTHadWide", "t \\to q \\bar{q};M_{t}\\  [GeV];Counts", nBinsTopWide, massTopminWide, massTopmaxWide);
+    TH1F *histMTLeptWide = new TH1F("histMTLeptWide", "t#rightarrow l#nu;M_{t}  [GeV];Counts", nBinsTopWide, massTopminWide, massTopmaxWide);
+    TH1F *histMTHadWide = new TH1F("histMTHadWide", "t#rightarrow q#bar{q};M_{t}  [GeV];Counts", nBinsTopWide, massTopminWide, massTopmaxWide);
 
-    TH1F *histMTWide = new TH1F("histMTWide", "t;M_{t} \\ [GeV]; Counts", nBinsTopWide, massTopminWide, massTopmaxWide);
-    TH1F *histMTBarWide = new TH1F("histMTBarWide", "\\bar{t}; M_{\\bar{t}} \\ [GeV];Counts", nBinsTopWide, massTopminWide, massTopmaxWide);
+    TH1F *histMTWide = new TH1F("histMTWide", "t;M_{t} [GeV]; Counts", nBinsTopWide, massTopminWide, massTopmaxWide);
+    TH1F *histMTBarWide = new TH1F("histMTBarWide", "#bar{t}; M_{#bar{t}} [GeV];Counts", nBinsTopWide, massTopminWide, massTopmaxWide);
 
-    TH1F *histMWLept = new TH1F("histMWLept", "W \\to l \\nu;M_{W} [GeV];Counts", nBinsW, massWmin, massWmax);
-    TH1F *histMWHad = new TH1F("histMWHad", "W \\to q \\bar{q};M_{W} [GeV];Counts", nBinsW, massWmin, massWmax);
+    TH1F *histMWLept = new TH1F("histMWLept", "W#rightarrow l#nu;M_{W} [GeV];Counts", nBinsW, massWmin, massWmax);
+    TH1F *histMWHad = new TH1F("histMWHad", "W#rightarrow q#bar{q};M_{W} [GeV];Counts", nBinsW, massWmin, massWmax);
 
     TH1F *histMWPlus = new TH1F("histMWPlus", "W^{+};M_{W^{+}} [GeV];Counts", nBinsW, massWmin, massWmax);
     TH1F *histMWMinus = new TH1F("histMWMinus", "W^{-}; M_{W^{-}} [GeV];Counts", nBinsW, massWmin, massWmax);
 
-    TH1F *histMWLeptWide = new TH1F("histMWLeptWide", "W \\to l \\nu;M_{W} [GeV];Counts", nBinsWWide, massWminWide, massWmaxWide);
-    TH1F *histMWHadWide = new TH1F("histMWHadWide", "W \\to q \\bar{q};M_{W} [GeV];Counts", nBinsWWide, massWminWide, massWmaxWide);
+    TH1F *histMWLeptWide = new TH1F("histMWLeptWide", "W#rightarrow l#nu;M_{W} [GeV];Counts", nBinsWWide, massWminWide, massWmaxWide);
+    TH1F *histMWHadWide = new TH1F("histMWHadWide", "W#rightarrow q#bar{q};M_{W} [GeV];Counts", nBinsWWide, massWminWide, massWmaxWide);
 
     TH1F *histMWPlusWide = new TH1F("histMWPlusWide", "W^{+};M_{W^{+}} [GeV];Counts", nBinsWWide, massWminWide, massWmaxWide);
     TH1F *histMWMinusWide = new TH1F("histMWMinusWide", "W^{-}; M_{W^{-}} [GeV];Counts", nBinsWWide, massWminWide, massWmaxWide);
@@ -100,14 +100,14 @@ int main() {
     double ptMax=500;
     int nBinsPt=60;
 
-    TH1F *histPtTLept = new TH1F("histPtTLept", "t \\to l \\nu;p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax);
-    TH1F *histPtTHad = new TH1F("histPtTHad", "t \\to q \\bar{q};p_{t} [GeV];Counts",nBinsPt, ptMin, ptMax);
+    TH1F *histPtTLept = new TH1F("histPtTLept", "t#rightarrow l#nu;p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax);
+    TH1F *histPtTHad = new TH1F("histPtTHad", "t#rightarrow q#bar{q};p_{t} [GeV];Counts",nBinsPt, ptMin, ptMax);
 
     TH1F *histPtT = new TH1F("histPtT", "t; p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax);
-    TH1F *histPtTBar = new TH1F("histPtTBar", "\\bar{t} ;p_{\\bar{t}} [GeV];Counts", nBinsPt, ptMin, ptMax);
+    TH1F *histPtTBar = new TH1F("histPtTBar", "#bar{t} ;p_{#bar{t}} [GeV];Counts", nBinsPt, ptMin, ptMax);
 
-    TH1F *histPtWLept = new TH1F("histPtWLept", "W \\to l \\nu;p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax);
-    TH1F *histPtWHad = new TH1F("histPtWHad", "W \\to q \\bar{q};p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax);
+    TH1F *histPtWLept = new TH1F("histPtWLept", "W#rightarrow l#nu;p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax);
+    TH1F *histPtWHad = new TH1F("histPtWHad", "W#rightarrow q#bar{q};p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax);
 
     TH1F *histPtWPlus = new TH1F("histPtWPlus", "W^{+};p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax);
     TH1F *histPtWMinus = new TH1F("histPtWMinus", "W^{-};p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax);
@@ -117,17 +117,17 @@ int main() {
     double etaMax=6;
     int nBinsEta=50;
 
-    TH1F *histEtaTLept = new TH1F("histEtaTLept", "t \\to l \\nu;\\eta;Counts", nBinsEta, etaMin, etaMax);
-    TH1F *histEtaTHad = new TH1F("histEtaTHad", "t \\to q \\bar{q};\\eta;Counts", nBinsEta, etaMin, etaMax);
+    TH1F *histEtaTLept = new TH1F("histEtaTLept", "t#rightarrow l#nu;#eta;Counts", nBinsEta, etaMin, etaMax);
+    TH1F *histEtaTHad = new TH1F("histEtaTHad", "t#rightarrow q#bar{q};#eta;Counts", nBinsEta, etaMin, etaMax);
 
-    TH1F *histEtaT = new TH1F("histEtaT", "t;\\eta;Counts", nBinsEta, etaMin, etaMax);
-    TH1F *histEtaTBar= new TH1F("histEtaTBar", "\\bar{t};\\eta;Counts", nBinsEta, etaMin, etaMax);
+    TH1F *histEtaT = new TH1F("histEtaT", "t;#eta;Counts", nBinsEta, etaMin, etaMax);
+    TH1F *histEtaTBar= new TH1F("histEtaTBar", "#bar{t};#eta;Counts", nBinsEta, etaMin, etaMax);
 
-    TH1F *histEtaWLept = new TH1F("histEtaWLept", "W \\to l \\nu;\\eta;Counts", nBinsEta, etaMin, etaMax);
-    TH1F *histEtaWHad = new TH1F("histEtaWHad", "W \\to q \\bar{q};\\eta;Counts", nBinsEta, etaMin, etaMax);
+    TH1F *histEtaWLept = new TH1F("histEtaWLept", "W#rightarrow l#nu;#eta;Counts", nBinsEta, etaMin, etaMax);
+    TH1F *histEtaWHad = new TH1F("histEtaWHad", "W#rightarrow q#bar{q};#eta;Counts", nBinsEta, etaMin, etaMax);
 
-    TH1F *histEtaWPlus = new TH1F("histEtaWPlus", "W^{+};\\eta;Counts", nBinsEta, etaMin, etaMax);
-    TH1F *histEtaWMinus = new TH1F("histEtaWMinus", "W^{-};\\eta;Counts", nBinsEta, etaMin, etaMax);
+    TH1F *histEtaWPlus = new TH1F("histEtaWPlus", "W^{+};#eta;Counts", nBinsEta, etaMin, etaMax);
+    TH1F *histEtaWMinus = new TH1F("histEtaWMinus", "W^{-};#eta;Counts", nBinsEta, etaMin, etaMax);
 
     //----------------------------W hadronic decays----------------------------------//
 
@@ -286,26 +286,26 @@ int main() {
 
     //-------------------------------------------------------------------------------------------------------
     //                                      Draw the histograms
-    StackHist(histMT, histMTBar, "M_{t}\\: / \\: M_{\\bar{t}}", "M_{t}  [GeV]", "./images/mass/Mttbar.png",true);
-    StackHist(histMTHad, histMTLept, "M_{t \\to q \\bar{q}}\\: / \\: M_{t \\to l \\nu}}", "M_{t} [GeV]", "./images/mass/MtLeptHad.png",true);
-    StackHist(histMWPlus, histMWMinus, "M_{W^{+}}\\: / \\: M_{W^{-}}", "M_{W} [GeV]", "./images/mass/MWPlusMinus.png",true);
-    StackHist(histMWHad, histMWLept, "M_{W \\to q \\bar{q}}\\: / \\: M_{W \\to l \\nu}}", "M_{W} [GeV]", "./images/mass/MWLeptHad.png",true);
+    StackHist(histMT, histMTBar, "M_{t}/ M_{#bar{t}}", "M_{t}  [GeV]", "./images/mass/Mttbar.png",true);
+    StackHist(histMTHad, histMTLept, "M_{t#rightarrow q#bar{q}}/ M_{t#rightarrow l#nu}", "M_{t} [GeV]", "./images/mass/MtLeptHad.png",true);
+    StackHist(histMWPlus, histMWMinus, "M_{W^{+}}/ M_{W^{-}}", "M_{W} [GeV]", "./images/mass/MWPlusMinus.png",true);
+    StackHist(histMWHad, histMWLept, "M_{W#rightarrow q#bar{q} }/ M_{W#rightarrow l#nu}", "M_{W} [GeV]", "./images/mass/MWLeptHad.png",true);
 
-    StackHist(histMTWide, histMTBarWide, "M_{t}\\: / \\: M_{\\bar{t}}", "M_{t}  [GeV]", "./images/mass/MttbarWide.png");
-    StackHist(histMTHadWide, histMTLeptWide, "M_{t \\to q \\bar{q}}\\: / \\: M_{t \\to l \\nu}", "M_{t} [GeV]", "./images/mass/MtLeptHadWide.png");
-    StackHist(histMWPlusWide, histMWMinusWide, "M_{W^{+}}\\: / \\: M_{W^{-}}", "M_{W} [GeV]", "./images/mass/MWPlusMinusWide.png");
-    StackHist(histMWHadWide, histMWLeptWide, "M_{W \\to q \\bar{q}}\\: / \\: M_{W \\to l \\nu}}", "M_{W} [GeV]", "./images/mass/MWLeptHadWide.png");
+    StackHist(histMTWide, histMTBarWide, "M_{t}/ M_{#bar{t}}", "M_{t}  [GeV]", "./images/mass/MttbarWide.png");
+    StackHist(histMTHadWide, histMTLeptWide, "M_{t#rightarrow q#bar{q}}/ M_{t#rightarrow l#nu}", "M_{t} [GeV]", "./images/mass/MtLeptHadWide.png");
+    StackHist(histMWPlusWide, histMWMinusWide, "M_{W^{+}}/ M_{W^{-}}", "M_{W} [GeV]", "./images/mass/MWPlusMinusWide.png");
+    StackHist(histMWHadWide, histMWLeptWide, "M_{W#rightarrow q#bar{q}}/ M_{W#rightarrow l#nu}", "M_{W} [GeV]", "./images/mass/MWLeptHadWide.png");
 
-    StackHist(histEtaT, histEtaTBar, "\\eta_{t}\\: / \\: \\eta_{\\bar{t}}", "\\eta_{t}", "./images/eta/EtaTTbar.png");
-    StackHist(histEtaTHad, histEtaTLept, "\\eta_{t \\to q \\bar{q}}\\: / \\: \\eta_{t \\to l \\nu}}", "\\eta_{t}", "./images/eta/EtaTLeptHad.png");
-    StackHist(histEtaWPlus, histEtaWMinus, "\\eta_{W^{+}}\\: / \\: \\eta_{W^{-}}", "\\eta_{W}", "./images/eta/EtaWPlusMinux.png");
-    StackHist(histEtaWHad, histEtaWLept, "\\eta_{W \\to q \\bar{q}}\\: / \\: \\eta_{W \\to l \\nu}}", "\\eta_{W}", "./images/eta/EtaWLeptHad.png");
+    StackHist(histEtaT, histEtaTBar, "#eta_{t}/#eta_{#bar{t}}", "#eta_{t}", "./images/eta/EtaTTbar.png");
+    StackHist(histEtaTHad, histEtaTLept, "#eta_{t#rightarrow q#bar{q}} / #eta_{t#rightarrow l#nu}", "#eta_{t}", "./images/eta/EtaTLeptHad.png");
+    StackHist(histEtaWPlus, histEtaWMinus, "#eta_{W^{+}}/#eta_{W^{-}}", "#eta_{W}", "./images/eta/EtaWPlusMinux.png");
+    StackHist(histEtaWHad, histEtaWLept, "#eta_{W#rightarrow q#bar{q}}/#eta_{W#rightarrow l#nu}", "#eta_{W}", "./images/eta/EtaWLeptHad.png");
 
 
-    StackHist(histPtT, histPtTBar, "p_{t}(t)\\: / \\: p_{t}(\\bar{t})", "p_{t} [GeV]", "./images/pt/PtTTBar.png");
-    StackHist(histPtTHad, histPtTLept, "p_{t}(t \\to q \\bar{q}) \\: / \\:  p_{t}(t \\to l \\nu)", "p_{t} [GeV]", "./images/pt/PtTLeptHad.png");
-    StackHist(histPtWPlus, histPtWMinus, "p_{t}(W^{+}) \\: / \\: p_{t}(W^{-})", "p_{t} [GeV]", "./images/pt/PtWPlusMinus.png");
-    StackHist(histPtWHad, histPtWLept, "p_{t}(W \\to q \\bar{q}) \\: / \\:  p_{t}(W \\to l \\nu)", "p_{t} [GeV]", "./images/pt/PtWLeptHad.png");
+    StackHist(histPtT, histPtTBar, "p_{t}(t)/p_{t}(#bar{t})", "p_{t} [GeV]", "./images/pt/PtTTBar.png");
+    StackHist(histPtTHad, histPtTLept, "p_{t}(t#rightarrow q#bar{q})/p_{t}(t#rightarrow l#nu)", "p_{t} [GeV]", "./images/pt/PtTLeptHad.png");
+    StackHist(histPtWPlus, histPtWMinus, "p_{t}(W^{+})/p_{t}(W^{-})", "p_{t} [GeV]", "./images/pt/PtWPlusMinus.png");
+    StackHist(histPtWHad, histPtWLept, "p_{t}(W#rightarrow q#bar{q})/p_{t}(W#rightarrow l#nu)", "p_{t} [GeV]", "./images/pt/PtWLeptHad.png");
 
 
     StackHist(histWPlusJetDecay, histWMinusJetDecay, "W hadronic Decays", "W qq Decay", "./images/WHadronicDecay.png");
