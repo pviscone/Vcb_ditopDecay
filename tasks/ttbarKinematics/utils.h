@@ -9,6 +9,7 @@
 #include <TTree.h>
 #include <iostream>
 #include <TAxis.h>
+#include <TF1.h>
 
 using namespace ROOT::Math;
 
@@ -113,20 +114,25 @@ PtEtaPhiMVector getLorentzVector(TTree *tree, int instance) {
  * @param savePath Path/filename.png where the plot will be saved
  * @return THStack* Return the THStack object
  */
-THStack *StackHist(TH1 *hist1, TH1 *hist2, std::string title, std::string xLabel, std::string savePath) {
+THStack *StackHist(TH1 *hist1, TH1 *hist2, std::string title, std::string xLabel, std::string savePath,bool fit = false) {
     // gStyle->SetPalette(70);
 
     // Set the colors,size and the stat options
     gStyle->SetOptStat(00011111);
-    hist1->SetFillColorAlpha(9, 0.15);
-    hist1->SetLineColor(9);
-    hist1->SetMarkerColor(1);
-    hist1->SetMarkerSize(0.3);
 
-    hist2->SetFillColorAlpha(2, 0.2);
-    hist2->SetLineColor(2);
+    int hist1Color = 798;
+    int hist2Color = 920;
+
+    hist1->SetFillColorAlpha(hist1Color, 1);
+    hist1->SetLineColor(hist1Color);
+    hist1->SetMarkerColor(1);
+    hist1->SetMarkerSize(0.);
+
+    hist2->SetFillColorAlpha(hist2Color, 0.3);
+    hist2->SetLineColor(1);
+    hist2->SetLineWidth(1);
     hist2->SetMarkerColor(1);
-    hist2->SetMarkerSize(0.3);
+    hist2->SetMarkerSize(0.5);
 
     // Create the stack
     THStack *hs = new THStack("hs", title.c_str());
@@ -134,7 +140,7 @@ THStack *StackHist(TH1 *hist1, TH1 *hist2, std::string title, std::string xLabel
     TCanvas *c = new TCanvas("cName", "cName", 50, 50, 800, 700);
 
     // Create 2 pads
-    TPad *p1 = new TPad("pad1", "pad1", 0, 0.3, 0.95, 1.0);
+    TPad *p1 = new TPad("pad1", "pad1", 0, 0.3, 0.95, 0.98);
     TPad *p2 = new TPad("pad2", "pad2", 0, 0.05, 0.95, 0.3);
     p1->Draw();
     p2->Draw();
@@ -151,7 +157,7 @@ THStack *StackHist(TH1 *hist1, TH1 *hist2, std::string title, std::string xLabel
     hs->Add(hist1, "sames");
     hs->Add(hist2, "sames");
 
-    hs->Draw("nostack E1 HIST");
+    hs->Draw("nostack HIST");
     gPad->Update();
 
     // Thing to avoid the overlap on the first label
@@ -170,12 +176,46 @@ THStack *StackHist(TH1 *hist1, TH1 *hist2, std::string title, std::string xLabel
     TLatex TeX;
     TeX.SetTextFont(42);
     TeX.SetTextAlign(21);
-    TeX.DrawLatexNDC(0.55, 0.96, title.c_str());
+    TeX.DrawLatexNDC(0.55, 0.97, title.c_str());
 
     // Legend
-    TLegend *legend = new TLegend(0.75, 0.51, 0.95, 0.63);
+    TLegend *legend = new TLegend(0.75, 0.51, 0.95, 0.68);
     legend->AddEntry(hist1->GetName(), hist1->GetTitle(), "f");
     legend->AddEntry(hist2->GetName(), hist2->GetTitle(), "f");
+
+    // FIT
+    if(fit){
+        p1->cd();
+        TF1 *f1 = new TF1("f1", "breitwigner", hist1->GetXaxis()->GetXmin(), hist1->GetXaxis()->GetXmax());
+        TF1 *f2 = new TF1("f2", "breitwigner", hist2->GetXaxis()->GetXmin(), hist2->GetXaxis()->GetXmax());
+
+        f1->SetParameters(hist1->GetMaximum(), hist1->GetMean(), hist1->GetRMS());
+        f2->SetParameters(hist2->GetMaximum(), hist2->GetMean(), hist2->GetRMS());
+
+        hist1->Fit("f1","L 0");
+        hist2->Fit("f2","L 0");
+
+        f1->SetNpx(500);
+        f1->SetLineColor(2);
+        f1->SetLineWidth(1);
+
+        f2->SetNpx(500);
+        f2->SetLineColor(9);
+        f2->SetLineWidth(1);
+
+        f1->Draw("same");
+        f2->Draw("same");
+
+        std::string leg1=hist1->GetTitle();
+        leg1+="\\mbox{ BW fit}";
+        std::string leg2 = hist2->GetTitle();
+        leg2 += "\\mbox{ BW fit}";
+
+        legend->AddEntry("f1", leg1.c_str(), "l");
+        legend->AddEntry("f2", leg2.c_str(), "l");
+    }
+
+
     legend->SetBorderSize(0);
     legend->Draw();
 
@@ -185,12 +225,16 @@ THStack *StackHist(TH1 *hist1, TH1 *hist2, std::string title, std::string xLabel
     TPaveStats *st2 = (TPaveStats *)hist2->GetListOfFunctions()->FindObject("stats");
     st1->SetX1NDC(.75);
     st1->SetX2NDC(0.95);
-    st1->SetY1NDC(.8);
+    st1->SetY1NDC(.7);
     st1->SetY2NDC(.92);
-    st2->SetX1NDC(.75);
-    st2->SetX2NDC(.95);
-    st2->SetY1NDC(.66);
-    st2->SetY2NDC(.78);
+    st2->SetX1NDC(.53);
+    st2->SetX2NDC(.73);
+    st2->SetY1NDC(.7);
+    st2->SetY2NDC(.92);
+
+    st1->SetLineColor(hist1Color);
+    st2->SetLineColor(hist2Color);
+
     c->Modified();
 
     // Ratio plot
@@ -210,7 +254,7 @@ THStack *StackHist(TH1 *hist1, TH1 *hist2, std::string title, std::string xLabel
     gPad->Update();
 
     // Y axis ratio plot settings
-    hist3->GetYaxis()->SetRangeUser(-1, 3);
+    hist3->GetYaxis()->SetRangeUser(-1.2, 3.2);
     hist3->GetYaxis()->SetTitle("Ratio");
     hist3->GetYaxis()->SetNdivisions(505);
     hist3->GetYaxis()->SetTitleSize(20);
