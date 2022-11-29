@@ -33,7 +33,7 @@ int main() {
 
     //-------------------------------------------------------------------------------------------------------
     //                                 File,tree and branches status
-    TFile *file = new TFile("ttbar.root");
+    TFile *file = new TFile("./2711494D-ED0F-7846-B32F-78D8B8A9F125.root");
     TTree *tree = (TTree *)file->Get("Events");
 
     tree->SetBranchStatus("*", 0);
@@ -171,8 +171,8 @@ int main() {
     std::vector<int> indexFromWPlus(2);
     std::vector<int> indexFromWMinus(2);
     //The particles in the 3rd instance comes always from the top, the 4rth from the antitop
-    int indexQFromT = 3;
-    int indexQBarFromTBar = 4;
+    int indexQFromT = 2;
+    int indexQBarFromTBar = 5;
 
     PtEtaPhiMVector lorentzVectorWPlus;
     PtEtaPhiMVector lorentzVectorWMinus;
@@ -184,7 +184,7 @@ int main() {
     PtEtaPhiMVector lorentzVectorTBar;
 
 
-    //NofEvents=1000;
+    //NofEvents=6000;
     //-------------------------------------------------------------------------------------------------------
     //                                       Loop over the events
     for (int eventNumber = 0; eventNumber < NofEvents; eventNumber++) {
@@ -192,7 +192,7 @@ int main() {
 
         // The charge of the 5th particle is in agreement with the charge of the W that produced it
         // The 5th and 6th particles are always produced together (same for the 7th and 8th)
-        int pdgId5 = (tree->GetLeaf("LHEPart_pdgId"))->GetValue(5);
+/*         int pdgId5 = (tree->GetLeaf("LHEPart_pdgId"))->GetValue(5);
         if (particle(pdgId5)->Charge() > 0.) {
             indexFromWPlus[0] = 5;
             indexFromWPlus[1] = 6;
@@ -203,7 +203,11 @@ int main() {
             indexFromWPlus[1] = 8;
             indexFromWMinus[0] = 5;
             indexFromWMinus[1] = 6;
-        }
+        } */
+        indexFromWPlus[0] = 3   ;
+        indexFromWPlus[1] = 4   ;
+        indexFromWMinus[0] = 6  ;
+        indexFromWMinus[1] = 7  ;
 
         lorentzVectorWPlus = getLorentzVector(tree, indexFromWPlus[0]) + getLorentzVector(tree, indexFromWPlus[1]);
         lorentzVectorWMinus = getLorentzVector(tree, indexFromWMinus[0]) + getLorentzVector(tree, indexFromWMinus[1]);
@@ -224,7 +228,6 @@ int main() {
             std::string quark2 = pdg(tree->GetLeaf("LHEPart_pdgId")->GetValue(indexFromWPlus[1]));
             jetCouple.push_back(quark1[0]);
             jetCouple.push_back(quark2[0]);
-
             histWPlusJetDecay->Fill(jetCoupleDictionary[jetCouple]);
 
         } else {
@@ -308,7 +311,7 @@ int main() {
     StackHist(histPtWHad, histPtWLept, "p_{t}(W#rightarrow q#bar{q})/p_{t}(W#rightarrow l#nu)", "p_{t} [GeV]", "./images/pt/PtWLeptHad.png");
 
 
-    StackHist(histWPlusJetDecay, histWMinusJetDecay, "W hadronic Decays", "W qq Decay", "./images/WHadronicDecay.png");
+    StackHist(histWPlusJetDecay, histWMinusJetDecay, "W hadronic Decays", "W qq Decay", "./images/WHadronicDecay.png",false, true);
 
     //-------------------------------------------------------------------------------------------------------
     //                                      DONE

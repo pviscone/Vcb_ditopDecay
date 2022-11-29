@@ -114,7 +114,7 @@ PtEtaPhiMVector getLorentzVector(TTree *tree, int instance) {
  * @param savePath Path/filename.png where the plot will be saved
  * @return THStack* Return the THStack object
  */
-THStack *StackHist(TH1 *hist1, TH1 *hist2, std::string title, std::string xLabel, std::string savePath,bool fit = false) {
+THStack *StackHist(TH1 *hist1, TH1 *hist2, std::string title, std::string xLabel, std::string savePath,bool fit = false, bool log = false) {
     // gStyle->SetPalette(70);
 
     // Set the colors,size and the stat options
@@ -144,6 +144,7 @@ THStack *StackHist(TH1 *hist1, TH1 *hist2, std::string title, std::string xLabel
     TPad *p2 = new TPad("pad2", "pad2", 0, 0.05, 0.95, 0.3);
     p1->Draw();
     p2->Draw();
+
 
     // First pad: THStack
     p1->cd();
@@ -283,6 +284,11 @@ THStack *StackHist(TH1 *hist1, TH1 *hist2, std::string title, std::string xLabel
     int iPos = 11;
     float iPeriod = 0;
     CMS_lumi(c, iPeriod, iPos);
+
+    if (log) {
+        hist1->GetYaxis()->SetRangeUser(0.1, 1.15 * std::max(hist1->GetMaximum(), hist2->GetMaximum()));
+        p1->SetLogy();
+    }
 
     // Save and return
     c->Update();
