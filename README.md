@@ -30,3 +30,4 @@
 # TODO:
 
 - Find a way to define a env variable that refers to the workspace folder. In this way you don't have to change all the includes if you move a macro
+- Add the images to git LFS
