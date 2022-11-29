@@ -10,10 +10,10 @@
 #include <TROOT.h>
 #include <TTree.h>
 
-#include "../../utils/CMSStyle/CMS_lumi.h"
-#include "../../utils/CMSStyle/tdrstyle.C"
-#include "../../utils/CMSStyle/CMS_lumi.C"
-#include "utils.h"
+#include "../../../utils/CMSStyle/CMS_lumi.h"
+#include "../../../utils/CMSStyle/tdrstyle.C"
+#include "../../../utils/CMSStyle/CMS_lumi.C"
+#include "../utils.h"
 
 using namespace ROOT::Math;
 
@@ -23,9 +23,9 @@ int main() {
     //-------------------------------------------------------------------------------------------------------
     //                                 set the tdr style (from CMS TWIKI)
     ROOT::EnableImplicitMT();
-    gROOT->LoadMacro("../../utils/CMSStyle/tdrstyle.C");
+    gROOT->LoadMacro("../../../utils/CMSStyle/tdrstyle.C");
     setTDRStyle();
-    gROOT->LoadMacro("../../utils/CMSStyle/CMS_lumi.C");
+    gROOT->LoadMacro("../../../utils/CMSStyle/CMS_lumi.C");
     TH1::SetDefaultSumw2();
 
     //Draw "Preliminary"
@@ -33,7 +33,7 @@ int main() {
 
     //-------------------------------------------------------------------------------------------------------
     //                                 File,tree and branches status
-    TFile *file = new TFile("./2711494D-ED0F-7846-B32F-78D8B8A9F125.root");
+    TFile *file = new TFile("./0BCB1429-8B19-3245-92C4-68B3DD50AC78.root");
     TTree *tree = (TTree *)file->Get("Events");
 
     tree->SetBranchStatus("*", 0);
@@ -190,20 +190,6 @@ int main() {
     for (int eventNumber = 0; eventNumber < NofEvents; eventNumber++) {
         tree->GetEntry(eventNumber);
 
-        // The charge of the 5th particle is in agreement with the charge of the W that produced it
-        // The 5th and 6th particles are always produced together (same for the 7th and 8th)
-/*         int pdgId5 = (tree->GetLeaf("LHEPart_pdgId"))->GetValue(5);
-        if (particle(pdgId5)->Charge() > 0.) {
-            indexFromWPlus[0] = 5;
-            indexFromWPlus[1] = 6;
-            indexFromWMinus[0] = 7;
-            indexFromWMinus[1] = 8;
-        } else {
-            indexFromWPlus[0] = 7;
-            indexFromWPlus[1] = 8;
-            indexFromWMinus[0] = 5;
-            indexFromWMinus[1] = 6;
-        } */
         indexFromWPlus[0] = 3   ;
         indexFromWPlus[1] = 4   ;
         indexFromWMinus[0] = 6  ;
