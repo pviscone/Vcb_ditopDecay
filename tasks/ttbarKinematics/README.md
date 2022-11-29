@@ -38,7 +38,7 @@
 >    
 >    - [ ] Multithreaded loop over events (or implement everything using the RDataframes)
 > 
-> # Fix
+> ## Fix
 > 
 > - [x] For the M plots, create another version with a wider scale on the x axis
 > 
@@ -56,7 +56,7 @@
 
 ---
 
-### Info
+# Info
 
 - Object dictionary: [Documentation for mc94X_NANO.root](https://cms-nanoaod-integration.web.cern.ch/integration/master/mc94X_doc.html)
   
@@ -94,50 +94,50 @@ There are 9 particles (the 6th(5) and the 7th(6) are produced by the same W. The
 
 The quark in $t \to q W^\pm$ has the opposite charge of the $W^\pm$ and $t$ has the same charge of the $W$ ( so $t \to q_{-}W^+$  or $\bar{t} \to \bar{q}_{+}W^-$ )
 
-### Observation and doubts
+# Observation and doubts
 
-- **The Ws decay only in ud,us,cd,cs pais. The motecarlo was generated with some strange cuts???** :
-  
-  Probably only the Cabibbo mixing is enabled.
-  
-  In TT_hdamp_NNPDF31_NNLO_ljets/poweg.input there is:
-  
-  ```fortran
-  topdecaymode 11111   ! an integer of 5 digits that are either 0, or 2, representing in 
-                       ! the order the maximum number of the following particles(antiparticles)
-                       ! in the final state: e  mu tau up charm
-                       ! For example
-                       ! 22222    All decays (up to 2 units of everything)
-                       ! 20000    both top go into b l nu (with the appropriate signs)
-                       ! 10011    one top goes into electron (or positron), the other into (any) hadrons,
-                       !          or one top goes into charm, the other into up
-                       ! 00022    Fully hadronic
-                       ! 00002    Fully hadronic with two charms
-                       ! 00011    Fully hadronic with a single charm
-                       ! 00012    Fully hadronic with at least one charm
-  
-  semileptonic 1      ! uncomment if you want to filter out only semileptonic events. For example,
-                       ! with topdecaymode 10011 and semileptonic 1 you get only events with one top going
-                       ! to an electron or positron, and the other into any hadron.
-  
-  ! Parameters for the generation of spin correlations in t tbar decays
-  tdec/wmass 80.4  ! W mass for top decay
-  tdec/wwidth 2.141
-  tdec/bmass 4.8
-  tdec/twidth  1.31 ! 1.33 using PDG LO formula
-  tdec/elbranching 0.108
-  tdec/emass 0.00051
-  tdec/mumass 0.1057
-  tdec/taumass 1.777
-  tdec/dmass   0.100
-  tdec/umass   0.100
-  tdec/smass   0.200
-  tdec/cmass   1.5
-  tdec/sin2cabibbo 0.051
-  ```
+### The Ws decay only in ud,us,cd,cs pais. The motecarlo was generated with some strange cuts???:
+
+Probably only the Cabibbo mixing is enabled.
+
+In [TT_hdamp_NNPDF31_NNLO_ljets/poweg.input](TT_hdamp_NNPDF31_NNLO_ljets/poweg.input) there is:
+
+```fortran
+topdecaymode 11111   ! an integer of 5 digits that are either 0, or 2, representing in 
+                     ! the order the maximum number of the following particles(antiparticles)
+                     ! in the final state: e  mu tau up charm
+                     ! For example
+                     ! 22222    All decays (up to 2 units of everything)
+                     ! 20000    both top go into b l nu (with the appropriate signs)
+                     ! 10011    one top goes into electron (or positron), the other into (any) hadrons,
+                     !          or one top goes into charm, the other into up
+                     ! 00022    Fully hadronic
+                     ! 00002    Fully hadronic with two charms
+                     ! 00011    Fully hadronic with a single charm
+                     ! 00012    Fully hadronic with at least one charm
+
+semileptonic 1      ! uncomment if you want to filter out only semileptonic events. For example,
+                     ! with topdecaymode 10011 and semileptonic 1 you get only events with one top going
+                     ! to an electron or positron, and the other into any hadron.
+
+! Parameters for the generation of spin correlations in t tbar decays
+tdec/wmass 80.4  ! W mass for top decay
+tdec/wwidth 2.141
+tdec/bmass 4.8
+tdec/twidth  1.31 ! 1.33 using PDG LO formula
+tdec/elbranching 0.108
+tdec/emass 0.00051
+tdec/mumass 0.1057
+tdec/taumass 1.777
+tdec/dmass   0.100
+tdec/umass   0.100
+tdec/smass   0.200
+tdec/cmass   1.5
+tdec/sin2cabibbo 0.051
+```
 
 ```bash
-runcmsgrid.sh:process="hvq"
+runcmsgrid.sh:process="hvq" #heavy quark pair production
 runcmsgrid_par.sh:process="hvq"
 ```
 
@@ -145,9 +145,36 @@ Manual powheg-hvq (see page 6 and 7):
 
 https://mobydick.mib.infn.it/~nason/POWHEG/HeavyQuarks/Powheg-hvq-manual-1.01.pdf
 
-### Technical doubts
+In the code of the generator there is ( [POWHEG/ttdec.f at 47e17e62203a1313961e7a54d45738470344875b · alisw/POWHEG · GitHub](https://github.com/alisw/POWHEG/blob/47e17e62203a1313961e7a54d45738470344875b/hvq/ttdec.f) ) (845)
+
+```fortran
+c pdg id's of 1st and 2nd W+ decay products for e,mu,tau,up and charm decays (ignoring CKM)
+      data ((iwp(j,k),k=1,2),j=1,5)/-11,12, -13,14, -15,16, -1,2, -3,4/
+      save ini,probs,iwp,mass,sin2cabibbo,semileptonic
+```
+
+---
+
+POWHEG-BOX has a lot of generators ( [Homepage of the POWHEG BOX](https://powhegbox.mib.infn.it/#NLOps) ) (the source code can be downloaded with the following command):
+
+```bash
+svn checkout --username anonymous --password anonymous svn://powhegbox.mib.infn.it/trunk/POWHEG-BOX
+```
+
+In some of these generators, e.g. powheg-st (single top), the CKM mixing is enabled ( https://virgilio.mib.infn.it/~re/POWHEG/st/POWHEG-st/st_manual_v1.0.ps.gz ) 
+
+---
+
+In the file [powhegCKM.txt](powhegCKM.txt) I have exported the output of 
+
+```bash
+grep -Ri "CKM" . #(folder repo of powheg-box)
+```
+
+Looking at the output you can easily understand which generator exploit the ckm mixing.
+
+# Technical doubts
 
 - Ci sono modi più veloci di usare root o va bene usare il plain C in questo modo? Conviene imparare a usare rdataframe per sfruttare multithreading implicito?
-- 
 - Come posso fare uno scan filtrando per istanza?
-  - Semplicemente usa le parentesi quadre [idx]
+  - Semplicemente usa le parentesi quadre [idx] 
