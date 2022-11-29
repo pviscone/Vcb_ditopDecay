@@ -50,3 +50,9 @@
 - Additional partons (up to 3)
 
 # Observation and doubts
+
+- The branching ratio for $W \to ub$ on all hadronic W decays from tt is:
+  
+  $ \frac{|V_{ub}|^2}{|V_{ud}|^2+|V_{us}|^2+|V_{ub}|^2+|V_{cd}|^2+|V_{cs}|^2+|V_{cb}|^2   } \simeq 5.3 \cdot 10^{-6}$ 
+  
+  The tops are excluded for mass constraint
