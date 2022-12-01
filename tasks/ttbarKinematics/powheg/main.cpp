@@ -13,7 +13,7 @@
 #include "../../../utils/CMSStyle/CMS_lumi.h"
 #include "../../../utils/CMSStyle/tdrstyle.C"
 #include "../../../utils/CMSStyle/CMS_lumi.C"
-#include "../utils.h"
+#include "utils.h"
 
 using namespace ROOT::Math;
 
