@@ -1,5 +1,5 @@
 *.root
-*.png
-*.jpg
-*.jpeg
-*.gif
+tasks/**.png
+tasks/**.jpg
+tasks/**.jpeg
+tasks**.gif
