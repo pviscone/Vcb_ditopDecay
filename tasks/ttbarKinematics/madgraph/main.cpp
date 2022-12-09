@@ -118,7 +118,7 @@ int main() {
                        "LHEPart_pdgId"});
 
     // If you want to run on 10 event (for debugging purpose), uncomment, disable the MT and rename fileDF to fileDF10
-    // auto fileDF=fileDF0.Range(10);
+    //auto fileDF=fileDF0.Range(10000);
 
     //-------------------------------------------------------------------------------------------------------
     //      Define a Lorentz vectors for each particles
@@ -199,134 +199,155 @@ int main() {
 
     // non si sa perchè ma getptr è rottissimpo. usa getvalue e poi passa gli indirizzi
 
-    TH1D histMTLept = ptEtaPhiMDF.Histo1D({"histMTLept", "t#rightarrow bl#nu;M_{t} [GeV];Counts", nBinsTop, massTopmin, massTopmax}, "TLept_mass").GetValue();
-    TH1D histMTHad = ptEtaPhiMDF.Histo1D({"histMTHad", "t#rightarrow bq#bar{q};M_{t}  [GeV];Counts", nBinsTop, massTopmin, massTopmax}, "THad_mass").GetValue();
+    auto histMTLept = ptEtaPhiMDF.Histo1D({"histMTLept", "t#rightarrow bl#nu;M_{t} [GeV];Counts", nBinsTop, massTopmin, massTopmax}, "TLept_mass");
+    auto histMTHad = ptEtaPhiMDF.Histo1D({"histMTHad", "t#rightarrow bq#bar{q};M_{t}  [GeV];Counts", nBinsTop, massTopmin, massTopmax}, "THad_mass");
 
-    TH1D histMT = ptEtaPhiMDF.Histo1D({"histMT", "t;M_{t} [GeV]; Counts", nBinsTop, massTopmin, massTopmax}, "T_mass").GetValue();
-    TH1D histMTBar = ptEtaPhiMDF.Histo1D({"histMTBar", "#bar{t}; M_{#bar{t}} [GeV];Counts", nBinsTop, massTopmin, massTopmax}, "TBar_mass").GetValue();
+    auto histMT = ptEtaPhiMDF.Histo1D({"histMT", "t;M_{t} [GeV]; Counts", nBinsTop, massTopmin, massTopmax}, "T_mass");
+    auto histMTBar = ptEtaPhiMDF.Histo1D({"histMTBar", "#bar{t}; M_{#bar{t}} [GeV];Counts", nBinsTop, massTopmin, massTopmax}, "TBar_mass");
 
-    TH1D histMTLeptWide = ptEtaPhiMDF.Histo1D({"histMTLeptWide", "t#rightarrow l#nu;M_{t}  [GeV];Counts", nBinsTopWide, massTopminWide, massTopmaxWide}, "TLept_mass").GetValue();
-    TH1D histMTHadWide = ptEtaPhiMDF.Histo1D({"histMTHadWide", "t#rightarrow q#bar{q};M_{t}  [GeV];Counts", nBinsTopWide, massTopminWide, massTopmaxWide}, "THad_mass").GetValue();
+    auto histMTLeptWide = ptEtaPhiMDF.Histo1D({"histMTLeptWide", "t#rightarrow l#nu;M_{t}  [GeV];Counts", nBinsTopWide, massTopminWide, massTopmaxWide}, "TLept_mass");
+    auto histMTHadWide = ptEtaPhiMDF.Histo1D({"histMTHadWide", "t#rightarrow q#bar{q};M_{t}  [GeV];Counts", nBinsTopWide, massTopminWide, massTopmaxWide}, "THad_mass");
 
-    TH1D histMTWide = ptEtaPhiMDF.Histo1D({"histMTWide", "t;M_{t} [GeV]; Counts", nBinsTopWide, massTopminWide, massTopmaxWide}, "T_mass").GetValue();
-    TH1D histMTBarWide = ptEtaPhiMDF.Histo1D({"histMTBarWide", "#bar{t}; M_{#bar{t}} [GeV];Counts", nBinsTopWide, massTopminWide, massTopmaxWide}, "TBar_mass").GetValue();
+    auto histMTWide = ptEtaPhiMDF.Histo1D({"histMTWide", "t;M_{t} [GeV]; Counts", nBinsTopWide, massTopminWide, massTopmaxWide}, "T_mass");
+    auto histMTBarWide = ptEtaPhiMDF.Histo1D({"histMTBarWide", "#bar{t}; M_{#bar{t}} [GeV];Counts", nBinsTopWide, massTopminWide, massTopmaxWide}, "TBar_mass");
 
-    TH1D histMWLept = ptEtaPhiMDF.Histo1D({"histMWLept", "W#rightarrow l#nu;M_{W} [GeV];Counts", nBinsW, massWmin, massWmax}, "WLept_mass").GetValue();
-    TH1D histMWHad = ptEtaPhiMDF.Histo1D({"histMWHad", "W#rightarrow q#bar{q};M_{W} [GeV];Counts", nBinsW, massWmin, massWmax}, "WHad_mass").GetValue();
+    auto histMWLept = ptEtaPhiMDF.Histo1D({"histMWLept", "W#rightarrow l#nu;M_{W} [GeV];Counts", nBinsW, massWmin, massWmax}, "WLept_mass");
+    auto histMWHad = ptEtaPhiMDF.Histo1D({"histMWHad", "W#rightarrow q#bar{q};M_{W} [GeV];Counts", nBinsW, massWmin, massWmax}, "WHad_mass");
 
-    TH1D histMWPlus = ptEtaPhiMDF.Histo1D({"histMWPlus", "W^{+};M_{W^{+}} [GeV];Counts", nBinsW, massWmin, massWmax}, "WPlus_mass").GetValue();
-    TH1D histMWMinus = ptEtaPhiMDF.Histo1D({"histMWMinus", "W^{-}; M_{W^{-}} [GeV];Counts", nBinsW, massWmin, massWmax}, "WMinus_mass").GetValue();
+    auto histMWPlus = ptEtaPhiMDF.Histo1D({"histMWPlus", "W^{+};M_{W^{+}} [GeV];Counts", nBinsW, massWmin, massWmax}, "WPlus_mass");
+    auto histMWMinus = ptEtaPhiMDF.Histo1D({"histMWMinus", "W^{-}; M_{W^{-}} [GeV];Counts", nBinsW, massWmin, massWmax}, "WMinus_mass");
 
-    TH1D histMWLeptWide = ptEtaPhiMDF.Histo1D({"histMWLeptWide", "W#rightarrow l#nu;M_{W} [GeV];Counts", nBinsWWide, massWminWide, massWmaxWide}, "WLept_mass").GetValue();
-    TH1D histMWHadWide = ptEtaPhiMDF.Histo1D({"histMWHadWide", "W#rightarrow q#bar{q};M_{W} [GeV];Counts", nBinsWWide, massWminWide, massWmaxWide}, "WHad_mass").GetValue();
+    auto histMWLeptWide = ptEtaPhiMDF.Histo1D({"histMWLeptWide", "W#rightarrow l#nu;M_{W} [GeV];Counts", nBinsWWide, massWminWide, massWmaxWide}, "WLept_mass");
+    auto histMWHadWide = ptEtaPhiMDF.Histo1D({"histMWHadWide", "W#rightarrow q#bar{q};M_{W} [GeV];Counts", nBinsWWide, massWminWide, massWmaxWide}, "WHad_mass");
 
-    TH1D histMWPlusWide = ptEtaPhiMDF.Histo1D({"histMWPlusWide", "W^{+};M_{W^{+}} [GeV];Counts", nBinsWWide, massWminWide, massWmaxWide}, "WPlus_mass").GetValue();
-    TH1D histMWMinusWide = ptEtaPhiMDF.Histo1D({"histMWMinusWide", "W^{-}; M_{W^{-}} [GeV];Counts", nBinsWWide, massWminWide, massWmaxWide}, "WMinus_mass").GetValue();
+    auto histMWPlusWide = ptEtaPhiMDF.Histo1D({"histMWPlusWide", "W^{+};M_{W^{+}} [GeV];Counts", nBinsWWide, massWminWide, massWmaxWide}, "WPlus_mass");
+    auto histMWMinusWide = ptEtaPhiMDF.Histo1D({"histMWMinusWide", "W^{-}; M_{W^{-}} [GeV];Counts", nBinsWWide, massWminWide, massWmaxWide}, "WMinus_mass");
 
     //-------------------------------------Pt-------------------------------------//
     double ptMin = 0;
     double ptMax = 500;
     int nBinsPt = 60;
 
-    TH1D histPtTLept = ptEtaPhiMDF.Histo1D({"histPtTLept", "t#rightarrow bl#nu;p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "TLept_pt").GetValue();
-    TH1D histPtTHad = ptEtaPhiMDF.Histo1D({"histPtTHad", "t#rightarrow bq#bar{q};p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "THad_pt").GetValue();
+    auto histPtTLept = ptEtaPhiMDF.Histo1D({"histPtTLept", "t#rightarrow bl#nu;p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "TLept_pt");
+    auto histPtTHad = ptEtaPhiMDF.Histo1D({"histPtTHad", "t#rightarrow bq#bar{q};p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "THad_pt");
 
-    TH1D histPtT = ptEtaPhiMDF.Histo1D({"histPtT", "t; p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "T_pt").GetValue();
-    TH1D histPtTBar = ptEtaPhiMDF.Histo1D({"histPtTBar", "#bar{t} ;p_{#bar{t}} [GeV];Counts", nBinsPt, ptMin, ptMax}, "TBar_pt").GetValue();
+    auto histPtT = ptEtaPhiMDF.Histo1D({"histPtT", "t; p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "T_pt");
+    auto histPtTBar = ptEtaPhiMDF.Histo1D({"histPtTBar", "#bar{t} ;p_{#bar{t}} [GeV];Counts", nBinsPt, ptMin, ptMax}, "TBar_pt");
 
-    TH1D histPtWLept = ptEtaPhiMDF.Histo1D({"histPtWLept", "W#rightarrow l#nu;p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "WLept_pt").GetValue();
-    TH1D histPtWHad = ptEtaPhiMDF.Histo1D({"histPtWHad", "W#rightarrow q#bar{q};p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "WHad_pt").GetValue();
+    auto histPtWLept = ptEtaPhiMDF.Histo1D({"histPtWLept", "W#rightarrow l#nu;p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "WLept_pt");
+    auto histPtWHad = ptEtaPhiMDF.Histo1D({"histPtWHad", "W#rightarrow q#bar{q};p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "WHad_pt");
 
-    TH1D histPtWPlus = ptEtaPhiMDF.Histo1D({"histPtWPlus", "W^{+};p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "WPlus_pt").GetValue();
-    TH1D histPtWMinus = ptEtaPhiMDF.Histo1D({"histPtWMinus", "W^{-};p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "WMinus_pt").GetValue();
-
-    // TODO define new hist and new quantities
-    /*     TH1D histPtBFromT = ptEtaPhiMDF.Histo1D({"histPtBFromT", "b from t;p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax},"").GetValue();
-        TH1D histPtBBarFromTBar = ptEtaPhiMDF.Histo1D({"histPtBBarFromTBar", "b from #bar{t};p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax},"").GetValue();
-        TH1D histPtBBarFromWPlus = ptEtaPhiMDF.Histo1D({"histPtBBarFromWPlus", "b from W;p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax},"").GetValue();
-        TH1D histPtC = ptEtaPhiMDF.Histo1D({"histPtC", "c;p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax},"").GetValue();
-        TH1D histPtLept = ptEtaPhiMDF.Histo1D({"histPtLept", "lepton;p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax},"").GetValue(); */
-
-    //-------------------------------------Eta-------------------------------------//
+    auto histPtWPlus = ptEtaPhiMDF.Histo1D({"histPtWPlus", "W^{+};p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "WPlus_pt");
+    auto histPtWMinus = ptEtaPhiMDF.Histo1D({"histPtWMinus", "W^{-};p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "WMinus_pt");
+//TODO define single particle pt
+    // -------------------------------------Eta-------------------------------------//
     double etaMin = -6;
     double etaMax = 6;
     int nBinsEta = 50;
 
-    TH1D histEtaTLept = ptEtaPhiMDF.Histo1D({"histEtaTLept", "t#rightarrow bl#nu;#eta;Counts", nBinsEta, etaMin, etaMax}, "TLept_eta").GetValue();
-    TH1D histEtaTHad = ptEtaPhiMDF.Histo1D({"histEtaTHad", "t#rightarrow bq#bar{q};#eta;Counts", nBinsEta, etaMin, etaMax}, "THad_eta").GetValue();
+    auto histEtaTLept = ptEtaPhiMDF.Histo1D({"histEtaTLept", "t#rightarrow bl#nu;#eta;Counts", nBinsEta, etaMin, etaMax}, "TLept_eta");
+    auto histEtaTHad = ptEtaPhiMDF.Histo1D({"histEtaTHad", "t#rightarrow bq#bar{q};#eta;Counts", nBinsEta, etaMin, etaMax}, "THad_eta");
 
-    TH1D histEtaT = ptEtaPhiMDF.Histo1D({"histEtaT", "t;#eta;Counts", nBinsEta, etaMin, etaMax}, "T_eta").GetValue();
-    TH1D histEtaTBar = ptEtaPhiMDF.Histo1D({"histEtaTBar", "#bar{t};#eta;Counts", nBinsEta, etaMin, etaMax}, "TBar_eta").GetValue();
+    auto histEtaT = ptEtaPhiMDF.Histo1D({"histEtaT", "t;#eta;Counts", nBinsEta, etaMin, etaMax}, "T_eta");
+    auto histEtaTBar = ptEtaPhiMDF.Histo1D({"histEtaTBar", "#bar{t};#eta;Counts", nBinsEta, etaMin, etaMax}, "TBar_eta");
 
-    TH1D histEtaWLept = ptEtaPhiMDF.Histo1D({"histEtaWLept", "W#rightarrow l#nu;#eta;Counts", nBinsEta, etaMin, etaMax}, "WLept_eta").GetValue();
-    TH1D histEtaWHad = ptEtaPhiMDF.Histo1D({"histEtaWHad", "W#rightarrow q#bar{q};#eta;Counts", nBinsEta, etaMin, etaMax}, "WHad_eta").GetValue();
+    auto histEtaWLept = ptEtaPhiMDF.Histo1D({"histEtaWLept", "W#rightarrow l#nu;#eta;Counts", nBinsEta, etaMin, etaMax}, "WLept_eta");
+    auto histEtaWHad = ptEtaPhiMDF.Histo1D({"histEtaWHad", "W#rightarrow q#bar{q};#eta;Counts", nBinsEta, etaMin, etaMax}, "WHad_eta");
 
-    TH1D histEtaWPlus = ptEtaPhiMDF.Histo1D({"histEtaWPlus", "W^{+};#eta;Counts", nBinsEta, etaMin, etaMax}, "WPlus_eta").GetValue();
-    TH1D histEtaWMinus = ptEtaPhiMDF.Histo1D({"histEtaWMinus", "W^{-};#eta;Counts", nBinsEta, etaMin, etaMax}, "WMinus_eta").GetValue();
+    auto histEtaWPlus = ptEtaPhiMDF.Histo1D({"histEtaWPlus", "W^{+};#eta;Counts", nBinsEta, etaMin, etaMax}, "WPlus_eta");
+    auto histEtaWMinus = ptEtaPhiMDF.Histo1D({"histEtaWMinus", "W^{-};#eta;Counts", nBinsEta, etaMin, etaMax}, "WMinus_eta");
+
+
+    auto histEtaB=fileDF.Define("B_eta","filterTracks(LHEPart_eta,(LHEPart_pdgId==5) && LHEPart_status==1)").Histo1D({"histEtaB", "b;#eta;   Counts", nBinsEta, etaMin, etaMax}, "B_eta");
+    auto histEtaBBar=fileDF.Define("BBar_eta","filterTracks(LHEPart_eta,(LHEPart_pdgId==-5) && LHEPart_status==1)").Histo1D({"histEtaBBar", "#bar{b};#eta;Counts", nBinsEta, etaMin, etaMax}, "BBar_eta");
+    auto histEtaC=fileDF.Define("C_eta","filterTracks(LHEPart_eta,(LHEPart_pdgId==4) && LHEPart_status==1)").Histo1D({"histEtaC", "c;#eta;Counts", nBinsEta, etaMin, etaMax}, "C_eta");
+    auto histEtaCBar=fileDF.Define("CBar_eta","filterTracks(LHEPart_eta,(LHEPart_pdgId==-4) && LHEPart_status==1)").Histo1D({"histEtaCBar", "#bar{c};#eta;Counts", nBinsEta, etaMin, etaMax}, "CBar_eta");
+    auto histEtaS=fileDF.Define("S_eta","filterTracks(LHEPart_eta,(LHEPart_pdgId==3) && LHEPart_status==1)").Histo1D({"histEtaS", "s;#eta;Counts", nBinsEta, etaMin, etaMax}, "S_eta");
+    auto histEtaSBar=fileDF.Define("SBar_eta","filterTracks(LHEPart_eta,(LHEPart_pdgId==-3) && LHEPart_status==1)").Histo1D({"histEtaSBar", "#bar{s};#eta;Counts", nBinsEta, etaMin, etaMax}, "SBar_eta");
+    auto histEtaD=fileDF.Define("D_eta","filterTracks(LHEPart_eta,(LHEPart_pdgId==1) && LHEPart_status==1)").Histo1D({"histEtaD", "d;#eta;Counts", nBinsEta, etaMin, etaMax}, "D_eta");
+    auto histEtaDBar=fileDF.Define("DBar_eta","filterTracks(LHEPart_eta,(LHEPart_pdgId==-1) && LHEPart_status==1)").Histo1D({"histEtaDBar", "#bar{d};#eta;Counts", nBinsEta, etaMin, etaMax}, "DBar_eta");
+    auto histEtaU=fileDF.Define("U_eta","filterTracks(LHEPart_eta,(LHEPart_pdgId==2) && LHEPart_status==1)").Histo1D({"histEtaU", "u;#eta;Counts", nBinsEta, etaMin, etaMax}, "U_eta");
+    auto histEtaUBar=fileDF.Define("UBar_eta","filterTracks(LHEPart_eta,(LHEPart_pdgId==-2) && LHEPart_status==1)").Histo1D({"histEtaUBar", "#bar{u};#eta;Counts", nBinsEta, etaMin, etaMax}, "UBar_eta");
+    auto histEtaLept=fileDF.Define("Lept_eta","filterTracks(LHEPart_eta,(LHEPart_pdgId==11 || LHEPart_pdgId==13 || LHEPart_pdgId==15) && LHEPart_status==1)").Histo1D({"histEtaLept", "leptons;#eta;Counts", nBinsEta, etaMin, etaMax}, "Lept_eta");
+
 
     // TODO define new hist and new quantities
-    /*     TH1D histEtaBFromT = ptEtaPhiMDF.Histo1D({"histEtaB", "b;#eta;Counts", nBinsEta, etaMin, etaMax},"").GetValue();
-        TH1D histEtaBBarFromTBar = ptEtaPhiMDF.Histo1D({"histEtaBBar", "#bar{b};#eta;Counts", nBinsEta, etaMin, etaMax},"").GetValue();
-        TH1D histEtaBBarFromWPlus = ptEtaPhiMDF.Histo1D({"histEtaBBarFromWPlus", "b;#eta;Counts", nBinsEta, etaMin, etaMax},"").GetValue();
-        TH1D histEtaC = ptEtaPhiMDF.Histo1D({"histEtaC", "c;#eta;Counts", nBinsEta, etaMin, etaMax},"").GetValue();
-        TH1D histEtaLep = ptEtaPhiMDF.Histo1D({"histEtaLep", "l;#eta;Counts", nBinsEta, etaMin, etaMax},"").GetValue(); */
-
     //-----------------------------------Delta eta-------------------------------------//
 
     //----------------------------W hadronic decays----------------------------------//
 
-    TH1D histWPlusJetDecay = ptEtaPhiMDF.Filter("jetCoupleWPlus>0").Histo1D({"histWPlusJetDecay", "W^{+} jet decay; ;Counts", 9, 1, 9}, "jetCoupleWPlus").GetValue();
-    TH1D histWMinusJetDecay = ptEtaPhiMDF.Filter("jetCoupleWMinus>0").Histo1D({"histWMinusJetDecay", "W^{-} jet decay; ;Counts", 9, 1, 9}, "jetCoupleWMinus").GetValue();
+    auto histWPlusJetDecay = ptEtaPhiMDF.Filter("jetCoupleWPlus>0").Histo1D({"histWPlusJetDecay", "W^{+} jet decay; ;Counts", 9, 1, 9}, "jetCoupleWPlus");
+    auto histWMinusJetDecay = ptEtaPhiMDF.Filter("jetCoupleWMinus>0").Histo1D({"histWMinusJetDecay", "W^{-} jet decay; ;Counts", 9, 1, 9}, "jetCoupleWMinus");
 
-    // Set the TH1 Label of the W decays the strings above
-    (&histWPlusJetDecay)->GetXaxis()->SetBinLabel(1, "ud");
-    (&histWMinusJetDecay)->GetXaxis()->SetBinLabel(1, "ud");
-    (&histWPlusJetDecay)->GetXaxis()->SetBinLabel(2, "us");
-    (&histWMinusJetDecay)->GetXaxis()->SetBinLabel(2, "us");
-    (&histWPlusJetDecay)->GetXaxis()->SetBinLabel(3, "ub");
-    (&histWMinusJetDecay)->GetXaxis()->SetBinLabel(3, "ub");
-    (&histWPlusJetDecay)->GetXaxis()->SetBinLabel(4, "cd");
-    (&histWMinusJetDecay)->GetXaxis()->SetBinLabel(4, "cd");
-    (&histWPlusJetDecay)->GetXaxis()->SetBinLabel(5, "cs");
-    (&histWMinusJetDecay)->GetXaxis()->SetBinLabel(5, "cs");
-    (&histWPlusJetDecay)->GetXaxis()->SetBinLabel(6, "cb");
-    (&histWMinusJetDecay)->GetXaxis()->SetBinLabel(6, "cb");
-    (&histWPlusJetDecay)->GetXaxis()->SetBinLabel(7, "td");
-    (&histWMinusJetDecay)->GetXaxis()->SetBinLabel(7, "td");
-    (&histWPlusJetDecay)->GetXaxis()->SetBinLabel(8, "ts");
-    (&histWMinusJetDecay)->GetXaxis()->SetBinLabel(8, "ts");
-    (&histWPlusJetDecay)->GetXaxis()->SetBinLabel(9, "tb");
-    (&histWMinusJetDecay)->GetXaxis()->SetBinLabel(9, "tb");
+    StackPlotter jetCouple({histWPlusJetDecay}, "W hadronic Decays", "W qq Decay", "./images/WHadronicDecay.png", false, false, true);
+
+        // Set the TH1 Label of the W decays the strings above
+    (jetCouple).SetBinLabel(1, "ud");
+    (jetCouple).SetBinLabel(2, "us");
+    (jetCouple).SetBinLabel(3, "ub");
+    (jetCouple).SetBinLabel(4, "cd");
+    (jetCouple).SetBinLabel(5, "cs");
+    (jetCouple).SetBinLabel(6, "cb");
+    (jetCouple).SetBinLabel(8, "ts");
+    (jetCouple).SetBinLabel(9, "tb");
 
     //------------------------------------------DRAW---------------------------
     // (histvec,title,xlabel,path,ratio,fit,log)
 
-    StackHist({&histMTBar, &histMT}, "M_{t}/ M_{#bar{t}}", "M_{t}  [GeV]", "./images/mass/Mttbar.png", true, true, false);
+    StackPlotter ttbarMass({histMTBar, histMT}, "M_{t}/ M_{#bar{t}}", "M_{t}  [GeV]", "./images/mass/Mttbar.png", true, true, false);
+    StackPlotter tLeptHadMass({histMTHad, histMTLept}, "M_{t#rightarrow q#bar{q}}/ M_{t#rightarrow l#nu}", "M_{t} [GeV]", "./images/mass/MtLeptHad.png", true, true);
+    StackPlotter WPMMass({histMWPlus, histMWMinus}, "M_{W^{+}}/ M_{W^{-}}", "M_{W} [GeV]", "./images/mass/MWPlusMinus.png", true, true);
+    StackPlotter WLeptHadMass({histMWHad, histMWLept}, "M_{W#rightarrow q#bar{q} }/ M_{W#rightarrow l#nu}", "M_{W} [GeV]", "./images/mass/MWLeptHad.png", true, true);
 
-    StackHist({&histMT, &histMTBar}, "M_{t}/ M_{#bar{t}}", "M_{t}  [GeV]", "./images/mass/Mttbar.png", true, true);
-    StackHist({&histMTHad, &histMTLept}, "M_{t#rightarrow q#bar{q}}/ M_{t#rightarrow l#nu}", "M_{t} [GeV]", "./images/mass/MtLeptHad.png", true, true);
-    StackHist({&histMWPlus, &histMWMinus}, "M_{W^{+}}/ M_{W^{-}}", "M_{W} [GeV]", "./images/mass/MWPlusMinus.png", true, true);
-    StackHist({&histMWHad, &histMWLept}, "M_{W#rightarrow q#bar{q} }/ M_{W#rightarrow l#nu}", "M_{W} [GeV]", "./images/mass/MWLeptHad.png", true, true);
+    StackPlotter ttbarMassWide({histMTWide, histMTBarWide}, "M_{t}/ M_{#bar{t}}", "M_{t}  [GeV]", "./images/mass/MttbarWide.png", true);
+    StackPlotter tLeptHadMassWide({histMTHadWide, histMTLeptWide}, "M_{t#rightarrow q#bar{q}}/ M_{t#rightarrow l#nu}", "M_{t} [GeV]", "./images/mass/MtLeptHadWide.png", true);
+    StackPlotter WPMMassWide({histMWPlusWide, histMWMinusWide}, "M_{W^{+}}/ M_{W^{-}}", "M_{W} [GeV]", "./images/mass/MWPlusMinusWide.png", true);
+    StackPlotter WLeptHadMassWide({histMWHadWide, histMWLeptWide}, "M_{W#rightarrow q#bar{q}}/ M_{W#rightarrow l#nu}", "M_{W} [GeV]", "./images/mass/MWLeptHadWide.png", true);
 
-    StackHist({&histMTWide, &histMTBarWide}, "M_{t}/ M_{#bar{t}}", "M_{t}  [GeV]", "./images/mass/MttbarWide.png", true);
-    StackHist({&histMTHadWide, &histMTLeptWide}, "M_{t#rightarrow q#bar{q}}/ M_{t#rightarrow l#nu}", "M_{t} [GeV]", "./images/mass/MtLeptHadWide.png", true);
-    StackHist({&histMWPlusWide, &histMWMinusWide}, "M_{W^{+}}/ M_{W^{-}}", "M_{W} [GeV]", "./images/mass/MWPlusMinusWide.png", true);
-    StackHist({&histMWHadWide, &histMWLeptWide}, "M_{W#rightarrow q#bar{q}}/ M_{W#rightarrow l#nu}", "M_{W} [GeV]", "./images/mass/MWLeptHadWide.png", true);
+    StackPlotter ttbarEta({histEtaT, histEtaTBar}, "#eta_{t}/#eta_{#bar{t}}", "#eta_{t}", "./images/eta/EtaTTbar.png", true);
+    StackPlotter tLeptHadEta({histEtaTHad, histEtaTLept}, "#eta_{t#rightarrow q#bar{q}} / #eta_{t#rightarrow l#nu}", "#eta_{t}", "./images/eta/EtaTLeptHad.png", true);
+    StackPlotter WPMEta({histEtaWPlus, histEtaWMinus}, "#eta_{W^{+}}/#eta_{W^{-}}", "#eta_{W}", "./images/eta/EtaWPlusMinux.png", true);
+    StackPlotter WLeptHadEta({histEtaWHad, histEtaWLept}, "#eta_{W#rightarrow q#bar{q}}/#eta_{W#rightarrow l#nu}", "#eta_{W}", "./images/eta/EtaWLeptHad.png", true);
 
-    StackHist({&histEtaT, &histEtaTBar}, "#eta_{t}/#eta_{#bar{t}}", "#eta_{t}", "./images/eta/EtaTTbar.png", true);
-    StackHist({&histEtaTHad, &histEtaTLept}, "#eta_{t#rightarrow q#bar{q}} / #eta_{t#rightarrow l#nu}", "#eta_{t}", "./images/eta/EtaTLeptHad.png", true);
-    StackHist({&histEtaWPlus, &histEtaWMinus}, "#eta_{W^{+}}/#eta_{W^{-}}", "#eta_{W}", "./images/eta/EtaWPlusMinux.png", true);
-    StackHist({&histEtaWHad, &histEtaWLept}, "#eta_{W#rightarrow q#bar{q}}/#eta_{W#rightarrow l#nu}", "#eta_{W}", "./images/eta/EtaWLeptHad.png", true);
+    StackPlotter ttbarPt({histPtT, histPtTBar}, "p_{t}(t)/p_{t}(#bar{t})", "p_{t} [GeV]", "./images/pt/PtTTBar.png", true);
+    StackPlotter tLeptHadPt({histPtTHad, histPtTLept}, "p_{t}(t#rightarrow q#bar{q})/p_{t}(t#rightarrow l#nu)", "p_{t} [GeV]", "./images/pt/PtTLeptHad.png", true);
+    StackPlotter WPMPt({histPtWPlus, histPtWMinus}, "p_{t}(W^{+})/p_{t}(W^{-})", "p_{t} [GeV]", "./images/pt/PtWPlusMinus.png", true);
+    StackPlotter WLeptHadPt({histPtWHad, histPtWLept}, "p_{t}(W#rightarrow q#bar{q})/p_{t}(W#rightarrow l#nu)", "p_{t} [GeV]", "./images/pt/PtWLeptHad.png", true);
 
-    StackHist({&histPtT, &histPtTBar}, "p_{t}(t)/p_{t}(#bar{t})", "p_{t} [GeV]", "./images/pt/PtTTBar.png", true);
-    StackHist({&histPtTHad, &histPtTLept}, "p_{t}(t#rightarrow q#bar{q})/p_{t}(t#rightarrow l#nu)", "p_{t} [GeV]", "./images/pt/PtTLeptHad.png", true);
-    StackHist({&histPtWPlus, &histPtWMinus}, "p_{t}(W^{+})/p_{t}(W^{-})", "p_{t} [GeV]", "./images/pt/PtWPlusMinus.png", true);
-    StackHist({&histPtWHad, &histPtWLept}, "p_{t}(W#rightarrow q#bar{q})/p_{t}(W#rightarrow l#nu)", "p_{t} [GeV]", "./images/pt/PtWLeptHad.png", true);
 
-    // in this dataset all the Wplus are hadronic and all the Wminus leptonic
-    StackHist({&histWPlusJetDecay}, "W hadronic Decays", "W qq Decay", "./images/WHadronicDecay.png", false, false, true);
+    StackPlotter etaParticles({histEtaB, histEtaBBar, histEtaC, histEtaCBar, histEtaS, histEtaSBar, histEtaD, histEtaDBar, histEtaU, histEtaUBar, histEtaLept}, "#eta", "#eta", "./images/eta/etaParticles.png");
+    etaParticles.SetLegendPos({0.8, 0.6, 0.9, 0.9});
+    etaParticles.SetPalette(55);
+    etaParticles.Normalize();
 
-    //-------------------------------------------------------------------------------------------------------
+    std::vector<StackPlotter *> stackCollection{
+                &ttbarMass,
+                &ttbarMassWide,
+                &ttbarEta,
+                &ttbarPt,
+                &tLeptHadMass,
+                &tLeptHadMassWide,
+                &tLeptHadEta,
+                &tLeptHadPt,
+                &WPMMass,
+                &WPMMassWide,
+                &WPMPt,
+                &WPMEta,
+                &WLeptHadMass,
+                &WLeptHadMassWide,
+                &WLeptHadPt,
+                &WLeptHadEta,
+                &WLeptHadPt,
+                &etaParticles,
+                &jetCouple
+
+    };
+
+    for (auto v : stackCollection) {
+        v->Save();
+    }
+
+    //-------------------------------------------------------------------------------
     //                                      DONE
     return 0;
 }
