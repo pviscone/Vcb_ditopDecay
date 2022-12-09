@@ -159,3 +159,9 @@ const char *PtEtaPhiMVecSum(std::vector<int> idxList, std::string ColumnName = "
     strcpy(funcStrChar, funcStr.c_str());
     return funcStrChar;
 }
+
+template <typename T>
+RVec<T> filterTracks(const RVec<T> &vec, const RVec<int> mask) {
+    RVec<T> filteredVec = vec[mask];
+    return filteredVec;
+}
