@@ -33,7 +33,7 @@ private:
     std::vector<RResultPtr<::TH1D>> RResultVector;
     Int_t palette=-1;
 
-    int nStatBox = 3;
+    int nStatBox = 2;
     int iPos = 11;
     float statGap = 0.18;
     std::vector<float> legendPos{0.79, 0.62, 0.92, 0.74};
@@ -62,16 +62,18 @@ public:
     std::vector<int> markerColor;
     std::vector<double> markerSize;
     std::vector<int> fitColor;
+    std::vector<double> lineAlpha;
     int lineWidth;
     int fitWidth;
     void SetColors(std::string colors) {
         if (colors == "YellowBlack") {
-            histColor = {798, 920};
-            alphaColor = {1., 0.3};
-            lineColor = {798, 1};
-            markerColor = {1, 1};
-            markerSize = {0, 0.5};
-            fitColor = {2, 9};
+            histColor = {798, 920,433};
+            alphaColor = {0.8, 0.3,0.3};
+            lineColor = {798, 1,433};
+            lineAlpha = {1, 1,0.3};
+            markerColor = {1, 1,1};
+            markerSize = {0, 0.5,0};
+            fitColor = {2, 9, 417};
             fitWidth = 2;
             lineWidth = 3;
         } else {
@@ -223,7 +225,7 @@ public:
         for (int idx = 0; idx < histVector.size(); idx++) {
             if(palette<0){
                 histVector[idx]->SetFillColorAlpha(histColor[idx], alphaColor[idx]);
-                histVector[idx]->SetLineColor(lineColor[idx]);
+                histVector[idx]->SetLineColorAlpha(lineColor[idx],lineAlpha[idx]);
                 histVector[idx]->SetMarkerColor(markerColor[idx]);
                 histVector[idx]->SetMarkerSize(markerSize[idx]);
                 histVector[idx]->SetLineWidth(lineWidth);
@@ -240,7 +242,6 @@ public:
             }
 
             hs->Add(histVector[idx], "sames");
-
             hs->Draw(drawOpt.c_str());
             gPad->Update();
 
@@ -286,13 +287,13 @@ public:
 
         hs->GetYaxis()->SetTitle("Events");
         hs->GetYaxis()->SetLabelOffset(0.01);
-
+        hs->GetYaxis()->SetMaxDigits(3);
         // Title
         TLatex TeX;
         TeX.SetTextFont(42);
         TeX.SetTextSize(0.036);
         TeX.SetTextAlign(21);
-        TeX.DrawLatexNDC(0.55, 0.96, title.c_str());
+        TeX.DrawLatexNDC(0.55, 0.97, title.c_str());
 
         // Legend
         legend->SetBorderSize(0);
