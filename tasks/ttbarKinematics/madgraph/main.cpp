@@ -368,6 +368,7 @@ int main() {
     (jetCouple).SetBinLabel(4, "cd");
     (jetCouple).SetBinLabel(5, "cs");
     (jetCouple).SetBinLabel(6, "cb");
+    (jetCouple).SetBinLabel(7, "td");
     (jetCouple).SetBinLabel(8, "ts");
     (jetCouple).SetBinLabel(9, "tb");
 
