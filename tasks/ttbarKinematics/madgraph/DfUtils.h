@@ -165,3 +165,7 @@ RVec<T> filterTracks(const RVec<T> &vec, const RVec<int> mask) {
     RVec<T> filteredVec = vec[mask];
     return filteredVec;
 }
+
+double deltaR(double deltaPhi, double deltaEta) {
+    return TMath::Sqrt(TMath::Power(deltaPhi, 2) + TMath::Power(deltaEta, 2));
+}
