@@ -27,19 +27,19 @@ using namespace ROOT::RDF;
 
 
 
-//TODO Create different TStyle (or palettes) and apply them
-int stackPlotterCounter = 0;
+    int stackPlotterCounter = 0;
 class StackPlotter {
 private:
     std::vector<RResultPtr<::TH1D>> RResultVector;
-    Int_t palette = 70;
-    int fitWidth = 2;
+    Int_t palette=-1;
+
     int nStatBox = 3;
     int iPos = 11;
     float statGap = 0.18;
     std::vector<float> legendPos{0.79, 0.62, 0.92, 0.74};
-    std::vector<float> statPos{.78, .78, .95, .92};
-    std::string drawOpt = "nostack hist PLC";
+    std::vector<float> statPos{.78, .76, .95, .92};
+    float yAxisMultiplier = 1.25;
+    std::string drawOpt = "nostack hist";
     TCanvas *c;
     std::vector<TH1 *> histVector;
     THStack *hs;
@@ -52,8 +52,34 @@ private:
     std::string savePath;
     bool constructed = false;
     std::string canvasName = "cName";
+    std::string colors;
+
 
 public:
+    std::vector<int> histColor;
+    std::vector<double> alphaColor;
+    std::vector<int> lineColor;
+    std::vector<int> markerColor;
+    std::vector<double> markerSize;
+    std::vector<int> fitColor;
+    int lineWidth;
+    int fitWidth;
+    void SetColors(std::string colors) {
+        if (colors == "YellowBlack") {
+            histColor = {798, 920};
+            alphaColor = {1., 0.3};
+            lineColor = {798, 1};
+            markerColor = {1, 1};
+            markerSize = {0, 0.5};
+            fitColor = {2, 9};
+            fitWidth = 2;
+            lineWidth = 3;
+        } else {
+            std::cout << "ERROR: colors not implemented" << std::endl;
+            std::exit(1);
+        }
+        this->colors = colors;
+    };
     StackPlotter(std::vector<RResultPtr<::TH1D>> RResultVector, std::string title, std::string xLabel, std::string savePath = "", bool ratio = false, bool fit = false, bool log = false) {
         canvasName += std::to_string(stackPlotterCounter);
         stackPlotterCounter++;
@@ -64,11 +90,13 @@ public:
         this->ratio = ratio;
         this->fit = fit;
         this->log = log;
+        colors="YellowBlack";
+        this->SetColors(colors);
     };
     ~StackPlotter(){};
     void Normalize() {
         this->normalize = true;
-    }
+    };
     void SetIPos(int iPos) {
         this->iPos = iPos;
     };
@@ -80,6 +108,9 @@ public:
     };
     void SetStatPos(std::vector<float> statPos) {
         this->statPos = statPos;
+    };
+    void SetYAxisMultiplier(float yAxisMultiplier) {
+        this->yAxisMultiplier = yAxisMultiplier;
     };
     void SetStatPos(int idx, float pos) {
         this->statPos[idx] = pos;
@@ -108,8 +139,18 @@ public:
     void SetDrawOpt(std::string drawOpt) {
         this->drawOpt = drawOpt;
     };
+    void AddDrawOpt(std::string drawOpt) {
+        this->drawOpt += " " + drawOpt;
+    };
     void SetPalette(Int_t palette) {
         this->palette = palette;
+        gStyle->SetPalette(palette);
+        this->AddDrawOpt("PLC");
+    };
+    void SetPalette(Int_t palette,Float_t alpha) {
+        this->palette = palette;
+        gStyle->SetPalette(palette,alpha);
+        this->AddDrawOpt("PLC");
     };
     THStack *GetStack() {
         return hs;
@@ -118,7 +159,7 @@ public:
         return c;
     };
     void GetValue() {
-        c = new TCanvas(canvasName.c_str(), canvasName.c_str(), 50, 50, 800, 700);
+        c = new TCanvas(canvasName.c_str(), canvasName.c_str(), 50, 50, 1280, 1120);
         hs = new THStack("hs", title.c_str());
         for (auto &resultptr : RResultVector) {
             TH1D hist = resultptr.GetValue();
@@ -136,32 +177,20 @@ public:
             hist->GetXaxis()->SetBinLabel(idx, label.c_str());
         }
     }
+
+
     void Draw() {
 
         if (!constructed) {
-            GetValue(); 
+            GetValue();
         }
         c->cd();
-
-        //TODO REMOVE THIS, now are used only in TF1 and TPaveStats
-        std::vector<int> histColor{798, 920};
-        std::vector<double> alphaColor{1., 0.3};
-        std::vector<int> lineColor{798, 1};
-        std::vector<int> markerColor{1, 1};
-        std::vector<double> markerSize{0, 0.5};
-        std::vector<int> fitColor{
-            2,
-            9,
-        };
 
         if (histVector.size() > nStatBox) {
             gStyle->SetOptStat(00000000);
         } else {
             gStyle->SetOptStat(00011110);
         }
-
-
-        gStyle->SetPalette(70);
 
         TPad *p1;
         TPad *p2;
@@ -192,13 +221,21 @@ public:
         TLegend *legend = new TLegend(legendPos[0], legendPos[1], legendPos[2], legendPos[3]);
         p1->cd();
         for (int idx = 0; idx < histVector.size(); idx++) {
+            if(palette<0){
+                histVector[idx]->SetFillColorAlpha(histColor[idx], alphaColor[idx]);
+                histVector[idx]->SetLineColor(lineColor[idx]);
+                histVector[idx]->SetMarkerColor(markerColor[idx]);
+                histVector[idx]->SetMarkerSize(markerSize[idx]);
+                histVector[idx]->SetLineWidth(lineWidth);
+            }
+
             if (normalize) {
                 histVector[idx]->Scale(1. / histVector[idx]->Integral(), "width");
             }
             if (!log) {
-                histVector[idx]->GetYaxis()->SetRangeUser(0, 1.15 * std::max(histVector[idx]->GetMaximum(), histVector[idx]->GetMaximum()));
+                histVector[idx]->GetYaxis()->SetRangeUser(0, yAxisMultiplier * std::max(histVector[idx]->GetMaximum(), histVector[idx]->GetMaximum()));
             } else {
-                histVector[idx]->GetYaxis()->SetRangeUser(0.1, 1.15 * std::max(histVector[idx]->GetMaximum(), 11.5 * histVector[idx]->GetMaximum()));
+                histVector[idx]->GetYaxis()->SetRangeUser(0.1, yAxisMultiplier * std::max(histVector[idx]->GetMaximum(), 11.5 * histVector[idx]->GetMaximum()));
                 gPad->SetLogy();
             }
 
@@ -253,9 +290,9 @@ public:
         // Title
         TLatex TeX;
         TeX.SetTextFont(42);
-        TeX.SetTextSize(0.038);
+        TeX.SetTextSize(0.036);
         TeX.SetTextAlign(21);
-        TeX.DrawLatexNDC(0.55, 0.97, title.c_str());
+        TeX.DrawLatexNDC(0.55, 0.96, title.c_str());
 
         // Legend
         legend->SetBorderSize(0);
@@ -273,7 +310,7 @@ public:
             TAxis *axis = hs->GetYaxis();
             axis->ChangeLabel(1, -1, -1, -1, -1, -1, " ");
             axis->SetLabelFont(43); // Absolute font size in pixel (precision 3)
-            axis->SetLabelSize(15);
+            axis->SetLabelSize(25);
 
             // Ratio plot
             p2->cd();
@@ -295,18 +332,18 @@ public:
             histRatio->GetYaxis()->SetRangeUser(-1.2, 3.2);
             histRatio->GetYaxis()->SetTitle("Ratio");
             histRatio->GetYaxis()->SetNdivisions(505);
-            histRatio->GetYaxis()->SetTitleSize(20);
+            histRatio->GetYaxis()->SetTitleSize(32);
             histRatio->GetYaxis()->SetTitleFont(43);
             histRatio->GetYaxis()->SetTitleOffset(1.55);
             histRatio->GetYaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
-            histRatio->GetYaxis()->SetLabelSize(15);
+            histRatio->GetYaxis()->SetLabelSize(25);
 
             // X axis ratio plot settings
-            histRatio->GetXaxis()->SetTitleSize(20);
+            histRatio->GetXaxis()->SetTitleSize(30);
             histRatio->GetXaxis()->SetTitleFont(43);
-            histRatio->GetXaxis()->SetTitleOffset(0.75);
+            histRatio->GetXaxis()->SetTitleOffset(0.8);
             histRatio->GetXaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
-            histRatio->GetXaxis()->SetLabelSize(15);
+            histRatio->GetXaxis()->SetLabelSize(25);
             gPad->Modified();
             gPad->Update();
             c->RedrawAxis();
