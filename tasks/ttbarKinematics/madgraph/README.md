@@ -8,11 +8,11 @@
 > 
 > 1. For the single particles ($b,\bar{b},...$)
 >    
->    - [ ] $\eta$
+>    - [x] $\eta$
 >    
->    - [ ] $p_t$
+>    - [x] $p_t$
 > 
-> 2. For the couples $(b,\bar{b}$  from tops $),(u,d,b$ from Ws) and for the couples (l,q):
+> 2. For the couples $(b,\bar{b}$  from tops $),(u,c),(d,b,s)bar$ from Ws) and for the couples (l,q):
 >    
 >    - [ ] $\Delta \phi$
 >    
@@ -22,7 +22,9 @@
 > 
 > 3. Compute the branching ratio for the $W\to ub$ decays
 > 
-> 4. Implement all with the RDataframe
+> 4. Look at the MC cuts in the gridpack
+> 
+> 5. Implement all with the RDataframe
 
 --- 
 
