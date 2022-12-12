@@ -443,7 +443,7 @@ int main() {
 
 
     std::vector<StackPlotter *> stackCollection{
-/*         &ttbarMass,
+        &ttbarMass,
         &ttbarMassWide,
         &ttbarEta,
         &ttbarPt,
@@ -461,7 +461,7 @@ int main() {
         &WLeptHadEta,
         &WLeptHadPt,
 
-        &jetCouple,*/
+        &jetCouple,
 
         &etaParticles,
         &ptParticles,
