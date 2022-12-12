@@ -169,3 +169,13 @@ RVec<T> filterTracks(const RVec<T> &vec, const RVec<int> mask) {
 double deltaR(double deltaPhi, double deltaEta) {
     return TMath::Sqrt(TMath::Power(deltaPhi, 2) + TMath::Power(deltaEta, 2));
 }
+
+double deltaPhi(double phi1, double phi2){
+    double dphi = phi1 - phi2;
+    if (dphi > TMath::Pi()) {
+        dphi -= 2 * TMath::Pi();
+    } else if (dphi < -TMath::Pi()) {
+        dphi += 2 * TMath::Pi();
+    }
+    return dphi;
+}
