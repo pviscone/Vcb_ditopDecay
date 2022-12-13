@@ -19,6 +19,7 @@
 
 using namespace ROOT;
 using namespace ROOT::Math;
+using namespace ROOT::VecOps;
 
 //----------------------------------------------------------------------
 //----------------------------------------------------------------------
@@ -178,4 +179,18 @@ double deltaPhi(double phi1, double phi2){
         dphi += 2 * TMath::Pi();
     }
     return dphi;
+}
+
+float leading(const RVec<float> &vec) {
+    return std::max({vec[3],vec[4]});
+}
+
+int leadingIdx(const RVec<int> &pdgIdVec,const RVec<float> &vec) {
+    RVec<float> quarkVec {vec[3],vec[4]};
+    int argMax = ArgMax(quarkVec);
+    return TMath::Abs(pdgIdVec[argMax+3]);
+}
+
+RVec<float> quarkVec(const RVec<int> &pdgIdVec) {
+    return RVec<float> {(float) pdgIdVec[3],(float) -pdgIdVec[4]};
 }
