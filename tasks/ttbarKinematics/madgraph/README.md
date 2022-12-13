@@ -59,14 +59,12 @@
   
   ```bash
   /cvmfs/cms.cern.ch/phys_generator/gridpacks/2017/13TeV/madgraph/V5_2.7.3/tt0123j_1l_tbar_5f_ckm_LO_MLM/tt0123j_1l_tbar_5f_ckm_LO_MLM_slc7_amd64_gcc700_CMSSW_10_6_19_tarball.tar.xz
+  
+  
   ```
 
 # Observation and doubts
 
-- The branching ratio for $W \to ub$ on all hadronic W decays from tt is:
-  
-  $ \frac{|V_{ub}|^2}{|V_{ud}|^2+|V_{us}|^2+|V_{ub}|^2+|V_{cd}|^2+|V_{cs}|^2+|V_{cb}|^2   } \simeq 7 \cdot 10^{-6}$ 
-  
-  The tops are excluded for mass constraint
-  
-  
+- The branching ratio for $W \to ub$ on all hadronic W decays from tt is: $ \frac{|V_{ub}|^2}{|V_{ud}|^2+|V_{us}|^2+|V_{ub}|^2+|V_{cd}|^2+|V_{cs}|^2+|V_{cb}|^2   } \simeq 7 \cdot 10^{-6}$ 
+
+- The tops are excluded for mass constraint
