@@ -95,7 +95,7 @@ float isLeptonic(float isQuark, float sameSign, float oppositeSign) {
 
 int main() {
     gStyle->SetFillStyle(1001);
-    
+
     //-------------------------------------------------------------------------------------------------------
     //                                 set the tdr style (from CMS TWIKI)
     ROOT::EnableImplicitMT();
@@ -110,7 +110,7 @@ int main() {
     //-------------------------------------------------------------------------------------------------------
     //                                 File,tree and branches status
 
-    RDataFrame fileDF("Events", "./0BCB1429-8B19-3245-92C4-68B3DD50AC78.root",
+    RDataFrame fileDF("Events", "./73B85577-0234-814E-947E-7DCFC1275886.root",
                       {"nLHEPart",
                        "LHEPart_pt",
                        "LHEPart_eta",
@@ -119,7 +119,7 @@ int main() {
                        "LHEPart_pdgId"});
 
     // If you want to run on 10 event (for debugging purpose), uncomment, disable the MT and rename fileDF to fileDF10
-    //auto fileDF=fileDF0.Range(10000);
+    // auto fileDF=fileDF0.Range(10000);
 
     //-------------------------------------------------------------------------------------------------------
     //      Define a Lorentz vectors for each particles
@@ -228,7 +228,7 @@ int main() {
     double ptMin = 0;
     double ptMax = 500;
     int nBinsPt = 60;
-    int nBinsPtSingle=60;
+    int nBinsPtSingle = 60;
 
     auto histPtTLept = ptEtaPhiMDF.Histo1D({"histPtTLept", "t#rightarrow bl#nu;p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "TLept_pt");
     auto histPtTHad = ptEtaPhiMDF.Histo1D({"histPtTHad", "t#rightarrow bq#bar{q};p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "THad_pt");
@@ -243,12 +243,17 @@ int main() {
     auto histPtWMinus = ptEtaPhiMDF.Histo1D({"histPtWMinus", "W^{-};p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "WMinus_pt");
 
     //! this section ptParticles is not future proof, it work only with this dataset (in which b=2,q=3,qbar=4,bbar=5,l=6)
-    auto histPtB = ptEtaPhiMDF.Define("B_pt","LHEPart_pt[2]").Histo1D({"histPtB", "b;p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "B_pt");
-    auto histPtBBar = ptEtaPhiMDF.Define("BBar_pt","LHEPart_pt[5]").Histo1D({"histPtBBar", "#bar{b};p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "BBar_pt");
+    auto histPtB = ptEtaPhiMDF.Define("B_pt", "LHEPart_pt[2]").Histo1D({"histPtB", "b;p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "B_pt");
+    auto histPtBBar = ptEtaPhiMDF.Define("BBar_pt", "LHEPart_pt[5]").Histo1D({"histPtBBar", "#bar{b};p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "BBar_pt");
     auto histPtQ = ptEtaPhiMDF.Define("Q_pt", "LHEPart_pt[3]").Histo1D({"histPtQ", "q;p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "Q_pt");
     auto histPtQBar = ptEtaPhiMDF.Define("QBar_pt", "LHEPart_pt[4]").Histo1D({"histPtQBar", "#bar{q};p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "QBar_pt");
     auto histPtLept = ptEtaPhiMDF.Define("Lept_pt", "LHEPart_pt[6]").Histo1D({"histPtL", "l;p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "Lept_pt");
 
+    auto histLeadingPt = ptEtaPhiMDF.Define("Leading_pt", "leading(LHEPart_pt)").Histo1D({"histLeadingPt", "Leading p_{t};p_{t} [GeV];Counts", nBinsPt, ptMin, ptMax}, "Leading_pt");
+
+    auto histLeadingPtPdgId = ptEtaPhiMDF.Define("Leading_ptPdgId", "leadingIdx(LHEPart_pdgId,LHEPart_pt)").Histo1D({"histLeadingPtPdgId", "Leading;pdgId;Events", 6, 1, 6}, "Leading_ptPdgId");
+
+    auto histQuarkCount = ptEtaPhiMDF.Define("quarkCount", "quarkVec(LHEPart_pdgId)").Histo1D({"histQuarkCount", "Total;pdgId;Events", 6, 1, 6}, "quarkCount");
     // -------------------------------------Eta-------------------------------------//
     double etaMin = -6;
     double etaMax = 6;
@@ -267,27 +272,29 @@ int main() {
     auto histEtaWPlus = ptEtaPhiMDF.Histo1D({"histEtaWPlus", "W^{+};#eta;Counts", nBinsEta, etaMin, etaMax}, "WPlus_eta");
     auto histEtaWMinus = ptEtaPhiMDF.Histo1D({"histEtaWMinus", "W^{-};#eta;Counts", nBinsEta, etaMin, etaMax}, "WMinus_eta");
 
+    auto histLeadingEta = ptEtaPhiMDF.Define("Leading_eta", "leading(LHEPart_eta)").Histo1D({"histLeadingEta", "Leading #eta;#eta;Counts", nBinsEta, etaMin, etaMax}, "Leading_eta");
+
+    auto histLeadingEtaPdgId = ptEtaPhiMDF.Define("Leading_etaPdgId", "leadingIdx(LHEPart_pdgId,LHEPart_eta)").Histo1D({"histLeadingEtaPdgId", "Leading;pdgId;Events", 6, 1, 6}, "Leading_etaPdgId");
 
     //! this section etaParticles is not future proof, it work only with this dataset (in which b=2,q=3,qbar=4,bbar=5,l=6)
     auto histEtaB = ptEtaPhiMDF.Define("B_eta", "LHEPart_eta[2]").Histo1D({"histEtaB", "b;#eta;Counts", nBinsEtaSingle, etaMin, etaMax}, "B_eta");
     auto histEtaQ = ptEtaPhiMDF.Define("Q_eta", "LHEPart_eta[3]").Histo1D({"histEtaQ", "q;#eta;Counts", nBinsEtaSingle, etaMin, etaMax}, "Q_eta");
     auto histEtaQBar = ptEtaPhiMDF.Define("QBar_eta", "LHEPart_eta[4]").Histo1D({"histEtaQBar", "#bar{q};#eta;Counts", nBinsEtaSingle, etaMin, etaMax}, "QBar_eta");
     auto histEtaBBar = ptEtaPhiMDF.Define("BBar_eta", "LHEPart_eta[5]").Histo1D({"histEtaBBar", "#bar{b};#eta;Counts", nBinsEtaSingle, etaMin, etaMax}, "BBar_eta");
-    auto histEtaLept = ptEtaPhiMDF.Define("Lept_eta", "LHEPart_eta[6]").Histo1D({"histEtaLept", "leptons;#eta;Counts", nBinsEtaSingle, etaMin, etaMax}, "Lept_eta");
+    auto histEtaLept = ptEtaPhiMDF.Define("Lept_eta", "LHEPart_eta[6]").Histo1D({"histEtaLept", "l;#eta;Counts", nBinsEtaSingle, etaMin, etaMax}, "Lept_eta");
 
     //! NB This section (dEta,dPhi,dR) is not future proof, it is right only with this dataset in which all the WPlus decay hadronically and all the WMinus decay leptonically
-    //The WPlus decays in u,c,dbar,sbar,bbar
+    // The WPlus decays in u,c,dbar,sbar,bbar
     //-----------------------------------Delta eta-------------------------------------//
     ptEtaPhiMDF = ptEtaPhiMDF.Define("DeltaEtaBQ", "LHEPart_eta[2]-LHEPart_eta[3]").Define("DeltaEtaBQBar", "LHEPart_eta[2]-LHEPart_eta[4]").Define("DeltaEtaBLept", "LHEPart_eta[2]-LHEPart_eta[6]").Define("DeltaEtaBBarQ", "LHEPart_eta[5]-LHEPart_eta[3]").Define("DeltaEtaBBarQBar", "LHEPart_eta[5]-LHEPart_eta[4]").Define("DeltaEtaBBarLept", "LHEPart_eta[5]-LHEPart_eta[6]");
 
     auto histDeltaEtaBQUp = ptEtaPhiMDF.Filter("LHEPart_pdgId[3]==2 || LHEPart_pdgId[3]==4").Histo1D({"histDeltaEtaBU", "q;#Delta#eta;Counts", nBinsEta, etaMin, etaMax}, "DeltaEtaBQ");
     auto histDeltaEtaBQDown = ptEtaPhiMDF.Filter("LHEPart_pdgId[4]==-1 || LHEPart_pdgId[4]==-3 || LHEPart_pdgId[4]==-5").Histo1D({"histDeltaEtaBDBar", "#bar{q};#Delta#eta b;Counts", nBinsEta, etaMin, etaMax}, "DeltaEtaBQBar");
-    auto histDeltaEtaBLept = ptEtaPhiMDF.Histo1D({"histDeltaEtaBLept", "leptons;#Delta#eta b;Counts", nBinsEta, etaMin, etaMax}, "DeltaEtaBLept");
+    auto histDeltaEtaBLept = ptEtaPhiMDF.Histo1D({"histDeltaEtaBLept", "l;#Delta#eta b;Counts", nBinsEta, etaMin, etaMax}, "DeltaEtaBLept");
 
     auto histDeltaEtaBBarQUp = ptEtaPhiMDF.Filter("LHEPart_pdgId[3]==2 || LHEPart_pdgId[3]==4").Histo1D({"histDeltaEtaBBarQ", "q;#Delta#eta #bar{b};Counts", nBinsEta, etaMin, etaMax}, "DeltaEtaBBarQ");
     auto histDeltaEtaBBarQDown = ptEtaPhiMDF.Filter("LHEPart_pdgId[4]==-1 || LHEPart_pdgId[4]==-3 || LHEPart_pdgId[4]==-5").Histo1D({"histDeltaEtaBBarQBar", "#bar{q};#Delta#eta #bar{b};Counts", nBinsEta, etaMin, etaMax}, "DeltaEtaBBarQBar");
-    auto histDeltaEtaBBarLept = ptEtaPhiMDF.Histo1D({"histDeltaEtaBBarLept", "leptons;#Delta#eta #bar{b};Counts", nBinsEta, etaMin, etaMax}, "DeltaEtaBBarLept");
-
+    auto histDeltaEtaBBarLept = ptEtaPhiMDF.Histo1D({"histDeltaEtaBBarLept", "l;#Delta#eta #bar{b};Counts", nBinsEta, etaMin, etaMax}, "DeltaEtaBBarLept");
 
     //------------------------- Delta phi--------------------------------------
     int nBinsPhi = 60;
@@ -295,17 +302,16 @@ int main() {
     double phiMin = -3.14;
     double phiMax = 3.14;
 
-    ptEtaPhiMDF = ptEtaPhiMDF.Define("DeltaPhiBQ", "deltaPhi(LHEPart_phi[2],LHEPart_phi[3])").Define("DeltaPhiBQBar", "deltaPhi(LHEPart_phi[2],LHEPart_phi[4])").Define("DeltaPhiBLept", "deltaPhi(LHEPart_phi[2],LHEPart_phi[6])").Define("DeltaPhiBBarQ", "deltaPhi(LHEPart_phi[2],LHEPart_phi[3])").Define("DeltaPhiBBarQBar", "deltaPhi(LHEPart_phi[2],LHEPart_phi[4])").Define("DeltaPhiBBarLept", "deltaPhi(LHEPart_phi[2],LHEPart_phi[6])");
+    ptEtaPhiMDF = ptEtaPhiMDF.Define("DeltaPhiBQ", "deltaPhi(LHEPart_phi[2],LHEPart_phi[3])").Define("DeltaPhiBQBar", "deltaPhi(LHEPart_phi[2],LHEPart_phi[4])").Define("DeltaPhiBLept", "deltaPhi(LHEPart_phi[2],LHEPart_phi[6])").Define("DeltaPhiBBarQ", "deltaPhi(LHEPart_phi[5],LHEPart_phi[3])").Define("DeltaPhiBBarQBar", "deltaPhi(LHEPart_phi[5],LHEPart_phi[4])").Define("DeltaPhiBBarLept", "deltaPhi(LHEPart_phi[5],LHEPart_phi[6])");
 
     auto histDeltaPhiBQUp = ptEtaPhiMDF.Filter("LHEPart_pdgId[3]==2 || LHEPart_pdgId[3]==4").Histo1D({"histDeltaPhiBU", "q;#Delta#phi b;Counts", nBinsPhi, phiMin, phiMax}, "DeltaPhiBQ");
 
     auto histDeltaPhiBQDown = ptEtaPhiMDF.Filter("LHEPart_pdgId[4]==-1 || LHEPart_pdgId[4]==-3 || LHEPart_pdgId[4]==-5").Histo1D({"histDeltaPhiBDBar", "#bar{q};#Delta#phi b;Counts", nBinsPhi, phiMin, phiMax}, "DeltaPhiBQBar");
-    auto histDeltaPhiBLept = ptEtaPhiMDF.Histo1D({"histDeltaPhiBLept", "leptons;#Delta#phi b;Counts", nBinsPhi,phiMin,phiMax}, "DeltaPhiBLept");
+    auto histDeltaPhiBLept = ptEtaPhiMDF.Histo1D({"histDeltaPhiBLept", "l;#Delta#phi b;Counts", nBinsPhi, phiMin, phiMax}, "DeltaPhiBLept");
 
     auto histDeltaPhiBBarQUp = ptEtaPhiMDF.Filter("LHEPart_pdgId[3]==2 || LHEPart_pdgId[3]==4").Histo1D({"histDeltaPhiBBar", "q;#Delta#phi #bar{b};Counts", nBinsPhi, phiMin, phiMax}, "DeltaPhiBBarQ");
     auto histDeltaPhiBBarQDown = ptEtaPhiMDF.Filter("LHEPart_pdgId[4]==-1 || LHEPart_pdgId[4]==-3 || LHEPart_pdgId[4]==-5").Histo1D({"histDeltaPhiBBarDBar", "#bar{q};#Delta#phi #bar{b};Counts", nBinsPhi, phiMin, phiMax}, "DeltaPhiBBarQBar");
-    auto histDeltaPhiBBarLept = ptEtaPhiMDF.Histo1D({"histDeltaPhiBBarLept", "leptons;#Delta#phi #bar{b};Counts", nBinsPhi,phiMin,phiMax}, "DeltaPhiBBarLept");
-
+    auto histDeltaPhiBBarLept = ptEtaPhiMDF.Histo1D({"histDeltaPhiBBarLept", "l;#Delta#phi #bar{b};Counts", nBinsPhi, phiMin, phiMax}, "DeltaPhiBBarLept");
 
     //-------------------------------Delta R----------------------------------//
     int nBinsR = 60;
@@ -313,17 +319,16 @@ int main() {
     double RMin = 0;
     double RMax = 6.5;
 
-
-    ptEtaPhiMDF = ptEtaPhiMDF.Define("DeltaRBQ","deltaR(DeltaPhiBQ,DeltaEtaBQ)").Define("DeltaRBQBar","deltaR(DeltaPhiBQBar,DeltaEtaBQBar)").Define("DeltaRBLept","deltaR(DeltaPhiBLept,DeltaEtaBLept)").Define("DeltaRBBarQ","deltaR(DeltaPhiBBarQ,DeltaEtaBBarQ)").Define("DeltaRBBarQBar","deltaR(DeltaPhiBBarQBar,DeltaEtaBBarQBar)").Define("DeltaRBBarLept","deltaR(DeltaPhiBBarLept,DeltaEtaBBarLept)");
+    ptEtaPhiMDF = ptEtaPhiMDF.Define("DeltaRBQ", "deltaR(DeltaPhiBQ,DeltaEtaBQ)").Define("DeltaRBQBar", "deltaR(DeltaPhiBQBar,DeltaEtaBQBar)").Define("DeltaRBLept", "deltaR(DeltaPhiBLept,DeltaEtaBLept)").Define("DeltaRBBarQ", "deltaR(DeltaPhiBBarQ,DeltaEtaBBarQ)").Define("DeltaRBBarQBar", "deltaR(DeltaPhiBBarQBar,DeltaEtaBBarQBar)").Define("DeltaRBBarLept", "deltaR(DeltaPhiBBarLept,DeltaEtaBBarLept)");
 
     auto histDeltaRBQUp = ptEtaPhiMDF.Filter("LHEPart_pdgId[3]==2 || LHEPart_pdgId[3]==4").Histo1D({"histDeltaRBU", "q;#DeltaR b;Counts", nBinsR, RMin, RMax}, "DeltaRBQ");
     auto histDeltaRBQDown = ptEtaPhiMDF.Filter("LHEPart_pdgId[4]==-1 || LHEPart_pdgId[4]==-3 || LHEPart_pdgId[4]==-5").Histo1D({"histDeltaRBDBar", "#bar{q};#DeltaR b;Counts", nBinsR, RMin, RMax}, "DeltaRBQBar");
-    auto histDeltaRBLept= ptEtaPhiMDF.Histo1D({"histDeltaRBLept", "leptons;#DeltaR b;Counts", nBinsR,RMin,RMax}, "DeltaRBLept");
+    auto histDeltaRBLept = ptEtaPhiMDF.Histo1D({"histDeltaRBLept", "l;#DeltaR b;Counts", nBinsR, RMin, RMax}, "DeltaRBLept");
 
     auto histDeltaRBBarQUp = ptEtaPhiMDF.Filter("LHEPart_pdgId[3]==2 || LHEPart_pdgId[3]==4").Histo1D({"histDeltaRBBarU", "q;#DeltaR #bar{b};Counts", nBinsR, RMin, RMax}, "DeltaRBBarQ");
 
     auto histDeltaRBBarQDown = ptEtaPhiMDF.Filter("LHEPart_pdgId[4]==-1 || LHEPart_pdgId[4]==-3 || LHEPart_pdgId[4]==-5").Histo1D({"histDeltaRBBarDBar", "#bar{q};#DeltaR #bar{b};Counts", nBinsR, RMin, RMax}, "DeltaRBBarQBar");
-    auto histDeltaRBBarLept= ptEtaPhiMDF.Histo1D({"histDeltaRBarBLept", "leptons;#DeltaR #bar{b};Counts", nBinsR,RMin,RMax}, "DeltaRBBarLept");
+    auto histDeltaRBBarLept = ptEtaPhiMDF.Histo1D({"histDeltaRBarBLept", "l;#DeltaR #bar{b};Counts", nBinsR, RMin, RMax}, "DeltaRBBarLept");
 
     //----------------------------W hadronic decays----------------------------------//
 
@@ -332,7 +337,7 @@ int main() {
 
     StackPlotter jetCouple({histWPlusJetDecay}, "W hadronic Decays", "W qq Decay", "./images/WHadronicDecay.png", false, false, true);
 
-        // Set the TH1 Label of the W decays the strings above
+    // Set the TH1 Label of the W decays the strings above
     (jetCouple).SetBinLabel(1, "ud");
     (jetCouple).SetBinLabel(2, "us");
     (jetCouple).SetBinLabel(3, "ub");
@@ -366,20 +371,15 @@ int main() {
     StackPlotter WPMPt({histPtWPlus, histPtWMinus}, "p_{t}(W^{+})/p_{t}(W^{-})", "p_{t} [GeV]", "./images/pt/PtWPlusMinus.png", true);
     StackPlotter WLeptHadPt({histPtWHad, histPtWLept}, "p_{t}(W#rightarrow q#bar{q})/p_{t}(W#rightarrow l#nu)", "p_{t} [GeV]", "./images/pt/PtWLeptHad.png", true);
 
-
-
-
-
-
     StackPlotter etaParticles({histEtaB, histEtaBBar, histEtaQ, histEtaQBar, histEtaLept}, "#eta", "#eta", "./images/eta/etaParticles.png");
 
-    etaParticles.SetLegendPos({0.8, 0.6, 0.9, 0.9});
+    etaParticles.SetLegendPos({0.78, 0.6, 0.9, 0.9});
     etaParticles.SetPalette(55);
     etaParticles.SetDrawOpt("hist PMC PLC nostack");
 
     StackPlotter ptParticles({histPtB, histPtBBar, histPtQ, histPtQBar, histPtLept}, "p_{t}", "p_{t} [GeV]", "./images/pt/ptParticles.png");
 
-    ptParticles.SetLegendPos({0.8, 0.6, 0.9, 0.9});
+    ptParticles.SetLegendPos({0.7, 0.6, 0.9, 0.9});
     ptParticles.SetPalette(55);
     ptParticles.SetDrawOpt("hist PMC PLC nostack");
 
@@ -388,46 +388,59 @@ int main() {
 
     StackPlotter deltaPhiB({histDeltaPhiBQUp, histDeltaPhiBQDown, histDeltaPhiBLept}, "#Delta#phi b", "#Delta#phi", "./images/phi/deltaPhiB.png");
 
-    deltaPhiB.SetLegendPos({0.79, 0.74, 0.92, 0.86});
+    deltaPhiB.SetLegendPos({0.2, 0.74, 0.33, 0.86});
     StackPlotter deltaPhiBBar({histDeltaPhiBBarQUp, histDeltaPhiBBarQDown, histDeltaPhiBBarLept}, "#Delta#phi #bar{b}", "#Delta#phi ", "./images/phi/deltaPhiBBar.png");
 
-    deltaPhiBBar.SetLegendPos({0.79, 0.74, 0.92, 0.86});
+    deltaPhiBBar.SetLegendPos({0.2, 0.74, 0.33, 0.86});
     StackPlotter deltaRB({histDeltaRBQUp, histDeltaRBQDown, histDeltaRBLept}, "#DeltaR b", "#DeltaR", "./images/r/deltaRB.png");
 
     StackPlotter deltaRBBar({histDeltaRBBarQUp, histDeltaRBBarQDown, histDeltaRBBarLept}, "#DeltaR #bar{b}", "#DeltaR", "./images/r/deltaRBBar.png");
 
+    StackPlotter leadingPt({histLeadingPt}, "Leading p_{t}", "p_{t} [GeV]", "./images/pt/leadingPt.png");
+    StackPlotter leadingPtPdgId({histLeadingPtPdgId, histQuarkCount}, "Leading p_{t} pdgId", "pdgId", "./images/pt/leadingPtpdgId.png", true, false, true);
 
+    leadingPtPdgId.setPdgLabel();
 
-    std::vector<StackPlotter *> stackCollection{
-/*         &ttbarMass,
-        &ttbarMassWide,
-        &ttbarEta,
-        &ttbarPt,
-        &tLeptHadMass,
-        &tLeptHadMassWide,
-        &tLeptHadEta,
-        &tLeptHadPt,
-        &WPMMass,
-        &WPMMassWide,
-        &WPMPt,
-        &WPMEta,
-        &WLeptHadMass,
-        &WLeptHadMassWide,
-        &WLeptHadPt,
-        &WLeptHadEta,
-        &WLeptHadPt,
+    StackPlotter leadingEta({histLeadingEta}, "Leading #eta", "#eta", "./images/eta/leadingEta.png");
+    StackPlotter leadingEtaPdgId({histLeadingEtaPdgId, histQuarkCount}, "Leading #eta pdgId", "pdgId", "./images/eta/leadingEtapdgId.png", true, false, true);
+    leadingEtaPdgId.setPdgLabel();
 
-        &jetCouple, */
+    std::vector<StackPlotter *>
+        stackCollection{
+            &ttbarMass,
+            &ttbarMassWide,
+            &ttbarEta,
+            &ttbarPt,
+            &tLeptHadMass,
+            &tLeptHadMassWide,
+            &tLeptHadEta,
+            &tLeptHadPt,
+            &WPMMass,
+            &WPMMassWide,
+            &WPMPt,
+            &WPMEta,
+            &WLeptHadMass,
+            &WLeptHadMassWide,
+            &WLeptHadPt,
+            &WLeptHadEta,
+            &WLeptHadPt,
 
-        &etaParticles,
-        &ptParticles,
-/*         &deltaEtaB,
-        &deltaEtaBBar,
-        &deltaPhiB,
-        &deltaPhiBBar,
-        &deltaRB,
-        &deltaRBBar */
-    };
+            &jetCouple,
+
+            &etaParticles,
+            &ptParticles,
+            &deltaEtaB,
+            &deltaEtaBBar,
+            &deltaPhiB,
+            &deltaPhiBBar,
+            &deltaRB,
+            &deltaRBBar,
+            &leadingPt,
+            &leadingPtPdgId,
+            &leadingEta,
+            &leadingEtaPdgId
+
+        };
 
     for (auto v : stackCollection) {
         v->Save();
