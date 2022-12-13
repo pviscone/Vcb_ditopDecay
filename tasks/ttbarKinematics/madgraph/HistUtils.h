@@ -33,12 +33,12 @@ private:
     std::vector<RResultPtr<::TH1D>> RResultVector;
     Int_t palette=-1;
 
-    int nStatBox = 2;
+    int nStatBox = 3;
     int iPos = 11;
     float statGap = 0.18;
     std::vector<float> legendPos{0.79, 0.62, 0.92, 0.74};
     std::vector<float> statPos{.78, .76, .95, .92};
-    float yAxisMultiplier = 1.25;
+    float yAxisMultiplier = 1.3;
     std::string drawOpt = "nostack hist";
     TCanvas *c;
     std::vector<TH1 *> histVector;
@@ -67,9 +67,9 @@ public:
     int fitWidth;
     void SetColors(std::string colors) {
         if (colors == "YellowBlack") {
-            histColor = {798, 920,433};
+            histColor = {798, 920,863};
             alphaColor = {0.8, 0.3,0.3};
-            lineColor = {798, 1,433};
+            lineColor = {798, 1,863};
             lineAlpha = {1, 1,0.3};
             markerColor = {1, 1,1};
             markerSize = {0, 0.5,0};
@@ -123,8 +123,8 @@ public:
     void SetSavePath(std::string savePath) {
         this->savePath = savePath;
     };
-    void SetLog(bool log) {
-        this->log = log;
+    void SetLog() {
+        this->log = true;
     };
     void SetFit(bool fit) {
         this->fit = fit;
@@ -245,7 +245,16 @@ public:
             hs->Draw(drawOpt.c_str());
             gPad->Update();
 
-            legend->AddEntry(histVector[idx]->GetName(), histVector[idx]->GetTitle(), "f");
+            std::string legendLabel=histVector[idx]->GetTitle();
+            if(histVector.size()>nStatBox){
+                legendLabel+="  ";
+                legendLabel += std::to_string(histVector[idx]->GetMean()).substr(0, std::to_string(histVector[idx]->GetMean()).find(".") + 3);
+                legendLabel += " (";
+                legendLabel += std::to_string(histVector[idx]->GetRMS()).substr(0, std::to_string(histVector[idx]->GetRMS()).find(".") + 3);
+                legendLabel += ")";
+            }
+    
+            legend->AddEntry(histVector[idx]->GetName(), legendLabel.c_str(), "f");
 
             if (fit) {
                 std::string funcName = "f" + std::to_string(idx);
@@ -281,6 +290,7 @@ public:
                 std::string legFit = histVector[idx]->GetTitle();
                 legFit += " BW fit";
                 legend->AddEntry(funcName.c_str(), legFit.c_str(), "l");
+
                 idx++;
             }
         }
@@ -354,7 +364,7 @@ public:
             line->SetLineColor(kRed);
             line->Draw();
             if (log) {
-                histVector[0]->GetYaxis()->SetRangeUser(0.1, 1.15 * std::max(histVector[0]->GetMaximum(), histVector[1]->GetMaximum()));
+                histVector[0]->GetYaxis()->SetRangeUser(0.1, yAxisMultiplier*10 * std::max(histVector[0]->GetMaximum(), histVector[1]->GetMaximum()));
                 p1->SetLogy();
             }
         } else {
@@ -375,4 +385,13 @@ public:
         Draw();
         c->SaveAs(savePath.c_str());
     }
+    void setPdgLabel() {
+        this->SetBinLabel(1, "d");
+        this->SetBinLabel(2, "u");
+        this->SetBinLabel(3, "s");
+        this->SetBinLabel(4, "c");
+        this->SetBinLabel(5, "b");
+        this->SetBinLabel(6, "t");
+    }
 };
+
