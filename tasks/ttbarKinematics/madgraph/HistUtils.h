@@ -83,6 +83,7 @@ public:
         this->colors = colors;
     };
     StackPlotter(std::vector<RResultPtr<::TH1D>> RResultVector, std::string title, std::string xLabel, std::string savePath = "", bool ratio = false, bool fit = false, bool log = false) {
+        hs = new THStack("hs", title.c_str());
         canvasName += std::to_string(stackPlotterCounter);
         stackPlotterCounter++;
         this->RResultVector = RResultVector;
@@ -160,9 +161,12 @@ public:
     TCanvas *GetCanvas() {
         return c;
     };
+    void Add(TH1* hist){
+        histVector.push_back(hist);
+    }
     void GetValue() {
         c = new TCanvas(canvasName.c_str(), canvasName.c_str(), 50, 50, 1280, 1120);
-        hs = new THStack("hs", title.c_str());
+        
         for (auto &resultptr : RResultVector) {
             TH1D hist = resultptr.GetValue();
             TH1D *histptr = new TH1D;
@@ -340,7 +344,7 @@ public:
             gPad->Update();
 
             // Y axis ratio plot settings
-            histRatio->GetYaxis()->SetRangeUser(-1.2, 3.2);
+            histRatio->GetYaxis()->SetRangeUser(0.3, 1.7);
             histRatio->GetYaxis()->SetTitle("Ratio");
             histRatio->GetYaxis()->SetNdivisions(505);
             histRatio->GetYaxis()->SetTitleSize(32);
@@ -364,7 +368,7 @@ public:
             line->SetLineColor(kRed);
             line->Draw();
             if (log) {
-                histVector[0]->GetYaxis()->SetRangeUser(0.1, yAxisMultiplier*10 * std::max(histVector[0]->GetMaximum(), histVector[1]->GetMaximum()));
+                histVector[0]->GetYaxis()->SetRangeUser(1, yAxisMultiplier*10 * std::max(histVector[0]->GetMaximum(), histVector[1]->GetMaximum()));
                 p1->SetLogy();
             }
         } else {

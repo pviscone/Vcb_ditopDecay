@@ -48,6 +48,18 @@ std::unordered_map<std::string, int> jetCoupleDictionary{
     {"st", 8},
     {"bt", 9}};
 
+std::unordered_map<std::string,float> CKM{
+    {"ud",0.973},
+    {"us",0.225},
+    {"ub",0.0038},
+    {"cd",0.221},
+    {"cs",0.987},
+    {"cb",0.041},
+    {"td",0},
+    {"ts",0},
+    {"tb",0},
+};
+
 int jetCoupleWPlus(RVec<int> pdgIdVec) {
 
     if (isQuark(pdgIdVec[indexFromWPlus[0]])) {
@@ -117,6 +129,9 @@ int main() {
                        "LHEPart_phi",
                        "LHEPart_mass",
                        "LHEPart_pdgId"});
+
+
+    int nEvents = fileDF.Count().GetValue();
 
     // If you want to run on 10 event (for debugging purpose), uncomment, disable the MT and rename fileDF to fileDF10
     // auto fileDF=fileDF0.Range(10000);
@@ -332,10 +347,24 @@ int main() {
 
     //----------------------------W hadronic decays----------------------------------//
 
-    auto histWPlusJetDecay = ptEtaPhiMDF.Filter("jetCoupleWPlus>0").Histo1D({"histWPlusJetDecay", "W^{+} jet decay; ;Counts", 9, 1, 9}, "jetCoupleWPlus");
-    auto histWMinusJetDecay = ptEtaPhiMDF.Filter("jetCoupleWMinus>0").Histo1D({"histWMinusJetDecay", "W^{-} jet decay; ;Counts", 9, 1, 9}, "jetCoupleWMinus");
+    auto histWPlusJetDecay = ptEtaPhiMDF.Filter("jetCoupleWPlus>0").Histo1D({"histWPlusJetDecay", "W^{+} qq decay; ;Counts", 9, 1, 9}, "jetCoupleWPlus");
+/*     auto histWMinusJetDecay = ptEtaPhiMDF.Filter("jetCoupleWMinus>0").Histo1D({"histWMinusJetDecay", "W^{-} jet decay; ;Counts", 9, 1, 9}, "jetCoupleWMinus"); */
 
-    StackPlotter jetCouple({histWPlusJetDecay}, "W hadronic Decays", "W qq Decay", "./images/WHadronicDecay.png", false, false, true);
+    StackPlotter jetCouple({histWPlusJetDecay}, "W hadronic Decays", "W qq Decay", "./images/WHadronicDecay.png", true, false, true);
+
+    jetCouple.GetValue();
+    TH1D* histCKM = new TH1D("CKM", "CKM Expected", 9, 1, 9);
+
+    histCKM->SetBinContent(jetCoupleDictionary["ud"], nEvents*TMath::Power(CKM["ud"],2)/2);
+    histCKM->SetBinContent(jetCoupleDictionary["us"], nEvents*TMath::Power(CKM["us"],2)/2);
+    histCKM->SetBinContent(jetCoupleDictionary["ub"], nEvents*TMath::Power(CKM["ub"],2)/2);
+    histCKM->SetBinContent(jetCoupleDictionary["cd"], nEvents*TMath::Power(CKM["cd"],2)/2);
+    histCKM->SetBinContent(jetCoupleDictionary["cs"], nEvents*TMath::Power(CKM["cs"],2)/2);
+    histCKM->SetBinContent(jetCoupleDictionary["cb"], nEvents*TMath::Power(CKM["cb"],2)/2);
+    histCKM->SetBinContent(jetCoupleDictionary["td"], 0);
+    histCKM->SetBinContent(jetCoupleDictionary["ts"], 0);
+    histCKM->SetBinContent(jetCoupleDictionary["tb"], 0);
+    jetCouple.Add(histCKM);
 
     // Set the TH1 Label of the W decays the strings above
     (jetCouple).SetBinLabel(1, "ud");
