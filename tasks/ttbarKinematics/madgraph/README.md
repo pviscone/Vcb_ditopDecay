@@ -20,11 +20,19 @@
 >    
 >    - [x] $\Delta R = \sqrt{\Delta\phi^2+\Delta\eta^2}$
 > 
-> 3. Compute the branching ratio for the $W\to ub$ decays
+> 3. - [ ] Plot the leading $\eta$ and $p_t$ for the quarks from W and make an histogram of the leading type of quarks for both
 > 
-> 4. Look at the MC cuts in the gridpack
+> 4. Compute the branching ratio for the $W\to ub$ decays
 > 
-> 5. Implement all with the RDataframe
+> 5. Look at the MC cuts in the gridpack
+> 
+> 6. Implement all with the RDataframe
+> 
+> 7. Add the mean and the rms in the legend
+> 
+> # FIXME
+> 
+> - Check the delta phi of the bbar, it doesn't make sense and is the same of the b one
 
 --- 
 
@@ -59,12 +67,12 @@
   
   ```bash
   /cvmfs/cms.cern.ch/phys_generator/gridpacks/2017/13TeV/madgraph/V5_2.7.3/tt0123j_1l_tbar_5f_ckm_LO_MLM/tt0123j_1l_tbar_5f_ckm_LO_MLM_slc7_amd64_gcc700_CMSSW_10_6_19_tarball.tar.xz
-  
-  
   ```
 
+```
 # Observation and doubts
 
 - The branching ratio for $W \to ub$ on all hadronic W decays from tt is: $ \frac{|V_{ub}|^2}{|V_{ud}|^2+|V_{us}|^2+|V_{ub}|^2+|V_{cd}|^2+|V_{cs}|^2+|V_{cb}|^2   } \simeq 7 \cdot 10^{-6}$ 
 
 - The tops are excluded for mass constraint
+```
