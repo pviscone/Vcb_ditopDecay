@@ -20,19 +20,21 @@
 >    
 >    - [x] $\Delta R = \sqrt{\Delta\phi^2+\Delta\eta^2}$
 > 
-> 3. - [ ] Plot the leading $\eta$ and $p_t$ for the quarks from W and make an histogram of the leading type of quarks for both
+> 3. - [x] Plot the leading $\eta$ and $p_t$ for the quarks from W and make an histogram of the leading type of quarks for both
 > 
 > 4. Compute the branching ratio for the $W\to ub$ decays
 > 
 > 5. Look at the MC cuts in the gridpack
 > 
-> 6. Implement all with the RDataframe
+> 6. - [x] Implement all with the RDataframe
 > 
-> 7. Add the mean and the rms in the legend
+> 7. - [x] Add the mean and the rms in the legend
+> 
+> 8. - [ ] Try to run on a bigger file to find the ub W decays
 > 
 > # FIXME
 > 
-> - Check the delta phi of the bbar, it doesn't make sense and is the same of the b one
+> - - [x] Check the delta phi of the bbar, it doesn't make sense and is the same of the b on
 
 --- 
 
@@ -40,6 +42,7 @@
 
 - dataset: [/TTJets_SingleLeptFromTbar_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM](https://cmsweb.cern.ch/das/request?input=dataset%3D%2FTTJets_SingleLeptFromTbar_TuneCP5_13TeV-madgraphMLM-pythia8%2FRunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1%2FNANOAODSIM&instance=prod/global)
 - file: [0BCB1429-8B19-3245-92C4-68B3DD50AC78.root](https://cmsweb.cern.ch/das/request?input=file%3D%2Fstore%2Fmc%2FRunIISummer20UL18NanoAODv9%2FTTJets_SingleLeptFromTbar_TuneCP5_13TeV-madgraphMLM-pythia8%2FNANOAODSIM%2F106X_upgrade2018_realistic_v16_L1v1-v1%2F2560000%2F0BCB1429-8B19-3245-92C4-68B3DD50AC78.root&instance=prod/global) (1.6GB)
+- newFile: [/store/mc/RunIISummer20UL18NanoAODv9/TTJets_SingleLeptFromTbar_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/2560000/73B85577-0234-814E-947E-7DCFC1275886.root](https://cmsweb.cern.ch/das/request?input=file%3D%2Fstore%2Fmc%2FRunIISummer20UL18NanoAODv9%2FTTJets_SingleLeptFromTbar_TuneCP5_13TeV-madgraphMLM-pythia8%2FNANOAODSIM%2F106X_upgrade2018_realistic_v16_L1v1-v1%2F2560000%2F73B85577-0234-814E-947E-7DCFC1275886.root&instance=prod/global) (2.9GB)
 
 ---
 
@@ -69,10 +72,8 @@
   /cvmfs/cms.cern.ch/phys_generator/gridpacks/2017/13TeV/madgraph/V5_2.7.3/tt0123j_1l_tbar_5f_ckm_LO_MLM/tt0123j_1l_tbar_5f_ckm_LO_MLM_slc7_amd64_gcc700_CMSSW_10_6_19_tarball.tar.xz
   ```
 
-```
 # Observation and doubts
 
 - The branching ratio for $W \to ub$ on all hadronic W decays from tt is: $ \frac{|V_{ub}|^2}{|V_{ud}|^2+|V_{us}|^2+|V_{ub}|^2+|V_{cd}|^2+|V_{cs}|^2+|V_{cb}|^2   } \simeq 7 \cdot 10^{-6}$ 
 
 - The tops are excluded for mass constraint
-```
