@@ -22,19 +22,25 @@
 > 
 > 3. - [x] Plot the leading $\eta$ and $p_t$ for the quarks from W and make an histogram of the leading type of quarks for both
 > 
-> 4. Compute the branching ratio for the $W\to ub$ decays
+> 4. - [ ] Plot $\eta$ ordered in $p_{t}$ and $p_t$ ordered in $\eta$
 > 
-> 5. Look at the MC cuts in the gridpack
+> 5. - [ ] Plot the $\Delta \eta, \Delta \phi, \Delta R$ for all possible couple (b,bbar,l,q,qbar)
 > 
-> 6. - [x] Implement all with the RDataframe
+> 6. Plot the $\Delta R_{min}$ and the histogram for each particle vs the others (5 hists) and to a stackhist with the particles
 > 
-> 7. - [x] Add the mean and the rms in the legend
+> 7. Compute the branching ratio for the $W\to ub$ decays
 > 
-> 8. - [ ] Try to run on a bigger file to find the ub W decays
+> 8. Look at the MC cuts in the gridpack
+> 
+> 9. - [x] Implement all with the RDataframe
+> 
+> 10. - [x] Add the mean and the rms in the legend
+>     
+>     
 > 
 > # FIXME
 > 
-> - - [x] Check the delta phi of the bbar, it doesn't make sense and is the same of the b on
+> - - [ ]  Add the b and bbar from t to the leadingEtaPdgId and leadingPtPdgId (and also lepton?) 
 
 --- 
 
