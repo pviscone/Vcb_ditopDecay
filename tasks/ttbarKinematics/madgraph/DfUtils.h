@@ -181,14 +181,35 @@ double deltaPhi(double phi1, double phi2){
     return dphi;
 }
 
-float leading(const RVec<float> &vec) {
-    return std::max({vec[3],vec[4]});
+RVec<float> leading(const RVec<float> &vec, bool absoluteValue=false) {
+    RVec<float> quarkVec {vec[2],vec[3],vec[4],vec[5]};
+    if (absoluteValue) {
+        quarkVec=abs(quarkVec);
+    }
+    auto sortQuarkVec = Sort(quarkVec);
+    return Reverse(sortQuarkVec);
 }
 
-int leadingIdx(const RVec<int> &pdgIdVec,const RVec<float> &vec) {
-    RVec<float> quarkVec {vec[3],vec[4]};
-    int argMax = ArgMax(quarkVec);
-    return TMath::Abs(pdgIdVec[argMax+3]);
+RVec<float> leadingIdx(const RVec<int> &pdgIdVec,const RVec<float> &vec,bool absoluteValue=false) {
+    //1 if (u,c), 2 if (d,s,b)bar
+    float quarkMax;
+    RVec<int> quarkOrdered {0,0,0,0};
+    RVec<float> quarkVec {vec[2],vec[3],vec[4],vec[5]};
+    if (absoluteValue) {
+        quarkVec=abs(quarkVec);
+    }
+    for(int i = 0; i < 4; i++){
+        int argMax = ArgMax(quarkVec);
+        if (argMax <= 1) {
+            quarkMax = 1;
+        } else {
+            quarkMax = 2;
+        }
+        quarkVec[argMax] = -99999;
+        quarkOrdered[i]=quarkMax;
+    }
+    return quarkOrdered;
+
 }
 
 RVec<float> quarkVec(const RVec<int> &pdgIdVec) {
