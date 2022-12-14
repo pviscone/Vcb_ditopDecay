@@ -32,8 +32,8 @@ class StackPlotter {
 private:
     std::vector<RResultPtr<::TH1D>> RResultVector;
     Int_t palette=-1;
-
-    int nStatBox = 3;
+    int nStatBox = 2;
+    int maxStatBoxPrinted;
     int iPos = 11;
     float statGap = 0.18;
     std::vector<float> legendPos{0.79, 0.62, 0.92, 0.74};
@@ -49,6 +49,7 @@ private:
     bool log = false;
     bool fit = false;
     bool normalize = false;
+    bool statsInLegend=true;
     std::string savePath;
     bool constructed = false;
     std::string canvasName = "cName";
@@ -67,13 +68,13 @@ public:
     int fitWidth;
     void SetColors(std::string colors) {
         if (colors == "YellowBlack") {
-            histColor = {798, 920,863};
-            alphaColor = {0.8, 0.3,0.3};
-            lineColor = {798, 1,863};
-            lineAlpha = {1, 1,0.3};
-            markerColor = {1, 1,1};
-            markerSize = {0, 0.5,0};
-            fitColor = {2, 9, 417};
+            histColor = {798, 920,863,616,418};
+            alphaColor = {0.8, 0.4,0.3,0.3,0.3};
+            lineColor = {798, 920+2, 863, 616,418};
+            lineAlpha = {1, 0.7,0.8,0.8,0.8};
+            markerColor = {1, 1,1,1,1};
+            markerSize = {0, 0.5,0,0,0};
+            fitColor = {2, 9, 417,0,0};
             fitWidth = 2;
             lineWidth = 3;
         } else {
@@ -95,6 +96,7 @@ public:
         this->log = log;
         colors="YellowBlack";
         this->SetColors(colors);
+        maxStatBoxPrinted = nStatBox;
     };
     ~StackPlotter(){};
     void Normalize() {
@@ -102,6 +104,12 @@ public:
     };
     void SetIPos(int iPos) {
         this->iPos = iPos;
+    };
+    void SetMaxStatBoxPrinted(int maxStatBoxPrinted) {
+        if(maxStatBoxPrinted>nStatBox){
+            throw std::invalid_argument("maxStatBoxPrinted cannot be larger than nStatBox");
+        }
+        this->maxStatBoxPrinted = maxStatBoxPrinted;
     };
     void SetLegendPos(std::vector<float> legendPos) {
         this->legendPos = legendPos;
@@ -115,6 +123,9 @@ public:
     void SetYAxisMultiplier(float yAxisMultiplier) {
         this->yAxisMultiplier = yAxisMultiplier;
     };
+    void SetStatsInLegend(bool val){
+        this->statsInLegend=val;
+    }
     void SetStatPos(int idx, float pos) {
         this->statPos[idx] = pos;
     };
@@ -132,6 +143,9 @@ public:
     };
     void SetRatio(bool ratio) {
         this->ratio = ratio;
+    };
+    void SetLineWidth(int lineWidth) {
+        this->lineWidth = lineWidth;
     };
     void SetNStatBox(int nStatBox) {
         this->nStatBox = nStatBox;
@@ -194,6 +208,7 @@ public:
 
         if (histVector.size() > nStatBox) {
             gStyle->SetOptStat(00000000);
+            legendPos={0.7, 0.7, 0.92, 0.92};
         } else {
             gStyle->SetOptStat(00011110);
         }
@@ -225,6 +240,7 @@ public:
             p1->cd();
         }
         TLegend *legend = new TLegend(legendPos[0], legendPos[1], legendPos[2], legendPos[3]);
+        legend->SetFillColorAlpha(0,0.4);
         p1->cd();
         for (int idx = 0; idx < histVector.size(); idx++) {
             if(palette<0){
@@ -232,8 +248,8 @@ public:
                 histVector[idx]->SetLineColorAlpha(lineColor[idx],lineAlpha[idx]);
                 histVector[idx]->SetMarkerColor(markerColor[idx]);
                 histVector[idx]->SetMarkerSize(markerSize[idx]);
-                histVector[idx]->SetLineWidth(lineWidth);
             }
+            histVector[idx]->SetLineWidth(lineWidth);
 
             if (normalize) {
                 histVector[idx]->Scale(1. / histVector[idx]->Integral(), "width");
@@ -250,15 +266,21 @@ public:
             gPad->Update();
 
             std::string legendLabel=histVector[idx]->GetTitle();
-            if(histVector.size()>nStatBox){
+            if(histVector.size()>nStatBox && statsInLegend==true){
                 legendLabel+="  ";
                 legendLabel += std::to_string(histVector[idx]->GetMean()).substr(0, std::to_string(histVector[idx]->GetMean()).find(".") + 3);
                 legendLabel += " (";
                 legendLabel += std::to_string(histVector[idx]->GetRMS()).substr(0, std::to_string(histVector[idx]->GetRMS()).find(".") + 3);
-                legendLabel += ")";
+                legendLabel += ") ";
+                try{
+                    legendLabel += xLabel.substr(xLabel.find("["),xLabel.find("]"));
+                }catch(const std::exception& e){}
             }
-    
-            legend->AddEntry(histVector[idx]->GetName(), legendLabel.c_str(), "f");
+            std::string legendOption = "f";
+            if(palette>0){
+                legendOption = "l";
+            }
+            legend->AddEntry(histVector[idx]->GetName(), legendLabel.c_str(), legendOption.c_str());
 
             if (fit) {
                 std::string funcName = "f" + std::to_string(idx);
@@ -276,11 +298,19 @@ public:
 
             if (histVector.size() <= nStatBox) {
                 statsVector[idx] = (TPaveStats *)histVector[idx]->GetListOfFunctions()->FindObject("stats");
-                statsVector[idx]->SetX1NDC(statPos[0] - idx * statGap);
-                statsVector[idx]->SetY1NDC(statPos[1]);
-                statsVector[idx]->SetX2NDC(statPos[2] - idx * statGap);
+                if(idx<maxStatBoxPrinted){
+                    statsVector[idx]->SetX1NDC(statPos[0] - idx * statGap);
+                    statsVector[idx]->SetY1NDC(statPos[1]);
+                    statsVector[idx]->SetX2NDC(statPos[2] - idx * statGap);
 
-                statsVector[idx]->SetY2NDC(statPos[3]);
+                    statsVector[idx]->SetY2NDC(statPos[3]);
+                } else{
+                    statsVector[idx]->SetX1NDC(99999);
+                    statsVector[idx]->SetY1NDC(99999);
+                    statsVector[idx]->SetX2NDC(99999);
+                    statsVector[idx]->SetY2NDC(99999);
+                }
+
                 statsVector[idx]->SetLineColor(histColor[idx]);
                 c->Modified();
             }
@@ -378,7 +408,7 @@ public:
         gPad->Modified();
         c->Update();
         c->RedrawAxis();
-        c->GetFrame()->Draw();
+        //c->GetFrame()->Draw();
     };
 
     void Save(std::string path) {
@@ -396,6 +426,10 @@ public:
         this->SetBinLabel(4, "c");
         this->SetBinLabel(5, "b");
         this->SetBinLabel(6, "t");
+    }
+    void setQuarkTypeLabel() {
+        this->SetBinLabel(1, "q up family");
+        this->SetBinLabel(2, "q down family");
     }
 };
 
