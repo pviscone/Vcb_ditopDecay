@@ -182,7 +182,7 @@ double deltaPhi(double phi1, double phi2){
 }
 
 RVec<float> leading(const RVec<float> &vec, bool absoluteValue=false) {
-    RVec<float> quarkVec {vec[2],vec[3],vec[4],vec[5]};
+    RVec<float> quarkVec {vec[2],vec[3],vec[4],vec[5],vec[6]};
     if (absoluteValue) {
         quarkVec=abs(quarkVec);
     }
@@ -191,22 +191,15 @@ RVec<float> leading(const RVec<float> &vec, bool absoluteValue=false) {
 }
 
 RVec<float> leadingIdx(const RVec<int> &pdgIdVec,const RVec<float> &vec,bool absoluteValue=false) {
-    //1 if (u,c), 2 if (d,s,b)bar
-    float quarkMax;
-    RVec<int> quarkOrdered {0,0,0,0};
-    RVec<float> quarkVec {vec[2],vec[3],vec[4],vec[5]};
+    RVec<int> quarkOrdered {0,0,0,0,0};
+    RVec<float> quarkVec {vec[2],vec[3],vec[4],vec[5],vec[6]};
     if (absoluteValue) {
         quarkVec=abs(quarkVec);
     }
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < quarkVec.size(); i++){
         int argMax = ArgMax(quarkVec);
-        if (argMax <= 1) {
-            quarkMax = 1;
-        } else {
-            quarkMax = 2;
-        }
-        quarkVec[argMax] = -99999;
-        quarkOrdered[i]=quarkMax;
+        quarkVec[argMax] = -999999999;
+        quarkOrdered[i]=argMax+2;
     }
     return quarkOrdered;
 
@@ -214,4 +207,34 @@ RVec<float> leadingIdx(const RVec<int> &pdgIdVec,const RVec<float> &vec,bool abs
 
 RVec<float> quarkVec(const RVec<int> &pdgIdVec) {
     return RVec<float> {(float) pdgIdVec[3],(float) -pdgIdVec[4]};
+}
+
+RVec<float> orderAccordingToVec(const RVec<float> &vecToOrder, const RVec<float> &orderVec, bool absoluteValue=false) {
+    RVec<float> partVec{orderVec[2], orderVec[3], orderVec[4], orderVec[5], orderVec[6]};
+    RVec<float> newVecToOrder{vecToOrder[2], vecToOrder[3], vecToOrder[4], vecToOrder[5], vecToOrder[6]};
+    RVec<float> resultVec{0, 0, 0, 0, 0};
+    if (absoluteValue) {
+        partVec = abs(partVec);
+        newVecToOrder = abs(newVecToOrder);
+    }
+    for (int i = 0; i < partVec.size(); i++) {
+        int argMax = ArgMax(partVec);
+        partVec[argMax] = -999999999;
+        resultVec[i] = newVecToOrder[argMax];
+    }
+    return resultVec;
+}
+
+//first element is the pdgid the smallest element, second element is the smallest element
+float DeltaRMin(float r1, float r2, float r3, float r4){
+    return std::min({r1,r2,r3,r4});
+}
+
+float PartDeltaRMin(float r1, float r2, float r3, float r4,float toExclude){
+    RVec<float> vec {r1, r2, r3, r4 };
+    float argmin = ArgMin(vec)+2;
+    if (argmin >= toExclude){
+        argmin++;
+    }
+    return argmin;
 }
