@@ -1,4 +1,6 @@
 #include "global.cpp"
+#include "../../../utils/itertools/product.hpp"
+#include "../../../utils/itertools/zip.hpp"
 
 //! this section is not future proof, it work only with this dataset (in which b=2,q=3,qbar=4,bbar=5,l=6)
 void singlePart() {
@@ -52,7 +54,7 @@ void singlePart() {
 
 #pragma region Leading
 
-#pragma region PT(Leading)
+#pragma region PT in PT(Leading)
     float ptMaxLeading = 350;
 
     ptEtaPhiMDF = ptEtaPhiMDF.Define("Leading_pt", "leading(LHEPart_pt)");
@@ -67,8 +69,8 @@ void singlePart() {
 
     StackPlotter leadingPt({histLeadingFirstPt, histLeadingSecondPt, histLeadingThirdPt, histLeadingFourthPt}, "Leading p_{T}", "p_{T} [GeV]", "./images/pt/leadingPt.png");
 
-#pragma endregion PT(Leading)
-#pragma region PTpdgId(Leading)
+#pragma endregion PT in PT(Leading)
+#pragma region PTpdgId in PT(Leading)
     ptEtaPhiMDF = ptEtaPhiMDF.Define("Leading_ptPdgId", "leadingIdx(LHEPart_pdgId,LHEPart_pt)");
 
     auto histLeadingFirstPtPdgId = ptEtaPhiMDF.Define("Leading_firstPtPdgId", "Leading_ptPdgId[0]").Histo1D({"histLeadingPtPdgId", "Leading;pdgId;Events", 2, 1, 3}, "Leading_firstPtPdgId");
@@ -87,7 +89,7 @@ void singlePart() {
 
 #pragma endregion PTpdgId(PT)(Leading)
 
-#pragma region ETA(Leading)
+#pragma region ETA in ETA(Leading)
     ptEtaPhiMDF = ptEtaPhiMDF.Define("Leading_eta", "leading(LHEPart_eta,true)");
 
     auto histLeadingFirstEta = ptEtaPhiMDF.Define("Leading_firstEta", "Leading_eta[0]").Histo1D({"histLeadingEta", "Leading #eta;#eta;Counts", nBinsEta, 0, EtaMax}, "Leading_firstEta");
@@ -99,8 +101,8 @@ void singlePart() {
     auto histLeadingFourthEta = ptEtaPhiMDF.Define("Leading_fourthEta", "Leading_eta[3]").Histo1D({"histLeadingFourthEta", "Fourth #eta;#eta;Counts", nBinsEta, 0, EtaMax}, "Leading_fourthEta");
 
     StackPlotter leadingEta({histLeadingFirstEta, histLeadingSecondEta, histLeadingThirdEta, histLeadingFourthEta}, "Leading #eta", "#eta", "./images/eta/leadingEta.png");
-#pragma endregion ETA(Leading)
-#pragma region ETApdgId(Leading)
+#pragma endregion ETA in ETA(Leading)
+#pragma region ETApdgId in ETA(Leading)
 
     ptEtaPhiMDF = ptEtaPhiMDF.Define("Leading_etaPdgId", "leadingIdx(LHEPart_pdgId,LHEPart_eta,true)");
 
@@ -121,63 +123,132 @@ void singlePart() {
 #pragma endregion Leading
 
 #pragma region DELTA
+    std::vector idxPart{2, 3, 4, 5, 6};
+    std::vector strPart{"B", "Q", "QBar", "BBar", "Lept"};
+    std::vector<std::tuple<int, int>> idxVec;
+    std::vector<std::tuple<std::string, std::string>> strPartVec;
+    for (auto idx : iter::product<2>(idxPart)) {
+        if (std::get<0>(idx) != std::get<1>(idx)) {
+            idxVec.push_back(idx);
+        }
+    }
+    for (auto str : iter::product<2>(strPart)) {
+        if (std::get<0>(str) != std::get<1>(str)) {
+            strPartVec.push_back(str);
+        }
+    }
+    std::unordered_map<std::string, std::string> strPartLatex{
+        {"B", "b"},
+        {"Q", "q"},
+        {"QBar", "#bar{q}"},
+        {"BBar", "#bar{b}"},
+        {"Lept", "l"},
+    };
 #pragma region ETA(DELTA)
 
-    ptEtaPhiMDF = ptEtaPhiMDF.Define("DeltaEtaBQ", "LHEPart_eta[2]-LHEPart_eta[3]").Define("DeltaEtaBQBar", "LHEPart_eta[2]-LHEPart_eta[4]").Define("DeltaEtaBLept", "LHEPart_eta[2]-LHEPart_eta[6]").Define("DeltaEtaBBarQ", "LHEPart_eta[5]-LHEPart_eta[3]").Define("DeltaEtaBBarQBar", "LHEPart_eta[5]-LHEPart_eta[4]").Define("DeltaEtaBBarLept", "LHEPart_eta[5]-LHEPart_eta[6]");
+    std::vector<RResultPtr<::TH1D>> histDeltaEtaVec;
+    for (auto [idxTuple, strTuple] : iter::zip(idxVec, strPartVec)) {
+        std::string columnName = "DeltaEta";
+        columnName += std::get<0>(strTuple) + std::get<1>(strTuple);
 
-    auto histDeltaEtaBQUp = ptEtaPhiMDF.Filter("LHEPart_pdgId[3]==2 || LHEPart_pdgId[3]==4").Histo1D({"histDeltaEtaBU", "q;#Delta#eta;Counts", nBinsEta, EtaMin, EtaMax}, "DeltaEtaBQ");
-    auto histDeltaEtaBQDown = ptEtaPhiMDF.Filter("LHEPart_pdgId[4]==-1 || LHEPart_pdgId[4]==-3 || LHEPart_pdgId[4]==-5").Histo1D({"histDeltaEtaBDBar", "#bar{q};#Delta#eta b;Counts", nBinsEta, EtaMin, EtaMax}, "DeltaEtaBQBar");
-    auto histDeltaEtaBLept = ptEtaPhiMDF.Histo1D({"histDeltaEtaBLept", "l;#Delta#eta b;Counts", nBinsEta, EtaMin, EtaMax}, "DeltaEtaBLept");
+        std::string functionString = "LHEPart_eta[";
+        functionString += std::to_string(std::get<0>(idxTuple)) + "]-LHEPart_eta[" + std::to_string(std::get<1>(idxTuple)) + "]";
+        ptEtaPhiMDF = ptEtaPhiMDF.Define(columnName.c_str(), functionString.c_str());
 
-    auto histDeltaEtaBBarQUp = ptEtaPhiMDF.Filter("LHEPart_pdgId[3]==2 || LHEPart_pdgId[3]==4").Histo1D({"histDeltaEtaBBarQ", "q;#Delta#eta #bar{b};Counts", nBinsEta, EtaMin, EtaMax}, "DeltaEtaBBarQ");
-    auto histDeltaEtaBBarQDown = ptEtaPhiMDF.Filter("LHEPart_pdgId[4]==-1 || LHEPart_pdgId[4]==-3 || LHEPart_pdgId[4]==-5").Histo1D({"histDeltaEtaBBarQBar", "#bar{q};#Delta#eta #bar{b};Counts", nBinsEta, EtaMin, EtaMax}, "DeltaEtaBBarQBar");
-    auto histDeltaEtaBBarLept = ptEtaPhiMDF.Histo1D({"histDeltaEtaBBarLept", "l;#Delta#eta #bar{b};Counts", nBinsEta, EtaMin, EtaMax}, "DeltaEtaBBarLept");
+        std::string histName="histDeltaEta";
+        histName += std::get<0>(strTuple) + std::get<1>(strTuple);
 
-    StackPlotter deltaEtaB({histDeltaEtaBQUp, histDeltaEtaBQDown, histDeltaEtaBLept}, "#Delta#eta b", "#Delta#eta", "./images/eta/deltaEtaB.png");
-    StackPlotter deltaEtaBBar({histDeltaEtaBBarQUp, histDeltaEtaBBarQDown, histDeltaEtaBBarLept}, "#Delta#eta #bar{b}", "#Delta#eta", "./images/eta/deltaEtaBBar.png");
+        std::string titleXLabYLab = strPartLatex[std::get<1>(strTuple)];
+        titleXLabYLab += ";#Delta#eta;Counts";
+
+        histDeltaEtaVec.push_back(ptEtaPhiMDF.Histo1D({histName.c_str(), titleXLabYLab.c_str(), nBinsEta, EtaMin, EtaMax}, columnName.c_str()));
+    }
+
+    StackPlotter deltaEtaB({histDeltaEtaVec[0], histDeltaEtaVec[1], histDeltaEtaVec[2], histDeltaEtaVec[3]},"#Delta#eta b", "#Delta#eta", "./images/eta/deltaEtaB.png");
+    StackPlotter deltaEtaQ({histDeltaEtaVec[4], histDeltaEtaVec[5], histDeltaEtaVec[6], histDeltaEtaVec[7]}, "#Delta#eta q", "#Delta#eta", "./images/eta/deltaEtaQ.png");
+    StackPlotter deltaEtaQBar({histDeltaEtaVec[8], histDeltaEtaVec[9], histDeltaEtaVec[10], histDeltaEtaVec[11]}, "#Delta#eta #bar{q}", "#Delta#eta", "./images/eta/deltaEtaQBar.png");
+    StackPlotter deltaEtaBBar({histDeltaEtaVec[12], histDeltaEtaVec[13], histDeltaEtaVec[14], histDeltaEtaVec[15]}, "#Delta#eta #bar{b}", "#Delta#eta", "./images/eta/deltaEtaBBar.png");
+    StackPlotter deltaEtaLept({histDeltaEtaVec[16], histDeltaEtaVec[17], histDeltaEtaVec[18], histDeltaEtaVec[19]}, "#Delta#eta l", "#Delta#eta", "./images/eta/deltaEtaLept.png");
+
+
+
 
 #pragma endregion ETA(DELTA)
 
+
 #pragma region PHI(DELTA)
 
-    ptEtaPhiMDF = ptEtaPhiMDF.Define("DeltaPhiBQ", "deltaPhi(LHEPart_phi[2],LHEPart_phi[3])").Define("DeltaPhiBQBar", "deltaPhi(LHEPart_phi[2],LHEPart_phi[4])").Define("DeltaPhiBLept", "deltaPhi(LHEPart_phi[2],LHEPart_phi[6])").Define("DeltaPhiBBarQ", "deltaPhi(LHEPart_phi[5],LHEPart_phi[3])").Define("DeltaPhiBBarQBar", "deltaPhi(LHEPart_phi[5],LHEPart_phi[4])").Define("DeltaPhiBBarLept", "deltaPhi(LHEPart_phi[5],LHEPart_phi[6])");
+    std::vector<RResultPtr<::TH1D>> histDeltaPhiVec;
+    for (auto [idxTuple, strTuple] : iter::zip(idxVec, strPartVec)) {
+        std::string columnName = "DeltaPhi";
+        columnName += std::get<0>(strTuple) + std::get<1>(strTuple);
 
-    auto histDeltaPhiBQUp = ptEtaPhiMDF.Filter("LHEPart_pdgId[3]==2 || LHEPart_pdgId[3]==4").Histo1D({"histDeltaPhiBU", "q;#Delta#phi b;Counts", nBinsPhi, phiMin, phiMax}, "DeltaPhiBQ");
+        std::string functionString = "deltaPhi(LHEPart_phi[";
+        functionString += std::to_string(std::get<0>(idxTuple)) + "],LHEPart_phi[" + std::to_string(std::get<1>(idxTuple)) + "])";
+        ptEtaPhiMDF = ptEtaPhiMDF.Define(columnName.c_str(), functionString.c_str());
 
-    auto histDeltaPhiBQDown = ptEtaPhiMDF.Filter("LHEPart_pdgId[4]==-1 || LHEPart_pdgId[4]==-3 || LHEPart_pdgId[4]==-5").Histo1D({"histDeltaPhiBDBar", "#bar{q};#Delta#phi b;Counts", nBinsPhi, phiMin, phiMax}, "DeltaPhiBQBar");
-    auto histDeltaPhiBLept = ptEtaPhiMDF.Histo1D({"histDeltaPhiBLept", "l;#Delta#phi b;Counts", nBinsPhi, phiMin, phiMax}, "DeltaPhiBLept");
+        std::string histName = "histDeltaPhi";
+        histName += std::get<0>(strTuple) + std::get<1>(strTuple);
 
-    auto histDeltaPhiBBarQUp = ptEtaPhiMDF.Filter("LHEPart_pdgId[3]==2 || LHEPart_pdgId[3]==4").Histo1D({"histDeltaPhiBBar", "q;#Delta#phi #bar{b};Counts", nBinsPhi, phiMin, phiMax}, "DeltaPhiBBarQ");
-    auto histDeltaPhiBBarQDown = ptEtaPhiMDF.Filter("LHEPart_pdgId[4]==-1 || LHEPart_pdgId[4]==-3 || LHEPart_pdgId[4]==-5").Histo1D({"histDeltaPhiBBarDBar", "#bar{q};#Delta#phi #bar{b};Counts", nBinsPhi, phiMin, phiMax}, "DeltaPhiBBarQBar");
-    auto histDeltaPhiBBarLept = ptEtaPhiMDF.Histo1D({"histDeltaPhiBBarLept", "l;#Delta#phi #bar{b};Counts", nBinsPhi, phiMin, phiMax}, "DeltaPhiBBarLept");
+        std::string titleXLabYLab = strPartLatex[std::get<1>(strTuple)];
+        titleXLabYLab += ";#Delta#phi;Counts";
 
-    StackPlotter deltaPhiB({histDeltaPhiBQUp, histDeltaPhiBQDown, histDeltaPhiBLept}, "#Delta#phi b", "#Delta#phi", "./images/phi/deltaPhiB.png");
+        histDeltaPhiVec.push_back(ptEtaPhiMDF.Histo1D({histName.c_str(), titleXLabYLab.c_str(), nBinsPhi, phiMin, phiMax}, columnName.c_str()));
+    }
+
+    StackPlotter deltaPhiB({histDeltaPhiVec[0], histDeltaPhiVec[1], histDeltaPhiVec[2], histDeltaPhiVec[3]}, "#Delta#phi b", "#Delta#phi", "./images/phi/deltaPhiB.png");
+    StackPlotter deltaPhiQ({histDeltaPhiVec[4], histDeltaPhiVec[5], histDeltaPhiVec[6], histDeltaPhiVec[7]}, "#Delta#phi q", "#Delta#phi", "./images/phi/deltaPhiQ.png");
+    StackPlotter deltaPhiQBar({histDeltaPhiVec[8], histDeltaPhiVec[9], histDeltaPhiVec[10], histDeltaPhiVec[11]}, "#Delta#phi #bar{q}", "#Delta#phi", "./images/phi/deltaPhiQBar.png");
+    StackPlotter deltaPhiBBar({histDeltaPhiVec[12], histDeltaPhiVec[13], histDeltaPhiVec[14], histDeltaPhiVec[15]}, "#Delta#phi #bar{b}", "#Delta#phi", "./images/phi/deltaPhiBBar.png");
+    StackPlotter deltaPhiLept({histDeltaPhiVec[16], histDeltaPhiVec[17], histDeltaPhiVec[18], histDeltaPhiVec[19]}, "#Delta#phi l", "#Delta#phi", "./images/phi/deltaEtaLept.png");
 
     deltaPhiB.SetLegendPos({0.2, 0.74, 0.33, 0.86});
-    StackPlotter deltaPhiBBar({histDeltaPhiBBarQUp, histDeltaPhiBBarQDown, histDeltaPhiBBarLept}, "#Delta#phi #bar{b}", "#Delta#phi ", "./images/phi/deltaPhiBBar.png");
-
+    deltaPhiQ.SetLegendPos({0.2, 0.74, 0.33, 0.86});
+    deltaPhiQBar.SetLegendPos({0.2, 0.74, 0.33, 0.86});
     deltaPhiBBar.SetLegendPos({0.2, 0.74, 0.33, 0.86});
+    deltaPhiLept.SetLegendPos({0.2, 0.74, 0.33, 0.86});
 
-#pragma endregion PHI(DELTA)
+#pragma endregion PHI(DELTA) 
+
 
 #pragma region R(DELTA)
+    std::vector<RResultPtr<::TH1D>> histDeltaRVec;
+    for (auto [idxTuple, strTuple] : iter::zip(idxVec, strPartVec)) {
+        std::string columnName = "DeltaR";
+        columnName += std::get<0>(strTuple) + std::get<1>(strTuple);
 
-    ptEtaPhiMDF = ptEtaPhiMDF.Define("DeltaRBQ", "deltaR(DeltaPhiBQ,DeltaEtaBQ)").Define("DeltaRBQBar", "deltaR(DeltaPhiBQBar,DeltaEtaBQBar)").Define("DeltaRBLept", "deltaR(DeltaPhiBLept,DeltaEtaBLept)").Define("DeltaRBBarQ", "deltaR(DeltaPhiBBarQ,DeltaEtaBBarQ)").Define("DeltaRBBarQBar", "deltaR(DeltaPhiBBarQBar,DeltaEtaBBarQBar)").Define("DeltaRBBarLept", "deltaR(DeltaPhiBBarLept,DeltaEtaBBarLept)");
+        std::string funcArg1= "DeltaPhi";
+        funcArg1+= std::get<0>(strTuple) + std::get<1>(strTuple);
 
-    auto histDeltaRBQUp = ptEtaPhiMDF.Filter("LHEPart_pdgId[3]==2 || LHEPart_pdgId[3]==4").Histo1D({"histDeltaRBU", "q;#DeltaR b;Counts", nBinsR, RMin, RMax}, "DeltaRBQ");
-    auto histDeltaRBQDown = ptEtaPhiMDF.Filter("LHEPart_pdgId[4]==-1 || LHEPart_pdgId[4]==-3 || LHEPart_pdgId[4]==-5").Histo1D({"histDeltaRBDBar", "#bar{q};#DeltaR b;Counts", nBinsR, RMin, RMax}, "DeltaRBQBar");
-    auto histDeltaRBLept = ptEtaPhiMDF.Histo1D({"histDeltaRBLept", "l;#DeltaR b;Counts", nBinsR, RMin, RMax}, "DeltaRBLept");
+        std::string funcArg2 = "DeltaEta";
+        funcArg2 += std::get<0>(strTuple) + std::get<1>(strTuple);
 
-    auto histDeltaRBBarQUp = ptEtaPhiMDF.Filter("LHEPart_pdgId[3]==2 || LHEPart_pdgId[3]==4").Histo1D({"histDeltaRBBarU", "q;#DeltaR #bar{b};Counts", nBinsR, RMin, RMax}, "DeltaRBBarQ");
+        std::string functionString = "deltaR(";
+        functionString += funcArg1 + "," + funcArg2 + ")";
+        ptEtaPhiMDF = ptEtaPhiMDF.Define(columnName.c_str(), functionString.c_str());
 
-    auto histDeltaRBBarQDown = ptEtaPhiMDF.Filter("LHEPart_pdgId[4]==-1 || LHEPart_pdgId[4]==-3 || LHEPart_pdgId[4]==-5").Histo1D({"histDeltaRBBarDBar", "#bar{q};#DeltaR #bar{b};Counts", nBinsR, RMin, RMax}, "DeltaRBBarQBar");
-    auto histDeltaRBBarLept = ptEtaPhiMDF.Histo1D({"histDeltaRBarBLept", "l;#DeltaR #bar{b};Counts", nBinsR, RMin, RMax}, "DeltaRBBarLept");
+        std::string histName = "histDeltaR";
+        histName += std::get<0>(strTuple) + std::get<1>(strTuple);
 
-    StackPlotter deltaRB({histDeltaRBQUp, histDeltaRBQDown, histDeltaRBLept}, "#DeltaR b", "#DeltaR", "./images/r/deltaRB.png");
+        std::string titleXLabYLab = strPartLatex[std::get<1>(strTuple)];
+        titleXLabYLab += ";#Delta#R;Counts";
 
-    StackPlotter deltaRBBar({histDeltaRBBarQUp, histDeltaRBBarQDown, histDeltaRBBarLept}, "#DeltaR #bar{b}", "#DeltaR", "./images/r/deltaRBBar.png");
+        histDeltaRVec.push_back(ptEtaPhiMDF.Histo1D({histName.c_str(), titleXLabYLab.c_str(), nBinsEta, 0, EtaMax}, columnName.c_str()));
+    }
+
+    StackPlotter deltaRB({histDeltaRVec[0], histDeltaRVec[1], histDeltaRVec[2], histDeltaRVec[3]}, "#Delta R b", "#Delta R", "./images/r/deltaRB.png");
+    StackPlotter deltaRQ({histDeltaRVec[4], histDeltaRVec[5], histDeltaRVec[6], histDeltaRVec[7]}, "#Delta R q", "#Delta R", "./images/r/deltaRQ.png");
+    StackPlotter deltaRQBar({histDeltaRVec[8], histDeltaRVec[9], histDeltaRVec[10], histDeltaRVec[11]}, "#Delta R #bar{q}", "#Delta R", "./images/r/deltaRQBar.png");
+    StackPlotter deltaRBBar({histDeltaRVec[12], histDeltaRVec[13], histDeltaRVec[14], histDeltaRVec[15]}, "#Delta R #bar{b}", "#Delta R", "./images/r/deltaRBBar.png");
+    StackPlotter deltaRLept({histDeltaRVec[16], histDeltaRVec[17], histDeltaRVec[18], histDeltaRVec[19]}, "#Delta R l", "#Delta R", "./images/r/deltaEtaLept.png");
+
+
+
 
 #pragma endregion R(DELTA)
+
+
+
 #pragma endregion DELTA
 
 #pragma region PLOT
@@ -185,18 +256,32 @@ void singlePart() {
     std::vector<StackPlotter *> stackCollection{
         &etaParticles,
         &ptParticles,
-        &deltaEtaB,
-        &deltaEtaBBar,
-        &deltaPhiB,
-        &deltaPhiBBar,
-        &deltaRB,
-        &deltaRBBar,
 
         &leadingPt,
         &leadingPtPdgId,
 
         &leadingEta,
-        &leadingEtaPdgId
+        &leadingEtaPdgId,
+
+        &deltaEtaB,
+        &deltaEtaQ,
+        &deltaEtaQBar,
+        &deltaEtaBBar,
+        &deltaEtaLept,
+
+        &deltaPhiB,
+        &deltaPhiQ,
+        &deltaPhiQBar,
+        &deltaPhiBBar,
+        &deltaPhiLept,
+
+        &deltaRB,
+        &deltaRQ,
+        &deltaRQBar,
+        &deltaRBBar,
+        &deltaRLept
+
+
 
     };
 

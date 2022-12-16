@@ -69,9 +69,9 @@ public:
     void SetColors(std::string colors) {
         if (colors == "YellowBlack") {
             histColor = {798, 920,863,616,418};
-            alphaColor = {0.8, 0.4,0.3,0.3,0.3};
+            alphaColor = {0.8, 0.4,0.3,0.25,0.25};
             lineColor = {798, 920+2, 863, 616,418};
-            lineAlpha = {1, 0.7,0.8,0.8,0.8};
+            lineAlpha = {1, 0.7,0.7,0.7,0.7};
             markerColor = {1, 1,1,1,1};
             markerSize = {0, 0.5,0,0,0};
             fitColor = {2, 9, 417,0,0};
