@@ -53,6 +53,7 @@ private:
     std::string savePath;
     bool constructed = false;
     std::string canvasName = "cName";
+    std::string yLabel = "Events";
     std::string colors;
 
 
@@ -73,7 +74,7 @@ public:
             lineColor = {798, 920+2, 863, 616,418};
             lineAlpha = {1, 0.7,0.7,0.7,0.7};
             markerColor = {1, 1,1,1,1};
-            markerSize = {0, 0.5,0,0,0};
+            markerSize = {0, 0 ,0 ,0 ,0};
             fitColor = {2, 9, 417,0,0};
             fitWidth = 2;
             lineWidth = 3;
@@ -99,6 +100,9 @@ public:
         maxStatBoxPrinted = nStatBox;
     };
     ~StackPlotter(){};
+    void SetYLabel(std::string yLabel) {
+        this->yLabel = yLabel;
+    };
     void Normalize() {
         this->normalize = true;
     };
@@ -329,7 +333,7 @@ public:
             }
         }
 
-        hs->GetYaxis()->SetTitle("Events");
+        hs->GetYaxis()->SetTitle(yLabel.c_str());
         hs->GetYaxis()->SetLabelOffset(0.01);
         hs->GetYaxis()->SetMaxDigits(3);
         // Title
@@ -419,6 +423,8 @@ public:
         Draw();
         c->SaveAs(savePath.c_str());
     }
+
+    //!Check  if this is used. If not delete it
     void setPdgLabel() {
         this->SetBinLabel(1, "d");
         this->SetBinLabel(2, "u");
@@ -427,9 +433,12 @@ public:
         this->SetBinLabel(5, "b");
         this->SetBinLabel(6, "t");
     }
-    void setQuarkTypeLabel() {
-        this->SetBinLabel(1, "q up family");
-        this->SetBinLabel(2, "q down family");
+    void setPartLabel() {
+        this->SetBinLabel(1, "b (from t)");
+        this->SetBinLabel(2, "q (from W^{+})");
+        this->SetBinLabel(3, "#bar{q} (from W^{+}))");
+        this->SetBinLabel(4, "#bar{b} (from #bar{t})");
+        this->SetBinLabel(5, "l (from W^{-})");
     }
 };
 
