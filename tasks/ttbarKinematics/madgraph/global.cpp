@@ -192,3 +192,11 @@ int nBinsR = 60;
 int nBinsRB = 10;
 double RMin = 0;
 double RMax = 6.5;
+
+std::unordered_map<std::string,std::string> strToPosString = {
+    {"B", "2"},
+    {"Q", "3"},
+    {"QBar", "4"},
+    {"BBar", "5"},
+    {"Lept", "6"},
+};
