@@ -357,6 +357,11 @@ void singlePart() {
     StackPlotter deltaRMinBBar({histDeltaRMinVec[12], histDeltaRMinVec[13], histDeltaRMinVec[14], histDeltaRMinVec[15]}, "#Delta R Min #bar{b}", "#Delta R Min", "./images/r/deltaRMinBBar.png");
     StackPlotter deltaRMinLept({histDeltaRMinVec[16], histDeltaRMinVec[17], histDeltaRMinVec[18], histDeltaRMinVec[19]}, "#Delta R Min l", "#Delta R Min", "./images/r/deltaRMinLept.png");
 
+    deltaRMinB.SetDrawOpt("hist");
+    deltaRMinBBar.SetDrawOpt("hist");
+    deltaRMinQ.SetDrawOpt("hist");
+    deltaRMinQBar.SetDrawOpt("hist");
+    deltaRMinLept.SetDrawOpt("hist");
 
 #pragma endregion RMin (DELTA)
 
@@ -367,7 +372,7 @@ void singlePart() {
 #pragma region PLOT
 
     std::vector<StackPlotter *> stackCollection{
-/*         &etaParticles,
+         &etaParticles,
         &ptParticles,
 
         &leadingPt,
@@ -392,11 +397,11 @@ void singlePart() {
         &deltaRQ,
         &deltaRQBar,
         &deltaRBBar,
-        &deltaRLept, */
+        &deltaRLept,
 
-/*         &etaOrderedInPt,
+         &etaOrderedInPt,
         &ptOrderedInEta,
- */
+
 
         &deltaRMinB,
         &deltaRMinQ,
