@@ -238,3 +238,7 @@ float PartDeltaRMin(float r1, float r2, float r3, float r4,float toExclude){
     }
     return argmin;
 }
+
+double ARGMIN(const RVec<double> &v) {
+    return ArgMin(v);
+};

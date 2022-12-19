@@ -8,14 +8,18 @@ void singlePart() {
 #pragma region Header
     gStyle->SetFillStyle(1001);
 
+    // Draw "Preliminary"
+    writeExtraText = true;
+    extraText = "Preliminary";
+    datasetText = "TTJets_SingleLeptFromTbar_TuneCP5_13TeV";
+
     ROOT::EnableImplicitMT();
     gROOT->LoadMacro("../../../utils/CMSStyle/tdrstyle.C");
     setTDRStyle();
     gROOT->LoadMacro("../../../utils/CMSStyle/CMS_lumi.C");
     TH1::SetDefaultSumw2();
 
-    // Draw "Preliminary"
-    writeExtraText = false;
+
 #pragma endregion Header
 
 #pragma region Particles
@@ -122,7 +126,7 @@ void singlePart() {
     auto histLeadingFourthEtaPdgId = ptEtaPhiMDF.Define("Leading_fourthEtaPdgId", "Leading_etaPdgId[3]").Histo1D({"histLeadingFourthEtaPdgId", "Fourth;pdgId;Events",4,2,6}, "Leading_fourthEtaPdgId");
 
 
-    StackPlotter leadingEtaPdgId({histLeadingFirstEtaPdgId, histLeadingSecondEtaPdgId, histLeadingThirdEtaPdgId, histLeadingFourthEtaPdgId}, "Order #eta for particles", "", "./images/eta/leadingEtapdgId.png");
+    StackPlotter leadingEtaPdgId({histLeadingFirstEtaPdgId, histLeadingSecondEtaPdgId, histLeadingThirdEtaPdgId, histLeadingFourthEtaPdgId}, "Ordered #eta for particles", "", "./images/eta/leadingEtapdgId.png");
 
     leadingEtaPdgId.Normalize();
     leadingEtaPdgId.SetYLabel("Fraction");
@@ -282,11 +286,11 @@ void singlePart() {
         histDeltaRVec.push_back(ptEtaPhiMDF.Histo1D({histName.c_str(), titleXLabYLab.c_str(), nBinsEta, 0, EtaMax}, columnName.c_str()));
     }
 
-    StackPlotter deltaRB({histDeltaRVec[0], histDeltaRVec[1], histDeltaRVec[2], histDeltaRVec[3]}, "#Delta R b", "#Delta R", "./images/r/deltaRB.png");
-    StackPlotter deltaRQ({histDeltaRVec[4], histDeltaRVec[5], histDeltaRVec[6], histDeltaRVec[7]}, "#Delta R q", "#Delta R", "./images/r/deltaRQ.png");
-    StackPlotter deltaRQBar({histDeltaRVec[8], histDeltaRVec[9], histDeltaRVec[10], histDeltaRVec[11]}, "#Delta R #bar{q}", "#Delta R", "./images/r/deltaRQBar.png");
-    StackPlotter deltaRBBar({histDeltaRVec[12], histDeltaRVec[13], histDeltaRVec[14], histDeltaRVec[15]}, "#Delta R #bar{b}", "#Delta R", "./images/r/deltaRBBar.png");
-    StackPlotter deltaRLept({histDeltaRVec[16], histDeltaRVec[17], histDeltaRVec[18], histDeltaRVec[19]}, "#Delta R l", "#Delta R", "./images/r/deltaRLept.png");
+    StackPlotter deltaRB({histDeltaRVec[0], histDeltaRVec[1], histDeltaRVec[2], histDeltaRVec[3]}, "#DeltaR b", "#DeltaR", "./images/r/deltaRB.png");
+    StackPlotter deltaRQ({histDeltaRVec[4], histDeltaRVec[5], histDeltaRVec[6], histDeltaRVec[7]}, "#DeltaR q", "#DeltaR", "./images/r/deltaRQ.png");
+    StackPlotter deltaRQBar({histDeltaRVec[8], histDeltaRVec[9], histDeltaRVec[10], histDeltaRVec[11]}, "#DeltaR #bar{q}", "#DeltaR", "./images/r/deltaRQBar.png");
+    StackPlotter deltaRBBar({histDeltaRVec[12], histDeltaRVec[13], histDeltaRVec[14], histDeltaRVec[15]}, "#DeltaR #bar{b}", "#DeltaR", "./images/r/deltaRBBar.png");
+    StackPlotter deltaRLept({histDeltaRVec[16], histDeltaRVec[17], histDeltaRVec[18], histDeltaRVec[19]}, "#DeltaR l", "#DeltaR", "./images/r/deltaRLept.png");
 
 
 
@@ -335,7 +339,7 @@ void singlePart() {
                 histName += str2;
 
                 std::string titleXLabYLab = strPartLatex[str2];
-                titleXLabYLab += ";#Delta R Min;Counts";
+                titleXLabYLab += ";#DeltaR_{min};Counts";
 
                 std::string filterString=columnPartName+"=="+strToPosString[str2];
 
@@ -344,12 +348,12 @@ void singlePart() {
         }
     }
 
-    StackPlotter deltaRMinB({histDeltaRMinVec[0], histDeltaRMinVec[1], histDeltaRMinVec[2], histDeltaRMinVec[3]}, "#Delta R Min B", "#Delta R Min", "./images/r/deltaRMinB.png");
+    StackPlotter deltaRMinB({histDeltaRMinVec[0], histDeltaRMinVec[1], histDeltaRMinVec[2], histDeltaRMinVec[3]}, "#DeltaR_{min} b", "#DeltaR_{min}", "./images/r/deltaRMinB.png");
 
-    StackPlotter deltaRMinQ({histDeltaRMinVec[4], histDeltaRMinVec[5], histDeltaRMinVec[6], histDeltaRMinVec[7]}, "#Delta R Min q", "#Delta R Min", "./images/r/deltaRMinQ.png");
-    StackPlotter deltaRMinQBar({histDeltaRMinVec[8], histDeltaRMinVec[9], histDeltaRMinVec[10], histDeltaRMinVec[11]}, "#Delta R Min #bar{q}", "#Delta R Min", "./images/r/deltaRMinQBar.png");
-    StackPlotter deltaRMinBBar({histDeltaRMinVec[12], histDeltaRMinVec[13], histDeltaRMinVec[14], histDeltaRMinVec[15]}, "#Delta R Min #bar{b}", "#Delta R Min", "./images/r/deltaRMinBBar.png");
-    StackPlotter deltaRMinLept({histDeltaRMinVec[16], histDeltaRMinVec[17], histDeltaRMinVec[18], histDeltaRMinVec[19]}, "#Delta R Min l", "#Delta R Min", "./images/r/deltaRMinLept.png");
+    StackPlotter deltaRMinQ({histDeltaRMinVec[4], histDeltaRMinVec[5], histDeltaRMinVec[6], histDeltaRMinVec[7]}, "#DeltaR_{min} q", "#DeltaR_{min}", "./images/r/deltaRMinQ.png");
+    StackPlotter deltaRMinQBar({histDeltaRMinVec[8], histDeltaRMinVec[9], histDeltaRMinVec[10], histDeltaRMinVec[11]}, "#DeltaR_{min} #bar{q}", "#DeltaR_{min}", "./images/r/deltaRMinQBar.png");
+    StackPlotter deltaRMinBBar({histDeltaRMinVec[12], histDeltaRMinVec[13], histDeltaRMinVec[14], histDeltaRMinVec[15]}, "#DeltaR_{min} #bar{b}", "#DeltaR_{min}", "./images/r/deltaRMinBBar.png");
+    StackPlotter deltaRMinLept({histDeltaRMinVec[16], histDeltaRMinVec[17], histDeltaRMinVec[18], histDeltaRMinVec[19]}, "#DeltaR_{min} l", "#DeltaR_{min}", "./images/r/deltaRMinLept.png");
 
     deltaRMinB.SetDrawOpt("hist");
     deltaRMinBBar.SetDrawOpt("hist");
@@ -361,12 +365,44 @@ void singlePart() {
 
 
 
+#pragma region absolute RMin(delta)
+
+    auto histRMin=ptEtaPhiMDF.Define("RMin","std::min({DeltaRBQ,DeltaRBQBar,DeltaRBBBar,DeltaRBLept,DeltaRQQBar,DeltaRQBBar,DeltaRQLept,DeltaRQBarBBar,DeltaRQBarLept,DeltaRBBarLept})").Histo1D({"histR", "#DeltaR_{min}", nBinsEta, 0, EtaMax}, "RMin");
+
+    auto histRMinPart = ptEtaPhiMDF.Define("RMinPart", "ARGMIN({DeltaRBQ,DeltaRBQBar,DeltaRBBBar,DeltaRBLept,DeltaRQQBar,DeltaRQBBar,DeltaRQLept,DeltaRQBarBBar,DeltaRQBarLept,DeltaRBBarLept})").Histo1D({"histRMinPart", "#DeltaR_{min}", 10, 0, 10}, "RMinPart");
+
+    StackPlotter rMin({histRMin}, "#DeltaR_{min}", "#DeltaR_{min}", "./images/r/rMin.png");
+    StackPlotter rMinPart({histRMinPart}, "#DeltaR_{min}", "", "./images/r/rMinPart.png");
+
+    rMin.SetLegendPos({0.7, 0.7, 0.92, 0.81});
+    rMin.DrawVerticalLine(0.4);
+
+    rMinPart.SetDrawOpt("hist");
+    rMinPart.SetBinLabel(1, "bq");
+    rMinPart.SetBinLabel(2, "b#bar{q}");
+    rMinPart.SetBinLabel(3, "b#bar{b}");
+    rMinPart.SetBinLabel(4, "bl");
+    rMinPart.SetBinLabel(5, "q#bar{q}");
+    rMinPart.SetBinLabel(6, "q#bar{b}");
+    rMinPart.SetBinLabel(7, "ql");
+    rMinPart.SetBinLabel(8, "#bar{q}#bar{b}");
+    rMinPart.SetBinLabel(9, "#bar{q}l");
+    rMinPart.SetBinLabel(10, "#bar{b}l");
+
+    rMinPart.SetStatsInLegend(false);
+    rMinPart.Normalize();
+    rMinPart.SetYLabel("Fraction");
+
+    rMinPart.SetLegendPos({0.7,0.7,0.81,0.81});
+
+#pragma endregion absolute RMin (DELTA)
+
 #pragma endregion DELTA
 
 #pragma region PLOT
 
     std::vector<StackPlotter *> stackCollection{
-         &etaParticles,
+/*        &etaParticles,
         &ptParticles,
 
         &leadingPt,
@@ -375,7 +411,7 @@ void singlePart() {
         &leadingEta,
         &leadingEtaPdgId,
 
-       &deltaEtaB,
+        &deltaEtaB,
         &deltaEtaQ,
         &deltaEtaQBar,
         &deltaEtaBBar,
@@ -393,7 +429,7 @@ void singlePart() {
         &deltaRBBar,
         &deltaRLept,
 
-         &etaOrderedInPt,
+        &etaOrderedInPt,
         &ptOrderedInEta,
 
 
@@ -401,7 +437,9 @@ void singlePart() {
         &deltaRMinQ,
         &deltaRMinQBar,
         &deltaRMinBBar,
-        &deltaRMinLept
+        &deltaRMinLept, */
+        &rMin,
+        &rMinPart
     };
 
     for (auto v : stackCollection) {
