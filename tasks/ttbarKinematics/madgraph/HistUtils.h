@@ -32,7 +32,7 @@ class StackPlotter {
 private:
     std::vector<RResultPtr<::TH1D>> RResultVector;
     Int_t palette=-1;
-    int nStatBox = 2;
+    int nStatBox = 0;
     int maxStatBoxPrinted;
     int iPos = 11;
     float statGap = 0.18;
@@ -55,6 +55,10 @@ private:
     std::string canvasName = "cName";
     std::string yLabel = "Events";
     std::string colors;
+    float thstackMaximum=0;
+    bool manualLegend=false;
+    bool drawVerticalLine=false;
+    float verticalLinePosition=0;
 
 
 public:
@@ -106,6 +110,9 @@ public:
     void Normalize() {
         this->normalize = true;
     };
+    void SetTHStackMaximum(float thstackMaximum) {
+        this->thstackMaximum = thstackMaximum;
+    };
     void SetIPos(int iPos) {
         this->iPos = iPos;
     };
@@ -117,10 +124,15 @@ public:
     };
     void SetLegendPos(std::vector<float> legendPos) {
         this->legendPos = legendPos;
+        this->manualLegend=true;
     };
     void SetLegendPos(int idx, float pos) {
         this->legendPos[idx] = pos;
     };
+    void DrawVerticalLine(float x){
+        this->drawVerticalLine=true;
+        this->verticalLinePosition=x;
+    }
     void SetStatPos(std::vector<float> statPos) {
         this->statPos = statPos;
     };
@@ -153,6 +165,7 @@ public:
     };
     void SetNStatBox(int nStatBox) {
         this->nStatBox = nStatBox;
+        this->maxStatBoxPrinted = nStatBox;
     };
     void SetFitWidth(int fitWidth) {
         this->fitWidth = fitWidth;
@@ -212,7 +225,9 @@ public:
 
         if (histVector.size() > nStatBox) {
             gStyle->SetOptStat(00000000);
-            legendPos={0.7, 0.7, 0.92, 0.92};
+            if(!manualLegend){
+                legendPos={0.7, 0.7, 0.92, 0.92};
+            }
         } else {
             gStyle->SetOptStat(00011110);
         }
@@ -336,6 +351,9 @@ public:
         hs->GetYaxis()->SetTitle(yLabel.c_str());
         hs->GetYaxis()->SetLabelOffset(0.01);
         hs->GetYaxis()->SetMaxDigits(3);
+
+
+
         // Title
         TLatex TeX;
         TeX.SetTextFont(42);
@@ -351,6 +369,20 @@ public:
 
         float iPeriod = 0;
         CMS_lumi(c, iPeriod, iPos);
+
+        // if nostack is not find in draw option set the maximum of the stack
+        if (drawOpt.find("nostack") == std::string::npos) {
+            float yMax=hs->GetMaximum();
+            hs->SetMaximum(yMax*yAxisMultiplier);
+        }
+
+        if(drawVerticalLine){
+            p1->cd();
+            TLine *line = new TLine(verticalLinePosition, p1->GetUymin(), verticalLinePosition, p1->GetUymax());
+            line->SetLineColor(kRed);
+            line->SetLineWidth(2);
+            line->Draw();
+        }
 
         //---------------------------RATIO PLOT--------------------------------
         if (ratio) {
@@ -436,7 +468,7 @@ public:
     void setPartLabel() {
         this->SetBinLabel(1, "b (from t)");
         this->SetBinLabel(2, "q (from W^{+})");
-        this->SetBinLabel(3, "#bar{q} (from W^{+}))");
+        this->SetBinLabel(3, "#bar{q} (from W^{+})");
         this->SetBinLabel(4, "#bar{b} (from #bar{t})");
     }
 };
