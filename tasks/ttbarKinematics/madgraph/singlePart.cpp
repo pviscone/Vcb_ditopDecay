@@ -67,25 +67,23 @@ void singlePart() {
 
     auto histLeadingFourthPt = ptEtaPhiMDF.Define("Leading_fourthPt", "Leading_pt[3]").Histo1D({"histLeadingFourthPt", "Fourth p_{T};p_{T} [GeV];Counts", nBinsPt, ptMin, ptMaxLeading}, "Leading_fourthPt");
 
-    auto histLeadingFifthPt = ptEtaPhiMDF.Define("Leading_fifthPt", "Leading_pt[4]").Histo1D({"histLeadingFifthPt", "Fifth p_{T};p_{T} [GeV];Counts", nBinsPt, ptMin, ptMaxLeading}, "Leading_fifthPt");
 
-    StackPlotter leadingPt({histLeadingFirstPt, histLeadingSecondPt, histLeadingThirdPt, histLeadingFourthPt,histLeadingFifthPt}, "Leading p_{T}", "p_{T} [GeV]", "./images/pt/leadingPt.png");
+    StackPlotter leadingPt({histLeadingFirstPt, histLeadingSecondPt, histLeadingThirdPt, histLeadingFourthPt}, "Leading p_{T}", "p_{T} [GeV]", "./images/pt/leadingPt.png");
 
 #pragma endregion PT in PT(Leading)
 #pragma region PTpdgId in PT(Leading)
     ptEtaPhiMDF = ptEtaPhiMDF.Define("Leading_ptPdgId", "leadingIdx(LHEPart_pdgId,LHEPart_pt)");
 
-    auto histLeadingFirstPtPdgId = ptEtaPhiMDF.Define("Leading_firstPtPdgId", "Leading_ptPdgId[0]").Histo1D({"histLeadingPtPdgId", "Leading;pdgId;Events", 5, 2 ,7}, "Leading_firstPtPdgId");
+    auto histLeadingFirstPtPdgId = ptEtaPhiMDF.Define("Leading_firstPtPdgId", "Leading_ptPdgId[0]").Histo1D({"histLeadingPtPdgId", "Leading;pdgId;Events",4,2,6}, "Leading_firstPtPdgId");
 
-    auto histLeadingSecondPtPdgId = ptEtaPhiMDF.Define("Leading_secondPtPdgId", "Leading_ptPdgId[1]").Histo1D({"histLeadingSecondPtPdgId", "Second;pdgId;Events", 5, 2 ,7}, "Leading_secondPtPdgId");
+    auto histLeadingSecondPtPdgId = ptEtaPhiMDF.Define("Leading_secondPtPdgId", "Leading_ptPdgId[1]").Histo1D({"histLeadingSecondPtPdgId", "Second;pdgId;Events",4,2,6}, "Leading_secondPtPdgId");
 
-    auto histLeadingThirdPtPdgId = ptEtaPhiMDF.Define("Leading_thirdPtPdgId", "Leading_ptPdgId[2]").Histo1D({"histLeadingThirdPtPdgId", "Third;pdgId;Events", 5, 2 ,7}, "Leading_thirdPtPdgId");
+    auto histLeadingThirdPtPdgId = ptEtaPhiMDF.Define("Leading_thirdPtPdgId", "Leading_ptPdgId[2]").Histo1D({"histLeadingThirdPtPdgId", "Third;pdgId;Events",4,2,6}, "Leading_thirdPtPdgId");
 
-    auto histLeadingFourthPtPdgId = ptEtaPhiMDF.Define("Leading_fourthPtPdgId", "Leading_ptPdgId[3]").Histo1D({"histLeadingFourthPtPdgId", "Fourth;pdgId;Events", 5, 2 ,7}, "Leading_fourthPtPdgId");
+    auto histLeadingFourthPtPdgId = ptEtaPhiMDF.Define("Leading_fourthPtPdgId", "Leading_ptPdgId[3]").Histo1D({"histLeadingFourthPtPdgId", "Fourth;pdgId;Events",4,2,6}, "Leading_fourthPtPdgId");
 
-    auto histLeadingFifthPtPdgId = ptEtaPhiMDF.Define("Leading_fifthPtPdgId", "Leading_ptPdgId[4]").Histo1D({"histLeadingFifthPtPdgId", " Fifth;pdgId;Events", 5, 2 ,7}, "Leading_fifthPtPdgId");
 
-    StackPlotter leadingPtPdgId({histLeadingFirstPtPdgId, histLeadingSecondPtPdgId, histLeadingThirdPtPdgId, histLeadingFourthPtPdgId,histLeadingFifthPtPdgId}, "Ordered p_{T} for particle", "", "./images/pt/leadingPtpdgId.png");
+    StackPlotter leadingPtPdgId({histLeadingFirstPtPdgId, histLeadingSecondPtPdgId, histLeadingThirdPtPdgId, histLeadingFourthPtPdgId}, "Ordered p_{T} for particle", "", "./images/pt/leadingPtpdgId.png");
 
     leadingPtPdgId.Normalize();
     leadingPtPdgId.SetYLabel("Fraction");
@@ -107,26 +105,24 @@ void singlePart() {
 
     auto histLeadingFourthEta = ptEtaPhiMDF.Define("Leading_fourthEta", "Leading_eta[3]").Histo1D({"histLeadingFourthEta", "Fourth #eta;#eta;Counts", nBinsEta, 0, EtaMax}, "Leading_fourthEta");
 
-    auto histLeadingFifthEta = ptEtaPhiMDF.Define("Leading_fifthEta", "Leading_eta[4]").Histo1D({"histLeadingFifthEta", "Fifth #eta;#eta;Counts", nBinsEta, 0, EtaMax}, "Leading_fifthEta");
 
-    StackPlotter leadingEta({histLeadingFirstEta, histLeadingSecondEta, histLeadingThirdEta, histLeadingFourthEta,histLeadingFifthEta}, "Leading #eta", "#eta", "./images/eta/leadingEta.png");
+    StackPlotter leadingEta({histLeadingFirstEta, histLeadingSecondEta, histLeadingThirdEta, histLeadingFourthEta}, "Leading #eta", "#eta", "./images/eta/leadingEta.png");
 
 #pragma endregion ETA in ETA(Leading)
 #pragma region ETApdgId in ETA(Leading)
 
     ptEtaPhiMDF = ptEtaPhiMDF.Define("Leading_etaPdgId", "leadingIdx(LHEPart_pdgId,LHEPart_eta,true)");
 
-    auto histLeadingFirstEtaPdgId = ptEtaPhiMDF.Define("Leading_firstEtaPdgId", "Leading_etaPdgId[0]").Histo1D({"histLeadingEtaPdgId", "Leading;pdgId;Events", 5, 2, 7}, "Leading_firstEtaPdgId");
+    auto histLeadingFirstEtaPdgId = ptEtaPhiMDF.Define("Leading_firstEtaPdgId", "Leading_etaPdgId[0]").Histo1D({"histLeadingEtaPdgId", "Leading;pdgId;Events",4,2,6}, "Leading_firstEtaPdgId");
 
-    auto histLeadingSecondEtaPdgId = ptEtaPhiMDF.Define("Leading_secondEtaPdgId", "Leading_etaPdgId[1]").Histo1D({"histLeadingSecondEtaPdgId", "Second;pdgId;Events", 5, 2, 7}, "Leading_secondEtaPdgId");
+    auto histLeadingSecondEtaPdgId = ptEtaPhiMDF.Define("Leading_secondEtaPdgId", "Leading_etaPdgId[1]").Histo1D({"histLeadingSecondEtaPdgId", "Second;pdgId;Events",4,2,6}, "Leading_secondEtaPdgId");
 
-    auto histLeadingThirdEtaPdgId = ptEtaPhiMDF.Define("Leading_thirdEtaPdgId", "Leading_etaPdgId[2]").Histo1D({"histLeadingThirdEtaPdgId", "Third;pdgId;Events", 5, 2, 7}, "Leading_thirdEtaPdgId");
+    auto histLeadingThirdEtaPdgId = ptEtaPhiMDF.Define("Leading_thirdEtaPdgId", "Leading_etaPdgId[2]").Histo1D({"histLeadingThirdEtaPdgId", "Third;pdgId;Events",4,2,6}, "Leading_thirdEtaPdgId");
 
-    auto histLeadingFourthEtaPdgId = ptEtaPhiMDF.Define("Leading_fourthEtaPdgId", "Leading_etaPdgId[3]").Histo1D({"histLeadingFourthEtaPdgId", "Fourth;pdgId;Events", 5, 2, 7}, "Leading_fourthEtaPdgId");
+    auto histLeadingFourthEtaPdgId = ptEtaPhiMDF.Define("Leading_fourthEtaPdgId", "Leading_etaPdgId[3]").Histo1D({"histLeadingFourthEtaPdgId", "Fourth;pdgId;Events",4,2,6}, "Leading_fourthEtaPdgId");
 
-    auto histLeadingFifthEtaPdgId = ptEtaPhiMDF.Define("Leading_fifthEtaPdgId", "Leading_etaPdgId[4]").Histo1D({"histLeadingFifthEtaPdgId", " Fifth;pdgId;Events", 5, 2, 7}, "Leading_fifthEtaPdgId");
 
-    StackPlotter leadingEtaPdgId({histLeadingFirstEtaPdgId, histLeadingSecondEtaPdgId, histLeadingThirdEtaPdgId, histLeadingFourthEtaPdgId, histLeadingFifthEtaPdgId}, "Order #eta for particles", "", "./images/eta/leadingEtapdgId.png");
+    StackPlotter leadingEtaPdgId({histLeadingFirstEtaPdgId, histLeadingSecondEtaPdgId, histLeadingThirdEtaPdgId, histLeadingFourthEtaPdgId}, "Order #eta for particles", "", "./images/eta/leadingEtapdgId.png");
 
     leadingEtaPdgId.Normalize();
     leadingEtaPdgId.SetYLabel("Fraction");
@@ -148,9 +144,8 @@ void singlePart() {
 
     auto histLeadingFourthEtaOrderedInPt = ptEtaPhiMDF.Define("Leading_fourthEtaOrderedInPt", "etaOrderedInPt[3]").Histo1D({"histLeadingFourthEtaOrderedInPt", "Fourth p_{T};#eta;Counts", nBinsEta, 0, EtaMax}, "Leading_fourthEtaOrderedInPt");
 
-    auto histLeadingFifthEtaOrderedInPt = ptEtaPhiMDF.Define("Leading_fifthEtaOrderedInPt", "etaOrderedInPt[4]").Histo1D({"histLeadingFifthEtaOrderedInPt", "Fifth p_{T};#eta;Counts", nBinsEta, 0, EtaMax}, "Leading_fifthEtaOrderedInPt");
 
-    StackPlotter etaOrderedInPt({histLeadingFirstEtaOrderedInPt, histLeadingSecondEtaOrderedInPt, histLeadingThirdEtaOrderedInPt, histLeadingFourthEtaOrderedInPt, histLeadingFifthEtaOrderedInPt}, "#eta ordered in p_{T}", "#eta", "./images/eta/EtaOrderedInPt.png");
+    StackPlotter etaOrderedInPt({histLeadingFirstEtaOrderedInPt, histLeadingSecondEtaOrderedInPt, histLeadingThirdEtaOrderedInPt, histLeadingFourthEtaOrderedInPt}, "#eta ordered in p_{T}", "#eta", "./images/eta/EtaOrderedInPt.png");
 
 #pragma endregion ETA ordered in PT (Leading)
 
@@ -166,9 +161,8 @@ void singlePart() {
 
     auto histLeadingFourthPtOrderedInEta = ptEtaPhiMDF.Define("Leading_fourthPtOrderedInEta", "ptOrderedInEta[3]").Histo1D({"histLeadingFourthPtOrderedInEta", "Fourth #eta;p_{T};Counts", nBinsPt, 0, ptMax}, "Leading_fourthPtOrderedInEta");
 
-    auto histLeadingFifthPtOrderedInEta = ptEtaPhiMDF.Define("Leading_fifthPtOrderedInEta", "ptOrderedInEta[4]").Histo1D({"histLeadingFifthPtOrderedInEta", "Fifth #eta;p_{T};Counts", nBinsPt, 0, ptMax}, "Leading_fifthPtOrderedInEta");
 
-    StackPlotter ptOrderedInEta({histLeadingFirstPtOrderedInEta, histLeadingSecondPtOrderedInEta, histLeadingThirdPtOrderedInEta, histLeadingFourthPtOrderedInEta, histLeadingFifthPtOrderedInEta}, "p_{T} ordered in #eta", "p_{T} [GeV]", "./images/pt/PtOrderedInEta.png");
+    StackPlotter ptOrderedInEta({histLeadingFirstPtOrderedInEta, histLeadingSecondPtOrderedInEta, histLeadingThirdPtOrderedInEta, histLeadingFourthPtOrderedInEta}, "p_{T} ordered in #eta", "p_{T} [GeV]", "./images/pt/PtOrderedInEta.png");
 
 #pragma endregion PT ordered in ETA (Leading)
 

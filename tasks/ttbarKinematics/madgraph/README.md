@@ -35,6 +35,14 @@
 > 9. - [x] Implement all with the RDataframe
 > 
 > 10. - [x] Add the mean and the rms in the legend
+> 
+> # FIXME
+> 
+> - Remove the leptons from the ordered plots
+> 
+> - Make the plot of absolute rmin, draw the line at 0.4 and make an histogram of the 10 possible couple
+> 
+> - Fix the labels and specify q up qbar antidown
 
 --- 
 

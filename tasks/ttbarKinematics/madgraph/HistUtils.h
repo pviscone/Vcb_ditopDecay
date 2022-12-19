@@ -438,7 +438,6 @@ public:
         this->SetBinLabel(2, "q (from W^{+})");
         this->SetBinLabel(3, "#bar{q} (from W^{+}))");
         this->SetBinLabel(4, "#bar{b} (from #bar{t})");
-        this->SetBinLabel(5, "l (from W^{-})");
     }
 };
 

@@ -182,7 +182,7 @@ double deltaPhi(double phi1, double phi2){
 }
 
 RVec<float> leading(const RVec<float> &vec, bool absoluteValue=false) {
-    RVec<float> quarkVec {vec[2],vec[3],vec[4],vec[5],vec[6]};
+    RVec<float> quarkVec {vec[2],vec[3],vec[4],vec[5]};
     if (absoluteValue) {
         quarkVec=abs(quarkVec);
     }
@@ -191,8 +191,8 @@ RVec<float> leading(const RVec<float> &vec, bool absoluteValue=false) {
 }
 
 RVec<float> leadingIdx(const RVec<int> &pdgIdVec,const RVec<float> &vec,bool absoluteValue=false) {
-    RVec<int> quarkOrdered {0,0,0,0,0};
-    RVec<float> quarkVec {vec[2],vec[3],vec[4],vec[5],vec[6]};
+    RVec<int> quarkOrdered {0,0,0,0};
+    RVec<float> quarkVec {vec[2],vec[3],vec[4],vec[5]};
     if (absoluteValue) {
         quarkVec=abs(quarkVec);
     }
@@ -210,9 +210,9 @@ RVec<float> quarkVec(const RVec<int> &pdgIdVec) {
 }
 
 RVec<float> orderAccordingToVec(const RVec<float> &vecToOrder, const RVec<float> &orderVec, bool absoluteValue=false) {
-    RVec<float> partVec{orderVec[2], orderVec[3], orderVec[4], orderVec[5], orderVec[6]};
-    RVec<float> newVecToOrder{vecToOrder[2], vecToOrder[3], vecToOrder[4], vecToOrder[5], vecToOrder[6]};
-    RVec<float> resultVec{0, 0, 0, 0, 0};
+    RVec<float> partVec{orderVec[2], orderVec[3], orderVec[4], orderVec[5]};
+    RVec<float> newVecToOrder{vecToOrder[2], vecToOrder[3], vecToOrder[4], vecToOrder[5]};
+    RVec<float> resultVec{0, 0, 0, 0};
     if (absoluteValue) {
         partVec = abs(partVec);
         newVecToOrder = abs(newVecToOrder);
