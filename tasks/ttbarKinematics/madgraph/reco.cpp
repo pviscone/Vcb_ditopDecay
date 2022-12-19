@@ -11,7 +11,8 @@ void reco(){
     TH1::SetDefaultSumw2();
 
     // Draw "Preliminary"
-    writeExtraText = false;
+    writeExtraText = true;
+    datasetText = "TTJets_SingleLeptFromTbar_TuneCP5_13TeV";
 
     //-------------------------------------------------------------------------------------------------------
     //                                          Create the histograms
@@ -129,7 +130,7 @@ void reco(){
     (jetCouple).SetBinLabel(8, "ts");
     (jetCouple).SetBinLabel(9, "tb");
 
-    jetCouple.SetMaxStatBoxPrinted(1);
+    //jetCouple.SetMaxStatBoxPrinted(1);
 
     StackPlotter ttbarMass({histMTBar, histMT}, "M_{t}/ M_{#bar{t}}", "M_{t}  [GeV]", "./images/mass/Mttbar.png", true, true, false);
     StackPlotter tLeptHadMass({histMTHad, histMTLept}, "M_{t#rightarrow q#bar{q}}/ M_{t#rightarrow l#nu}", "M_{t} [GeV]", "./images/mass/MtLeptHad.png", true, true);
@@ -150,6 +151,12 @@ void reco(){
     StackPlotter tLeptHadPt({histPtTHad, histPtTLept}, "p_{T}(t#rightarrow q#bar{q})/p_{T}(t#rightarrow l#nu)", "p_{T} [GeV]", "./images/pt/PtTLeptHad.png", true);
     StackPlotter WPMPt({histPtWPlus, histPtWMinus}, "p_{T}(W^{+})/p_{T}(W^{-})", "p_{T} [GeV]", "./images/pt/PtWPlusMinus.png", true);
     StackPlotter WLeptHadPt({histPtWHad, histPtWLept}, "p_{T}(W#rightarrow q#bar{q})/p_{T}(W#rightarrow l#nu)", "p_{T} [GeV]", "./images/pt/PtWLeptHad.png", true);
+
+    ttbarMass.SetNStatBox(2);
+    tLeptHadMass.SetNStatBox(2);
+    WPMMass.SetNStatBox(2);
+    WLeptHadMass.SetNStatBox(2);
+
 
     std::vector<StackPlotter *> stackCollection {
         &ttbarMass,
