@@ -252,11 +252,6 @@ void singlePart() {
     StackPlotter deltaPhiBBar({histDeltaPhiVec[12], histDeltaPhiVec[13], histDeltaPhiVec[14], histDeltaPhiVec[15]}, "#Delta#phi #bar{b}", "#Delta#phi", "./images/phi/deltaPhiBBar.png");
     StackPlotter deltaPhiLept({histDeltaPhiVec[16], histDeltaPhiVec[17], histDeltaPhiVec[18], histDeltaPhiVec[19]}, "#Delta#phi l", "#Delta#phi", "./images/phi/deltaPhiLept.png");
 
-    deltaPhiB.SetLegendPos({0.2, 0.74, 0.33, 0.86});
-    deltaPhiQ.SetLegendPos({0.2, 0.74, 0.33, 0.86});
-    deltaPhiQBar.SetLegendPos({0.2, 0.74, 0.33, 0.86});
-    deltaPhiBBar.SetLegendPos({0.2, 0.74, 0.33, 0.86});
-    deltaPhiLept.SetLegendPos({0.2, 0.74, 0.33, 0.86});
 
 #pragma endregion PHI(DELTA) 
 
@@ -402,7 +397,7 @@ void singlePart() {
 #pragma region PLOT
 
     std::vector<StackPlotter *> stackCollection{
-/*        &etaParticles,
+       &etaParticles,
         &ptParticles,
 
         &leadingPt,
@@ -437,7 +432,7 @@ void singlePart() {
         &deltaRMinQ,
         &deltaRMinQBar,
         &deltaRMinBBar,
-        &deltaRMinLept, */
+        &deltaRMinLept,
         &rMin,
         &rMinPart
     };
