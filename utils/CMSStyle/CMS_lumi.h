@@ -15,6 +15,7 @@ float cmsTextFont   = 61;  // default is helvetic-bold
 
 bool writeExtraText = false;
 TString extraText   = "Preliminary";
+TString datasetText   = "";
 float extraTextFont = 52;  // default is helvetica-italics
 
 // text sizes and text offsets with respect to the top frame

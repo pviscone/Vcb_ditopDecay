@@ -28,21 +28,19 @@
 > 
 > 6. - [x] Plot the $\Delta R_{min}$ and the histogram for each particle vs the others (5 hists) and to a stackhist with the particles
 > 
-> 7. Compute the branching ratio for the $W\to ub$ decays
+> 7. - [x] Plot the absoltute $\Delta R_{min}$ and the relative histogram for the 10 possible couple 
 > 
-> 8. Look at the MC cuts in the gridpack
+> 8. Compute the branching ratio for the $W\to ub$ decays
 > 
-> 9. - [x] Implement all with the RDataframe
+> 9. Look at the MC cuts in the gridpack
 > 
-> 10. - [x] Add the mean and the rms in the legend
+> 10. - [x] Implement all with the RDataframe
+> 
+> 11. - [x] Add the mean and the rms in the legend
 > 
 > # FIXME
 > 
-> - Make the plot of absolute rmin, draw the line at 0.4 and make an histogram of the 10 possible couple
-> 
-> - Fix the labels and specify q up qbar antidown
-> 
-> - Add "preliminary" and the name of the dataset under "CMS"  
+> - Fix the labels and specify q up qbar antidown 
 > 
 > - Try to uniform the style of the plots
 > 
