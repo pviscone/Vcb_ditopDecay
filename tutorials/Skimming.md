@@ -4,6 +4,19 @@ To skim NANOAODs the most feasible way is to use NANOAOD-Tools
 
  [GitHub - cms-nanoAOD/nanoAOD-tools: Tools for working with NanoAOD (requiring only python + root, not CMSSW)](https://github.com/cms-nanoAOD/nanoAOD-tools)
 
+## Build NanoAOD Tools
+
+In CMSSW_xx_x_x/src
+
+```bash
+git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools
+cd PhysicsTools/NanoAODTools
+cmsenv
+scram b
+cd $CMSSW_BASE/src
+cmsenv
+```
+
 ## Local skimming on lxplus
 
 ```python
@@ -34,7 +47,6 @@ p=PostProcessor(".", #This tells the postprocessor where to write the ROOT files
 #Up to this point, things have only been imported and defined. 
 #Nothing gets processed until the postprocessor we've created (and named "p") has its run command invoked:
 p.run()
-
 ```
 
 ```bash
