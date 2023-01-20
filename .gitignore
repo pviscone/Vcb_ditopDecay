@@ -1,4 +1,5 @@
 *.root
+*.pyc
 tasks/**/*.png
 tasks/**/*.jpg
 tasks/**/*.jpeg
