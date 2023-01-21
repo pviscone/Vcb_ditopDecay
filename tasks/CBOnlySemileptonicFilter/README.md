@@ -29,3 +29,21 @@ Scripts to run the skimming on crab using nanoaod tools
 - "*_cbFrom_Tbar" files refers to cbFromTbar_SingleLeptFromT dataset
 
 - The files without a suffix refers to cbFromT_SingleLeptFromTbar dataset
+
+---
+
+---
+
+# Observations
+
+- The skimmed dataset has:
+  
+  - $\sim$ 30k entries for the SingleLeptFromTbar case over 58178650 events
+  
+  - $\sim$ 15k entries for the SingleLeptFromT case over 57904914 events
+  
+  Also looking to the CRAB logs, the preselection fraction is $\sim$ 0.05% vs 0.03%
+  
+  The total BR for the semileptonic cb over all the semileptoni is 0.039%
+  
+  **WHY????**
