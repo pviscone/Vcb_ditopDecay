@@ -296,23 +296,25 @@ void singlePart() {
 
 
 
-/*
+
 #pragma endregion R(DELTA)
 
 //! This is a real mess, rewrite it from scratch
 #pragma region RMin(delta)
     std::vector<RResultPtr<::TH1D>> histDeltaRMinVec;
-    for(auto &str1: strPart){
+    for(auto &part1: strPart){
+
+        //DeltaRMin{Part}
         std::string columnName = "DeltaRMin";
-        columnName += str1;
+        columnName += part1;
 
-        std::string functionString = "DeltaRMin(";
-
-        for(auto &str2: strPart){
-            if(str1 != str2){
+        //DeltaRMin(DeltaR{Part1}{Part2}, ...)
+        std::string functionString = "Min(";
+        for(auto &part2: strPart){
+            if(part1 != part2){
                 functionString += "DeltaR";
-                functionString += str1;
-                functionString += str2;
+                functionString += part1;
+                functionString += part2;
                 functionString += ",";
             }
         }
@@ -321,32 +323,40 @@ void singlePart() {
 
         ptEtaPhiMDF = ptEtaPhiMDF.Define(columnName.c_str(), functionString.c_str());
 
-        std::string functionPartString="Part";
+
+//-----------------------------------------------------
+        std::string columnPartName = columnName + "Mask";
+
+        std::string functionPartString="Mask";
         functionPartString+=functionString;
         functionPartString.pop_back();
         functionPartString+=",\"";
-        functionPartString+=str1;
-        functionPartString += "\", isWPlusHadronic)";
-        std::cout<<functionPartString<<std::endl;
-        std::string columnPartName="Part";
-        columnPartName+=columnName;
+        functionPartString+=part1;
+        functionPartString += "\")";
+
+
 
         ptEtaPhiMDF = ptEtaPhiMDF.Define(columnPartName.c_str(), functionPartString.c_str());
-
-        int i=2;
-        for (auto &str2 : strPart) {
-            if (str1 != str2) {
+//-----------------------------------------------------
+        std::unordered_map<std::string, int> minMask = {
+            {"B", 1},
+            {"Q", 2},
+            {"Qbar", 3},
+            {"Bbar", 4},
+            {"Lept", 5}
+        };
+        for (auto &part2 : strPart) {
+            if (part1 != part2) {
                 std::string histName = "histDeltaRMin";
-                histName += str1;
-                histName += str2;
+                histName += part1;
+                histName += part2;
 
-                std::string titleXLabYLab = strPartLatex[str2];
+                std::string titleXLabYLab = strPartLatex[part2];
                 titleXLabYLab += ";#DeltaR_{min};Counts";
 
-                std::string filterString=columnPartName+"=="+std::to_string(i);
+                std::string filterString=columnPartName+"=="+std::to_string(minMask[part2]);
 
-                histDeltaRMinVec.push_back(ptEtaPhiMDF.Filter(filterString.c_str()).Histo1D({histName.c_str(), strPartLatex[str2].c_str(), nBinsEta, 0, EtaMax}, columnName.c_str()));
-                i++;
+                histDeltaRMinVec.push_back(ptEtaPhiMDF.Filter(filterString.c_str()).Histo1D({histName.c_str(), strPartLatex[part2].c_str(), nBinsEta, 0, EtaMax}, columnName.c_str()));
             }
         }
     }
@@ -365,19 +375,20 @@ void singlePart() {
     deltaRMinLept.SetDrawOpt("hist");
 #pragma endregion RMin (DELTA)
 
- */
 
 #pragma region absolute RMin(delta)
-/*
-    auto histRMin=ptEtaPhiMDF.Define("RMin","std::min({DeltaRBQ,DeltaRBQBar,DeltaRBBBar,DeltaRBLept,DeltaRQQBar,DeltaRQBBar,DeltaRQLept,DeltaRQBarBBar,DeltaRQBarLept,DeltaRBBarLept})").Histo1D({"histR", "#DeltaR_{min}", nBinsEta, 0, EtaMax}, "RMin");
 
-    auto histRMinPart = ptEtaPhiMDF.Define("RMinPart", "ARGMIN({DeltaRBQ,DeltaRBQBar,DeltaRBBBar,DeltaRBLept,DeltaRQQBar,DeltaRQBBar,DeltaRQLept,DeltaRQBarBBar,DeltaRQBarLept,DeltaRBBarLept})").Histo1D({"histRMinPart", "#DeltaR_{min}", 10, 0, 10}, "RMinPart");
+    auto histRMin=ptEtaPhiMDF.Define("RMin","std::min({DeltaRBQ,DeltaRBQbar,DeltaRBBbar,DeltaRBLept,DeltaRQQbar,DeltaRQBbar,DeltaRQLept,DeltaRQbarBbar,DeltaRQbarLept,DeltaRBbarLept})").Histo1D({"histR", "#DeltaR_{min}", nBinsEta, 0, EtaMax}, "RMin");
+
+    auto histRMinPart = ptEtaPhiMDF.Define("RMinPart", "ARGMIN({DeltaRBQ,DeltaRBQbar,DeltaRBBbar,DeltaRBLept,DeltaRQQbar,DeltaRQBbar,DeltaRQLept,DeltaRQbarBbar,DeltaRQbarLept,DeltaRBbarLept})").Histo1D({"histRMinPart", "#DeltaR_{min}", 10, 0, 10}, "RMinPart");
 
     StackPlotter rMin({histRMin}, "#DeltaR_{min}", "#DeltaR_{min}", "./images/r/rMin.png");
     StackPlotter rMinPart({histRMinPart}, "#DeltaR_{min}", "", "./images/r/rMinPart.png");
 
     rMin.SetLegendPos({0.7, 0.7, 0.92, 0.81});
     rMin.DrawVerticalLine(0.4);
+    rMin.Normalize();
+    rMin.SetYLabel("Event Fraction");
 
     rMinPart.SetDrawOpt("hist");
     rMinPart.SetBinLabel(1, "bq");
@@ -396,7 +407,7 @@ void singlePart() {
     rMinPart.SetYLabel("Fraction");
 
     rMinPart.SetLegendPos({0.7,0.7,0.81,0.81});
- */
+
 #pragma endregion absolute RMin (DELTA)
 
 #pragma endregion DELTA
@@ -439,13 +450,14 @@ void singlePart() {
 
 
 
-        /* &deltaRMinB,
+        &deltaRMinB,
         &deltaRMinQ,
         &deltaRMinQBar,
         &deltaRMinBBar,
         &deltaRMinLept,
+
         &rMin,
-        &rMinPart */
+        &rMinPart
     };
 
     for (auto v : stackCollection) {

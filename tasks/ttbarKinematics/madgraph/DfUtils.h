@@ -265,25 +265,31 @@ RVec<float> orderAccordingToVec(const RVec<float> &vecToOrder, const RVec<float>
     }
     for (int i = 0; i < partVec.size(); i++) {
         int argMax = ArgMax(partVec);
-        partVec[argMax] = -999999999;
+        partVec[argMax] = std::numeric_limits<float>::lowest();
         resultVec[i] = newVecToOrder[argMax];
     }
     return resultVec;
 }
 
 //first element is the pdgid the smallest element, second element is the smallest element
-float DeltaRMin(float r1, float r2, float r3, float r4){
+float Min(float r1, float r2, float r3, float r4){
     return std::min({r1,r2,r3,r4});
 }
 
-float PartDeltaRMin(float r1, float r2, float r3, float r4,int toExclude,int WPlusIsHadronic){
+//1:b, 2:q, 3:qbar, 4:bbar, 5:lept
+int MaskMin(const float &r1, const float &r2, const float &r3, const float &r4,const std::string &part1){
+    std::map<std::string, int> partMaskDictionary = {{"B",1},{"Q",2},{"Qbar",3},{"Bbar",4},{"Lept",5}};
+    partMaskDictionary.erase(part1);
 
-    RVec<float> vec {r1, r2, r3, r4 };
-    float argmin = ArgMin(vec)+2;
-    if (argmin >= toExclude){
-        argmin++;
+    std::vector<int> maskVec;
+    for(auto const &mapElement : partMaskDictionary){
+        maskVec.push_back(mapElement.second);
+
     }
-    return argmin;
+    std::sort(maskVec.begin(), maskVec.end());
+    RVec<float> vec = {r1,r2,r3,r4};
+    int argmin = ArgMin(vec);
+    return maskVec[argmin];
 }
 
 double ARGMIN(const RVec<double> &v) {
