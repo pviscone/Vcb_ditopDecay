@@ -209,12 +209,17 @@ void Plots(std::string rootFile, std::string datasetName, std::string imageSaveF
 
     //----------------------------W hadronic decays----------------------------------//
 
-    auto histWPlusJetDecay = ptEtaPhiMDF.Filter("jetCoupleWPlus>0").Histo1D({"histWPlusJetDecay", "W^{+} qq decay; ;Counts", 9, 1, 9}, "jetCoupleWPlus");
-    /*     auto histWMinusJetDecay = ptEtaPhiMDF.Filter("jetCoupleWMinus>0").Histo1D({"histWMinusJetDecay", "W^{-} jet decay; ;Counts", 9, 1, 9}, "jetCoupleWMinus"); */
+    auto histWPlusJetDecay = ptEtaPhiMDF.Filter("jetCoupleWPlus>0").Histo1D({"histWPlusJetDecay", "W^{+} q#bar{q} decay; ;Counts", 9, 1, 9}, "jetCoupleWPlus");
+    auto histWMinusJetDecay = ptEtaPhiMDF.Filter("jetCoupleWMinus>0").Histo1D({"histWMinusJetDecay", "W^{-} q#bar{q} decay; ;Counts", 9, 1, 9}, "jetCoupleWMinus");
 
-    StackPlotter jetCouple({histWPlusJetDecay}, "W hadronic Decays", "W qq Decay", imageSaveFolder+"/WHadronicDecay.png", true, false, true);
+    StackPlotter jetCouple({histWPlusJetDecay,histWMinusJetDecay}, "W hadronic Decays", "", imageSaveFolder+"/WHadronicDecay.png", false, false, true);
 
+    jetCouple.SetDrawOpt("hist");
+    jetCouple.SetLegendPos({0.75, 0.75, 0.92, 0.85});
     jetCouple.GetValue();
+    jetCouple.SetStatsInLegend(false);
+
+    /*
     TH1D *histCKM = new TH1D("CKM", "CKM Expected", 9, 1, 9);
 
     histCKM->SetBinContent(jetCoupleDictionary["ud"], nEvents * TMath::Power(CKM["ud"], 2) / 2);
@@ -227,6 +232,7 @@ void Plots(std::string rootFile, std::string datasetName, std::string imageSaveF
     histCKM->SetBinContent(jetCoupleDictionary["ts"], 0);
     histCKM->SetBinContent(jetCoupleDictionary["tb"], 0);
     jetCouple.Add(histCKM);
+    */
 
     // Set the TH1 Label of the W decays the strings above
     (jetCouple).SetBinLabel(1, "ud");
