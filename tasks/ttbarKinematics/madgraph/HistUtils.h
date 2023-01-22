@@ -197,7 +197,7 @@ public:
     }
     void GetValue() {
         c = new TCanvas(canvasName.c_str(), canvasName.c_str(), 50, 50, 1280, 1120);
-        
+
         for (auto &resultptr : RResultVector) {
             TH1D hist = resultptr.GetValue();
             TH1D *histptr = new TH1D;
@@ -466,10 +466,10 @@ public:
         this->SetBinLabel(6, "t");
     }
     void setPartLabel() {
-        this->SetBinLabel(1, "b (from t)");
-        this->SetBinLabel(2, "q (from W^{+})");
-        this->SetBinLabel(3, "#bar{q} (from W^{+})");
-        this->SetBinLabel(4, "#bar{b} (from #bar{t})");
+        this->SetBinLabel(1, "b");
+        this->SetBinLabel(2, "q");
+        this->SetBinLabel(3, "#bar{q}");
+        this->SetBinLabel(4, "#bar{b}");
     }
 };
 
