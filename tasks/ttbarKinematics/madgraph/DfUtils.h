@@ -167,12 +167,43 @@ RVec<T> filterTracks(const RVec<T> &vec, const RVec<int> mask) {
     return filteredVec;
 }
 
+double deltaEta(const RVec<float> &etaVec, const int &WPlusIsHadronic, std::string strPart1, std::string strPart2) {
+    std::unordered_map<std::string, int> partIdxDictionary;
+
+    partIdxDictionary["B"]=2;
+    partIdxDictionary["Bbar"]=5;
+    if(WPlusIsHadronic==1){
+        partIdxDictionary["Q"]=3;
+        partIdxDictionary["Qbar"]=4;
+        partIdxDictionary["Lept"]=6;
+    } else {
+        partIdxDictionary["Q"]=6;
+        partIdxDictionary["Qbar"]=7;
+        partIdxDictionary["Lept"]=3;
+    }
+    return etaVec[partIdxDictionary[strPart1]] - etaVec[partIdxDictionary[strPart2]];
+}
+
+
 double deltaR(double deltaPhi, double deltaEta) {
     return TMath::Sqrt(TMath::Power(deltaPhi, 2) + TMath::Power(deltaEta, 2));
 }
 
-double deltaPhi(double phi1, double phi2){
-    double dphi = phi1 - phi2;
+double deltaPhi(const RVec<float> &phiVec, const int &WPlusIsHadronic, std::string strPart1, std::string strPart2) {
+    std::unordered_map<std::string, int> partIdxDictionary;
+
+    partIdxDictionary["B"] = 2;
+    partIdxDictionary["Bbar"] = 5;
+    if (WPlusIsHadronic == 1) {
+        partIdxDictionary["Q"] = 3;
+        partIdxDictionary["Qbar"] = 4;
+        partIdxDictionary["Lept"] = 6;
+    } else {
+        partIdxDictionary["Q"] = 6;
+        partIdxDictionary["Qbar"] = 7;
+        partIdxDictionary["Lept"] = 3;
+    }
+    double dphi = phiVec[partIdxDictionary[strPart1]] - phiVec[partIdxDictionary[strPart2]];
     if (dphi > TMath::Pi()) {
         dphi -= 2 * TMath::Pi();
     } else if (dphi < -TMath::Pi()) {
@@ -181,8 +212,14 @@ double deltaPhi(double phi1, double phi2){
     return dphi;
 }
 
-RVec<float> leading(const RVec<float> &vec, bool absoluteValue=false) {
-    RVec<float> quarkVec {vec[2],vec[3],vec[4],vec[5]};
+
+RVec<float> leading(const RVec<float> &vec, const int &WPlusIsHadronic, bool absoluteValue=false) {
+    RVec<float> quarkVec;
+    if (WPlusIsHadronic==1){
+        quarkVec = {vec[2],vec[3],vec[4],vec[5]};
+    } else {
+        quarkVec = {vec[2],vec[6],vec[7],vec[5]};
+    }
     if (absoluteValue) {
         quarkVec=abs(quarkVec);
     }
@@ -190,9 +227,14 @@ RVec<float> leading(const RVec<float> &vec, bool absoluteValue=false) {
     return Reverse(sortQuarkVec);
 }
 
-RVec<float> leadingIdx(const RVec<int> &pdgIdVec,const RVec<float> &vec,bool absoluteValue=false) {
+RVec<float> leadingIdx(const RVec<int> &pdgIdVec,const RVec<float> &vec,const int &WPlusIsHadronic,bool absoluteValue=false) {
     RVec<int> quarkOrdered {0,0,0,0};
-    RVec<float> quarkVec {vec[2],vec[3],vec[4],vec[5]};
+    RVec<float> quarkVec;
+    if (WPlusIsHadronic==1) {
+        quarkVec = {vec[2], vec[3], vec[4], vec[5]};
+    } else {
+        quarkVec = {vec[2], vec[6], vec[7], vec[5]};
+    }
     if (absoluteValue) {
         quarkVec=abs(quarkVec);
     }
@@ -205,13 +247,17 @@ RVec<float> leadingIdx(const RVec<int> &pdgIdVec,const RVec<float> &vec,bool abs
 
 }
 
-RVec<float> quarkVec(const RVec<int> &pdgIdVec) {
-    return RVec<float> {(float) pdgIdVec[3],(float) -pdgIdVec[4]};
-}
 
-RVec<float> orderAccordingToVec(const RVec<float> &vecToOrder, const RVec<float> &orderVec, bool absoluteValue=false) {
-    RVec<float> partVec{orderVec[2], orderVec[3], orderVec[4], orderVec[5]};
-    RVec<float> newVecToOrder{vecToOrder[2], vecToOrder[3], vecToOrder[4], vecToOrder[5]};
+RVec<float> orderAccordingToVec(const RVec<float> &vecToOrder, const RVec<float> &orderVec, const int &WPlusIsHadronic, bool absoluteValue=false) {
+    RVec<float> partVec;
+    RVec<float> newVecToOrder;
+    if(WPlusIsHadronic==1){
+        partVec={orderVec[2], orderVec[3], orderVec[4], orderVec[5]};
+        newVecToOrder={vecToOrder[2], vecToOrder[3], vecToOrder[4], vecToOrder[5]};
+    } else {
+        partVec={orderVec[2], orderVec[6], orderVec[7], orderVec[5]};
+        newVecToOrder={vecToOrder[2], vecToOrder[6], vecToOrder[7], vecToOrder[5]};
+    }
     RVec<float> resultVec{0, 0, 0, 0};
     if (absoluteValue) {
         partVec = abs(partVec);
@@ -230,7 +276,8 @@ float DeltaRMin(float r1, float r2, float r3, float r4){
     return std::min({r1,r2,r3,r4});
 }
 
-float PartDeltaRMin(float r1, float r2, float r3, float r4,float toExclude){
+float PartDeltaRMin(float r1, float r2, float r3, float r4,int toExclude,int WPlusIsHadronic){
+
     RVec<float> vec {r1, r2, r3, r4 };
     float argmin = ArgMin(vec)+2;
     if (argmin >= toExclude){

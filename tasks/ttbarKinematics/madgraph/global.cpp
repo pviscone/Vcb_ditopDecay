@@ -108,6 +108,40 @@ float isLeptonic(float isQuark, float sameSign, float oppositeSign) {
     }
 }
 
+float selectQ(const int &WPlusIsHadronic, const RVec<float> &branch) {
+    if (WPlusIsHadronic==1) {
+        return branch[3];
+    } else {
+        return branch[6];
+    }
+}
+
+float selectQBar(const int &WPlusIsHadronic, const RVec<float> &branch) {
+    if (WPlusIsHadronic==1) {
+        return branch[4];
+    } else {
+        return branch[7];
+    }
+}
+
+float selectLept(const int &WPlusIsHadronic, const RVec<float> &branch) {
+    if (WPlusIsHadronic==1) {
+        return branch[6];
+    } else {
+        return branch[3];
+    }
+}
+
+int isWPlusHadronic(const RVec<int> &pdgIdVec) {
+    if (TMath::Abs(pdgIdVec[3]) <= 6) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+
 //-------------------------------------------------------------------------------------------------------
 //                                 File,tree and branches status
 int SetMT() {
@@ -171,7 +205,8 @@ auto ptEtaPhiMDF = lorentzVectorsDF
                        .Define("THad_mass", "isHadronic(jetCoupleWPlus,T_mass,TBar_mass)")
                        .Define("THad_pt", "isHadronic(jetCoupleWPlus,T_pt,TBar_pt)")
                        .Define("THad_eta", "isHadronic(jetCoupleWPlus,T_eta,TBar_eta)")
-                       .Define("THad_phi", "isHadronic(jetCoupleWPlus,T_phi,TBar_phi)");
+                       .Define("THad_phi", "isHadronic(jetCoupleWPlus,T_phi,TBar_phi)")
+                       .Define("isWPlusHadronic", isWPlusHadronic,{"LHEPart_pdgId"});
 
 double ptMin = 0;
 double ptMax = 500;
@@ -193,10 +228,3 @@ int nBinsRB = 10;
 double RMin = 0;
 double RMax = 6.5;
 
-std::unordered_map<std::string,std::string> strToPosString = {
-    {"B", "2"},
-    {"Q", "3"},
-    {"QBar", "4"},
-    {"BBar", "5"},
-    {"Lept", "6"},
-};
