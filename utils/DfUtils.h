@@ -154,7 +154,6 @@ int jetCoupleWMinus(RVec<int> pdgIdVec) {
         std::string q2 = pdg(pdgIdVec[indexFromWMinus[1]]);
         key.push_back(q1[0]);
         key.push_back(q2[0]);
-        std::cout << isQuark(pdgIdVec[indexFromWMinus[0]]) << std::endl;
         return jetCoupleDictionary[key];
     } else {
         return -1;
