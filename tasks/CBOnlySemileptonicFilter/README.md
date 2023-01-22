@@ -44,6 +44,14 @@ Scripts to run the skimming on crab using nanoaod tools
   
   Also looking to the CRAB logs, the preselection fraction is $\sim$ 0.05% vs 0.03%
   
-  The total BR for the semileptonic cb over all the semileptoni is 0.039%
+  The total BR for the semileptonic cb over all the semileptonic is 0.039%
+
+- Another weird thing is:
   
-  **WHY????**
+  - SingleLeptFromTbar case: the leptons are all $\tau$ 
+  
+  - SingleLeptFromT case: the leptons are all $e$
+  
+  Maybe this is the reason why the two cases have different BR (helicity suppression)
+  
+  This is true only if for the cbOnly case. In other hadronic decays we can find other leptons in the original dataset
