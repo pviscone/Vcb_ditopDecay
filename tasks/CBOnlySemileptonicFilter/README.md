@@ -4,6 +4,7 @@
 > 
 > - Do it first with a simple root macro
 > - Filter an existing dataset
+> - Create the same hists of the [ttbarKinematics](../ttbarKinematics/README.md) taks for both datasets and for the merged dataset
 > 
 > ## Datasets
 > 
