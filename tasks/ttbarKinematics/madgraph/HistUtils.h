@@ -271,7 +271,7 @@ public:
             histVector[idx]->SetLineWidth(lineWidth);
 
             if (normalize) {
-                histVector[idx]->Scale(1. / histVector[idx]->Integral(), "width");
+                histVector[idx]->Scale(1. / histVector[idx]->Integral());
             }
             if (!log) {
                 histVector[idx]->GetYaxis()->SetRangeUser(0, yAxisMultiplier * std::max(histVector[idx]->GetMaximum(), histVector[idx]->GetMaximum()));
