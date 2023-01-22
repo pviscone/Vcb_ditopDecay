@@ -2,7 +2,7 @@
 
 - [CRAB3ConfigurationFile](https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile)
 
-- Download from DAS: xrbcp root://cms-xrd-global.cern.ch/{filePath}
+- Download from DAS: xrdcp root://cms-xrd-global.cern.ch/{filePath}
 
 - Masses and charges
   
