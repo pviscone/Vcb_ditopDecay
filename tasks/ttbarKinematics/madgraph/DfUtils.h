@@ -21,6 +21,47 @@ using namespace ROOT;
 using namespace ROOT::Math;
 using namespace ROOT::VecOps;
 
+
+
+// This vector will contain index (Instance) of the particles produced by the W+ and by the W-
+std::vector<int> indexFromWPlus{3, 4};
+std::vector<int> indexFromWMinus{6, 7};
+// The particles in the 3rd instance comes always from the top, the 4rth from the antitop
+int indexQFromT = 2;
+int indexQBarFromTBar = 5;
+
+std::unordered_map<std::string, int> jetCoupleDictionary{
+    {"tb", 9},
+    {"ts", 8},
+    {"td", 7},
+    {"cb", 6},
+    {"cs", 5},
+    {"cd", 4},
+    {"ub", 3},
+    {"us", 2},
+    {"ud", 1},
+    {"du", 1},
+    {"su", 2},
+    {"bu", 3},
+    {"dc", 4},
+    {"sc", 5},
+    {"bc", 6},
+    {"dt", 7},
+    {"st", 8},
+    {"bt", 9}};
+
+std::unordered_map<std::string,float> CKM{
+    {"ud",0.973},
+    {"us",0.225},
+    {"ub",0.0038},
+    {"cd",0.221},
+    {"cs",0.987},
+    {"cb",0.041},
+    {"td",0},
+    {"ts",0},
+    {"tb",0},
+};
+
 //----------------------------------------------------------------------
 //----------------------------------------------------------------------
 //                         PDG DATABASE
@@ -90,6 +131,86 @@ TParticlePDG *particle(int id) {
 bool isQuark(int id) {
     return (abs(id) <= 8);
 }
+
+int jetCoupleWPlus(RVec<int> pdgIdVec) {
+
+    if (isQuark(pdgIdVec[indexFromWPlus[0]])) {
+        std::string key;
+        std::string q1 = pdg(pdgIdVec[indexFromWPlus[0]]);
+        std::string q2 = pdg(pdgIdVec[indexFromWPlus[1]]);
+        key.push_back(q1[0]);
+        key.push_back(q2[0]);
+        return jetCoupleDictionary[key];
+    } else {
+        return -1;
+    }
+}
+
+int jetCoupleWMinus(RVec<int> pdgIdVec) {
+
+    if (isQuark(pdgIdVec[indexFromWMinus[0]])) {
+        std::string key;
+        std::string q1 = pdg(pdgIdVec[indexFromWMinus[0]]);
+        std::string q2 = pdg(pdgIdVec[indexFromWMinus[1]]);
+        key.push_back(q1[0]);
+        key.push_back(q2[0]);
+        std::cout << isQuark(pdgIdVec[indexFromWMinus[0]]) << std::endl;
+        return jetCoupleDictionary[key];
+    } else {
+        return -1;
+    }
+}
+
+float isHadronic(float isQuark, float sameSign, float oppositeSign) {
+    if (isQuark >= 0) {
+        return sameSign;
+    } else {
+        return oppositeSign;
+    }
+}
+
+float isLeptonic(float isQuark, float sameSign, float oppositeSign) {
+    if (isQuark < 0) {
+        return sameSign;
+    } else {
+        return oppositeSign;
+    }
+}
+
+float selectQ(const int &WPlusIsHadronic, const RVec<float> &branch) {
+    if (WPlusIsHadronic==1) {
+        return branch[3];
+    } else {
+        return branch[6];
+    }
+}
+
+float selectQBar(const int &WPlusIsHadronic, const RVec<float> &branch) {
+    if (WPlusIsHadronic==1) {
+        return branch[4];
+    } else {
+        return branch[7];
+    }
+}
+
+float selectLept(const int &WPlusIsHadronic, const RVec<float> &branch) {
+    if (WPlusIsHadronic==1) {
+        return branch[6];
+    } else {
+        return branch[3];
+    }
+}
+
+int isWPlusHadronic(const RVec<int> &pdgIdVec) {
+    if (TMath::Abs(pdgIdVec[3]) <= 6) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+
 
 /**
  * @brief Get the Lorentz Vector object given pt,eta,phi and mass
