@@ -1,0 +1,19 @@
+import model smckm
+
+define p = u c s d b u~ c~ s~ d~ b~ g
+define j = p
+define l+ ? e+ mu+ ta+
+define l- = e- mu- ta-
+define vl = ve vm vt
+define vl~ = ve~ vm~ vt~
+
+generate p p > t t~, (t > b w+, w+ > l+ vl), (t~ > b~ w-, w- > b c~) @0
+add process p p > t t~, (t > b w +, w+ > c b~), (t~ > b~ w-, w- > l- vl~) @1
+add process p p > t t~ j, (t > b w+, w+ > l+ vl), (t~ > b~ w-, w- > b c~) @2
+add process p p > t t~ j, (t > b w +, w+ > c b~), (t~ > b~ w-, w- > l- vl~) @3
+add process p p > t t~ j j, (t > b w+, w+ > l+ vl), (t~ > b~ w-, w- > b c~) @4
+add process p p > t t~ j j, (t > b w +, w+ > c b~), (t~ > b~ w-, w- > l- vl~) @5
+add process p p > t t~ j j j, (t > b w+, w+ > l+ vl), (t~ > b~ w-, w- > b c~) @6
+add process p p > t t~ j j j, (t > b w +, w+ > c b~), (t~ > b~ w-, w- > l- vl~) @7
+
+output -f
