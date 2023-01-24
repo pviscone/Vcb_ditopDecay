@@ -9,6 +9,6 @@ define ell- = e- mu- ta-
 define q = u u~ d d~ c c~ s s~ b b~
 
 decay t > w+ b, w+ > c b~, t~ > w- b~, w- > ell- vl~
-decay t > w+ b, w+ > ell+ vl~, t~ > w- b~, w- > b c~
+decay t > w+ b, w+ > ell+ vl, t~ > w- b~, w- > b c~
 
 launch
