@@ -415,3 +415,21 @@ int MaskMin(const float &r1, const float &r2, const float &r3, const float &r4,c
 double ARGMIN(const RVec<double> &v) {
     return ArgMin(v);
 };
+
+
+int Lept(const RVec<int> &pdgIdVec){
+    if(TMath::Abs(pdgIdVec[3])<=6){
+        return TMath::Abs(pdgIdVec[6]);
+    } else {
+        return TMath::Abs(pdgIdVec[3]);
+    }
+}
+
+
+int jetCouple(const int &jetCoupleFromW1, const int &jetCoupleFromW2){
+    if (jetCoupleFromW1>0){
+        return jetCoupleFromW1;
+    } else{
+        return jetCoupleFromW2;
+    }
+}
