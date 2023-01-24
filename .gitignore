@@ -6,3 +6,5 @@ tasks/**/*.jpeg
 tasks/**/*.gif
 /**/prova.cpp
 check/*
+tasks/generateCbEvents/genproductions/*
+tasks/generateCbEvents/genproductions
