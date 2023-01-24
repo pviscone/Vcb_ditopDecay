@@ -23,7 +23,7 @@
 #*********************************************************************
 # Run to generate the grid pack                                      *
 #*********************************************************************
-  .true.     = gridpack  !True = setting up the grid pack
+  .false.     = gridpack  !True = setting up the grid pack
 #*********************************************************************
 # Number of events and rnd seed                                      *
 # Warning: Do not generate more than 1M events in a single run       *
@@ -269,4 +269,3 @@ $DEFAULT_PDF_MEMBERS = reweight_PDF     ! if pdlabel=lhapdf, this is the lhapdf 
    T  = use_syst      ! Enable systematics studies
 #
 #**************************************
-
