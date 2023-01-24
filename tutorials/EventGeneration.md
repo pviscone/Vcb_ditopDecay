@@ -1,4 +1,4 @@
-# How to generate events
+# How to generate events with madgraph + pythia + cmssw
 
 > **Useful links:**
 > 
@@ -22,8 +22,34 @@
 >   
 >   Seems to contain useful informations on how to build NanoAOD from the LHE files using cmsDriver.py
 
-# Generator and LHE files
 
-> I will use madgraph, but there is plenty of generators
+
+## Generate gridpack
+
+On lxplus/cmsanalysis:
+
+- git clone https://github.com/cms-sw/genproductions.git
+
+- Create the cards (copy some example, the run_cars have standard settings for a specific period of data taking )
+
+- Check if the cards are correctly defined using
+  
+  ```bash
+  cd genproductions/bin/MadGraph5_aMCatNLO/Utilities/parsing_code
+  python ./parsing.py ${path to card folder}/${name of cards}
+  ```
+
+- To generate the gridpack
+  
+  ```bash
+  cd genproductions/bin/MadGraph5_aMCatNLO
+  ./gridpack_generation.sh ${cardsName} ${cardsPath} local
+  ```
+  
+  **NB: to run it you have to clean the CMSSW enviroment**
+  
+  ```bash
+  unset CMSSW_BASE
+  ```
 
 
