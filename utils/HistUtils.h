@@ -59,6 +59,7 @@ private:
     bool manualLegend=false;
     bool drawVerticalLine=false;
     float verticalLinePosition=0;
+    std::string normOption="";
 
 
 public:
@@ -109,6 +110,10 @@ public:
     };
     void Normalize() {
         this->normalize = true;
+    };
+    void Normalize(std::string normOpt){
+        this->normalize = true;
+        this->normOption = normOpt;
     };
     void SetTHStackMaximum(float thstackMaximum) {
         this->thstackMaximum = thstackMaximum;
@@ -271,7 +276,31 @@ public:
             histVector[idx]->SetLineWidth(lineWidth);
 
             if (normalize) {
-                histVector[idx]->Scale(1. / histVector[idx]->Integral());
+                if(histVector[idx]->GetEntries()>0){
+                    if(normOption=="stack binwise"){
+                        if(idx==0){
+                            TH1F* newTempHist = (TH1F*) histVector[0]->Clone();
+                            newTempHist->Reset();
+                            TList* histCollection = new TList;
+                            for(auto &hist : histVector){
+                                histCollection->Add(hist);
+                            }
+                            newTempHist->Merge(histCollection,"-NOL -NOCHECK");
+
+                            for(int idx2=0; idx2<histVector.size();idx2++){
+                                for(int iBin=1;iBin<newTempHist->GetNbinsX()+1;iBin++){
+                                    if(histVector[idx2]->GetBinContent(iBin)>0){
+                                        float binValue=histVector[idx2]->GetBinContent(iBin)/newTempHist->GetBinContent(iBin);
+                                        histVector[idx2]->SetBinContent(iBin,binValue);
+                                    }
+                                }
+                            }
+                            delete histCollection;
+                        }
+                    } else{
+                        histVector[idx]->Scale(1. / histVector[idx]->Integral());
+                    }
+                }
             }
             if (!log) {
                 histVector[idx]->GetYaxis()->SetRangeUser(0, yAxisMultiplier * std::max(histVector[idx]->GetMaximum(), histVector[idx]->GetMaximum()));
