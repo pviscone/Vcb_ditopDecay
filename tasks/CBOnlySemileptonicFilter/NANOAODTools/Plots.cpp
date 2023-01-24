@@ -82,7 +82,9 @@ void Plots(std::string rootFile, std::string datasetName, std::string imageSaveF
                         .Define("THad_pt", "isHadronic(jetCoupleWPlus,T_pt,TBar_pt)")
                         .Define("THad_eta", "isHadronic(jetCoupleWPlus,T_eta,TBar_eta)")
                         .Define("THad_phi", "isHadronic(jetCoupleWPlus,T_phi,TBar_phi)")
-                        .Define("isWPlusHadronic", isWPlusHadronic,{"LHEPart_pdgId"});
+                        .Define("isWPlusHadronic", isWPlusHadronic,{"LHEPart_pdgId"})
+                        .Define("jetCouple",jetCouple,{"jetCoupleWPlus","jetCoupleWMinus"})
+                        .Define("Lepton",Lept,{"LHEPart_pdgId"});
 
     double ptMin = 0;
     double ptMax = 500;
@@ -215,24 +217,11 @@ void Plots(std::string rootFile, std::string datasetName, std::string imageSaveF
     StackPlotter jetCouple({histWPlusJetDecay,histWMinusJetDecay}, "W hadronic Decays", "", imageSaveFolder+"/WHadronicDecay.png", false, false, true);
 
     jetCouple.SetDrawOpt("hist");
-    jetCouple.SetLegendPos({0.75, 0.75, 0.92, 0.85});
-    jetCouple.GetValue();
+    jetCouple.SetLegendPos({0.78, 0.55, 0.95, 0.7});
+
     jetCouple.SetStatsInLegend(false);
 
-    /*
-    TH1D *histCKM = new TH1D("CKM", "CKM Expected", 9, 1, 9);
 
-    histCKM->SetBinContent(jetCoupleDictionary["ud"], nEvents * TMath::Power(CKM["ud"], 2) / 2);
-    histCKM->SetBinContent(jetCoupleDictionary["us"], nEvents * TMath::Power(CKM["us"], 2) / 2);
-    histCKM->SetBinContent(jetCoupleDictionary["ub"], nEvents * TMath::Power(CKM["ub"], 2) / 2);
-    histCKM->SetBinContent(jetCoupleDictionary["cd"], nEvents * TMath::Power(CKM["cd"], 2) / 2);
-    histCKM->SetBinContent(jetCoupleDictionary["cs"], nEvents * TMath::Power(CKM["cs"], 2) / 2);
-    histCKM->SetBinContent(jetCoupleDictionary["cb"], nEvents * TMath::Power(CKM["cb"], 2) / 2);
-    histCKM->SetBinContent(jetCoupleDictionary["td"], 0);
-    histCKM->SetBinContent(jetCoupleDictionary["ts"], 0);
-    histCKM->SetBinContent(jetCoupleDictionary["tb"], 0);
-    jetCouple.Add(histCKM);
-    */
 
     // Set the TH1 Label of the W decays the strings above
     (jetCouple).SetBinLabel(1, "ud");
@@ -246,6 +235,76 @@ void Plots(std::string rootFile, std::string datasetName, std::string imageSaveF
     (jetCouple).SetBinLabel(9, "tb");
 
     //jetCouple.SetMaxStatBoxPrinted(1);
+
+
+
+    if(datasetName.find("cb") == string::npos){
+        TH1D *histCKM = new TH1D("CKM", "CKM Expected", 9, 1, 9);
+
+        histCKM->SetBinContent(jetCoupleDictionary["ud"], nEvents * TMath::Power(CKM["ud"], 2) / 2);
+        histCKM->SetBinContent(jetCoupleDictionary["us"], nEvents * TMath::Power(CKM["us"], 2) / 2);
+        histCKM->SetBinContent(jetCoupleDictionary["ub"], nEvents * TMath::Power(CKM["ub"], 2) / 2);
+        histCKM->SetBinContent(jetCoupleDictionary["cd"], nEvents * TMath::Power(CKM["cd"], 2) / 2);
+        histCKM->SetBinContent(jetCoupleDictionary["cs"], nEvents * TMath::Power(CKM["cs"], 2) / 2);
+        histCKM->SetBinContent(jetCoupleDictionary["cb"], nEvents * TMath::Power(CKM["cb"], 2) / 2);
+        histCKM->SetBinContent(jetCoupleDictionary["td"], 0);
+        histCKM->SetBinContent(jetCoupleDictionary["ts"], 0);
+        histCKM->SetBinContent(jetCoupleDictionary["tb"], 0);
+        jetCouple.Add(histCKM);
+    }
+
+    StackPlotter jetCoupleNormalized({histWPlusJetDecay,histWMinusJetDecay}, "W hadronic Decays", "", imageSaveFolder+"/WHadronicDecayNormalized.png", false, false, false);
+
+    jetCoupleNormalized.SetDrawOpt("hist");
+    jetCoupleNormalized.SetLegendPos({0.78, 0.55, 0.95, 0.7});
+
+    jetCoupleNormalized.SetStatsInLegend(false);
+
+    // Set the TH1 Label of the W decays the strings above
+    (jetCoupleNormalized).SetBinLabel(1, "ud");
+    (jetCoupleNormalized).SetBinLabel(2, "us");
+    (jetCoupleNormalized).SetBinLabel(3, "ub");
+    (jetCoupleNormalized).SetBinLabel(4, "cd");
+    (jetCoupleNormalized).SetBinLabel(5, "cs");
+    (jetCoupleNormalized).SetBinLabel(6, "cb");
+    (jetCoupleNormalized).SetBinLabel(7, "td");
+    (jetCoupleNormalized).SetBinLabel(8, "ts");
+    (jetCoupleNormalized).SetBinLabel(9, "tb");
+    jetCoupleNormalized.SetYLabel("Fraction");
+    jetCoupleNormalized.Normalize("stack binwise");
+
+
+
+
+    auto histLeptE = ptEtaPhiMDF.Filter("Lepton==11").Histo1D({"histLeptE", "e; ;Counts", 9, 1, 9}, "jetCouple");
+    auto histLeptMu = ptEtaPhiMDF.Filter("Lepton==13").Histo1D({"histLeptMu", "#mu; ;Counts", 9, 1, 9}, "jetCouple");
+    auto histLeptTau = ptEtaPhiMDF.Filter("Lepton==15").Histo1D({"histLeptETau", "#tau; ;Counts", 9, 1, 9}, "jetCouple");
+
+
+    StackPlotter leptons({histLeptE,histLeptMu,histLeptTau}, "Leptons", "", imageSaveFolder+"/Leptons.png", false, false, false);
+
+    leptons.Normalize("stack binwise");
+    leptons.SetDrawOpt("hist");
+    leptons.SetLegendPos({0.78, 0.55, 0.95, 0.7});
+
+    leptons.SetStatsInLegend(false);
+
+    (leptons).SetBinLabel(1, "ud");
+    (leptons).SetBinLabel(2, "us");
+    (leptons).SetBinLabel(3, "ub");
+    (leptons).SetBinLabel(4, "cd");
+    (leptons).SetBinLabel(5, "cs");
+    (leptons).SetBinLabel(6, "cb");
+    (leptons).SetBinLabel(7, "td");
+    (leptons).SetBinLabel(8, "ts");
+    (leptons).SetBinLabel(9, "tb");
+    leptons.SetYLabel("Fraction");
+
+
+
+
+
+
 
     StackPlotter ttbarMass({histMTBar, histMT}, "M_{t}/ M_{#bar{t}}", "M_{t}  [GeV]", imageSaveFolder+"/mass/Mttbar.png", true, true, false);
     StackPlotter tLeptHadMass({histMTHad, histMTLept}, "M_{t#rightarrow q#bar{q}}/ M_{t#rightarrow l#nu}", "M_{t} [GeV]", imageSaveFolder+"/mass/MtLeptHad.png", true, true);
@@ -680,7 +739,7 @@ void Plots(std::string rootFile, std::string datasetName, std::string imageSaveF
 #pragma region PLOT
 
     std::vector<StackPlotter *> stackCollection{
-
+/*
         &ttbarMass,
         &ttbarMassWide,
         &ttbarEta,
@@ -699,7 +758,7 @@ void Plots(std::string rootFile, std::string datasetName, std::string imageSaveF
         &WLeptHadEta,
         &WLeptHadPt,
 
-        &jetCouple,
+
 
 //---------------------------
 
@@ -745,7 +804,11 @@ void Plots(std::string rootFile, std::string datasetName, std::string imageSaveF
         &deltaRMinLept,
 
         &rMin,
-        &rMinPart
+        &rMinPart, */
+
+        &leptons,
+        &jetCouple,
+        &jetCoupleNormalized
     };
 
     for (auto v : stackCollection) {
