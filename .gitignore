@@ -8,3 +8,4 @@ tasks/**/*.gif
 check/*
 tasks/generateCbEvents/genproductions/*
 tasks/generateCbEvents/genproductions
+*.tar.xz
