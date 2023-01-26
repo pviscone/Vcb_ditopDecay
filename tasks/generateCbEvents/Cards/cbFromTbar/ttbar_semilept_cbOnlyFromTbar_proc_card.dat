@@ -5,5 +5,5 @@ add process p p > t t~ j @1
 add process p p > t t~ j j @2
 add process p p > t t~ j j j @3
 
-output ./ttbar_semilept_cbOnly -nojpeg
+output ./ttbar_semilept_cbOnlyFromTbar -nojpeg
 
