@@ -6,6 +6,8 @@
 
 - Download from EOS: xrdcp root://eosuser.cern.ch//eos/user/p/pviscone/{filepaths}
 
+- How to use condor: https://uscms.org/uscms_at_work/physics/computing/setup/batch_systems.shtml#code_04
+
 - Masses and charges
   
   <img title="" src="../.img/2022-11-22-18-52-07-image.png" alt="" width="444" data-align="center">

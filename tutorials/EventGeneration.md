@@ -60,5 +60,3 @@ scram b
 ```
 
 **You have to create the folder "python" and put inside it the fragments**
-
-
