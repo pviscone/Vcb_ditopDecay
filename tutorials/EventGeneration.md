@@ -22,8 +22,6 @@
 >   
 >   Seems to contain useful informations on how to build NanoAOD from the LHE files using cmsDriver.py
 
-
-
 ## Generate gridpack
 
 On lxplus/cmsanalysis:
@@ -51,5 +49,16 @@ On lxplus/cmsanalysis:
   ```bash
   unset CMSSW_BASE
   ```
+
+## Generate
+
+You have to clone the fragments from genproductions, put in $CMSSW_BASE/src and scram 
+
+```bash
+git clone git@github.com:cms-sw/genproductions.git $CMSSW_BASE/src/Configuration/GenProduction/
+scram b
+```
+
+**You have to create the folder "python" and put inside it the fragments**
 
 

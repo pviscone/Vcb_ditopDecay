@@ -32,4 +32,4 @@
 # TODO:
 
 - Add the images to git LFS
-- **REMEMBER TO UPDATE IMAGES AND ROOT FILES TO EOS**where 
+- **REMEMBER TO UPDATE IMAGES AND ROOT FILES TO EOS**where root://eos.cern.ch
