@@ -9,7 +9,7 @@ config = config()
 config.section_("General")
 config.General.transferOutputs = True
 config.General.transferLogs = True
-config.General.requestName = 'TTbarSemileptonic_cbOnlyFromTbar_TuneCP5_13TeV-madgraphMLM-pythia8_max3j_FULLSIM'
+config.General.requestName = 'TTbarSemileptonic_cbOnlyFromTbar_TuneCP5_13TeV-madgraphMLM-pythia8_FULLSIM'
 config.General.workArea = 'crab_projects'
 
 config.section_("JobType")
@@ -29,7 +29,7 @@ config.JobType.sendPythonFolder = True
 
 config.section_("Data")
 
-config.Data.outputPrimaryDataset = 'TTbarSemileptonic_cbOnlyFromTbar_TuneCP5_13TeV-madgraphMLM-pythia8_max3j'
+config.Data.outputPrimaryDataset = 'TTbarSemileptonic_cbOnlyFromTbar_TuneCP5_13TeV-madgraphMLM-pythia8_FULLSIM'
 config.Data.splitting = 'EventBased'
 config.Data.unitsPerJob = 400
 NJOBS = 5000  # This is not a configuration parameter, but an auxiliary variable that we use in the next line.
