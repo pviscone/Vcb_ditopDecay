@@ -1,3 +1,0 @@
-universe=vanilla
-Executable = condorJob.sh
-Queue 1
