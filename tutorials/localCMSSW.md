@@ -13,25 +13,20 @@ To install all the utilities in your personal computer:
 - ```bash
   sudo mkdir -p /cvmfs/cms.cern.ch
   sudo mount -t cvmfs cms.cern.ch /cvmfs/cms.cern.ch
-  
+  ```
   
   echo 'CVMFS_REPOSITORIES=cms.cern.ch,grid.cern.ch,sft.cern.ch\nCVMFS_HTTP_PROXY=DIRECT' | sudo tee /etc/cvmfs/default.local
   echo 'cms.cern.ch /cvmfs/cms.cern.ch cvmfs noauto,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.idle-timeout=5min,x-systemd.device-timeout=10,_netdev 0 0' | sudo tee -a /etc/fstab
   echo 'user_allow_other' | sudo tee -a /etc/fuse.conf
-  
-  
-  
-  ```
 
-
-
+```
 3. Add to .zshrc:
-   
-   ```bash
-   source /cvmfs/cms.cern.ch/cmsset_default.sh
-   source /cvmfs/cms.cern.ch/crab3/crab.sh
-   ```
-   
+
+ ```bash
+ source /cvmfs/cms.cern.ch/cmsset_default.sh
+ source /cvmfs/cms.cern.ch/crab3/crab.sh
+```
+
    and source it
 
 4. Override SCRAM_ARCH to trick scram
@@ -58,7 +53,6 @@ To install all the utilities in your personal computer:
      cmsenv
      cd ~
    }
-   
    ```
 
 7. To get root working:
@@ -133,7 +127,6 @@ cmssw() {
 scp(){
   rsync -avAXEWSlHh "$@" --no-compress --info=progress2
 }
-
 ```
 
 # TODO
