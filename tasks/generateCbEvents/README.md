@@ -37,7 +37,7 @@ The tutorial about event generation is [here](../../tutorials/EventGeneration.md
 
 6. Merge the output files with haddnano.py
 
-**NB:** I don't know why but the NANO job does not prune the ParameterSets TTree. Use the script RemoveParameterSets.c to remove the TTree and then use hadd to shrink it.
+**Achtung:** I don't know why but the NANO job does not prune the ParameterSets TTree. Use the script RemoveParameterSets.c to remove the TTree and then use hadd to shrink it.
 
 
 
@@ -63,8 +63,8 @@ Maybe, this can be resolved with an additional step (NANOAODEDMSIM) before the N
 
 I used run_generic_tarball_xrootd.sh in the fragment to read my gridpack 
 
-- root://eosuse.cern.ch//eos/user/p/pviscone/Vcb_ditopDecay/tasks/generateCbEvents/Cards/cbFromT/ttbar_semilept_cbOnlyFromT_slc7_amd64_gcc10_CMSSW_12_4_8_tarball.tar.xz
-- root://eosuse.cern.ch//eos/user/p/pviscone/Vcb_ditopDecay/tasks/generateCbEvents/Cards/cbFromTbar/ttbar_semilept_cbOnlyFromTbar_slc7_amd64_gcc10_CMSSW_12_4_8_tarball.tar.xz
+- root://eosuser.cern.ch//eos/user/p/pviscone/Vcb_ditopDecay/tasks/generateCbEvents/Cards/cbFromT/ttbar_semilept_cbOnlyFromT_slc7_amd64_gcc10_CMSSW_12_4_8_tarball.tar.xz
+- root://eosuser.cern.ch//eos/user/p/pviscone/Vcb_ditopDecay/tasks/generateCbEvents/Cards/cbFromTbar/ttbar_semilept_cbOnlyFromTbar_slc7_amd64_gcc10_CMSSW_12_4_8_tarball.tar.xz
 
 To run this script, CMSSW_10_6_30_patch1 need two shared libraries: 
 
