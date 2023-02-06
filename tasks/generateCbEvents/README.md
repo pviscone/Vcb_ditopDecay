@@ -35,6 +35,10 @@ The tutorial about event generation is [here](../../tutorials/EventGeneration.md
 
 5. run crab submit -c crab_cfg.py (edit the job names if you want)
 
+6. Merge the output files with haddnano.py
+
+**NB:** I don't know why but the NANO job does not prune the ParameterSets TTree. Use the script RemoveParameterSets.c to remove the TTree and then use hadd to shrink it.
+
 ## Campaign
 
 **RunIISummer20UL18**
