@@ -39,6 +39,10 @@ The tutorial about event generation is [here](../../tutorials/EventGeneration.md
 
 **NB:** I don't know why but the NANO job does not prune the ParameterSets TTree. Use the script RemoveParameterSets.c to remove the TTree and then use hadd to shrink it.
 
+
+
+Maybe, this can be resolved with an additional step (NANOAODEDMSIM) before the NANOAODSIM step
+
 ## Campaign
 
 **RunIISummer20UL18**
