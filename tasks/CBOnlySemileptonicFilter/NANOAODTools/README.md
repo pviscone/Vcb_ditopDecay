@@ -53,6 +53,5 @@ Scripts to run the skimming on crab using nanoaod tools
   
   - SingleLeptFromT case: the leptons are all $e$
   
-  Maybe this is the reason why the two cases have different BR (helicity suppression)
   
   This is true only if for the cbOnly case. In other hadronic decays we can find other leptons in the original dataset
