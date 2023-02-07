@@ -36,7 +36,7 @@ private:
     int maxStatBoxPrinted;
     int iPos = 11;
     float statGap = 0.18;
-    std::vector<float> legendPos{0.79, 0.62, 0.92, 0.74};
+    std::vector<float> legendPos{0.7, 0.62, 0.92, 0.74};
     std::vector<float> statPos{.78, .76, .95, .92};
     float yAxisMultiplier = 1.3;
     std::string drawOpt = "nostack hist";
@@ -320,10 +320,12 @@ public:
                 legendLabel += " (";
                 legendLabel += std::to_string(histVector[idx]->GetRMS()).substr(0, std::to_string(histVector[idx]->GetRMS()).find(".") + 3);
                 legendLabel += ") ";
+
                 try{
                     legendLabel += xLabel.substr(xLabel.find("["),xLabel.find("]"));
                 }catch(const std::exception& e){}
             }
+            legendLabel += " N: " + std::to_string(histVector[idx]->GetEntries()).substr(0, std::to_string(histVector[idx]->GetEntries()).find("."));
             std::string legendOption = "f";
             if(palette>0){
                 legendOption = "l";
