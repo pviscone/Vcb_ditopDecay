@@ -30,3 +30,8 @@ bool selectMuonEvents(const RVec<int> &LHEPart_pdgId){
         return false;
     }
 }
+
+RVec<float> orderAbs(const RVec<float> &Rvec){
+    return Reverse(Sort(abs(Rvec)));
+
+}
