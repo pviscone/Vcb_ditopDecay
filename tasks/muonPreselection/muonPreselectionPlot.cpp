@@ -24,7 +24,7 @@
 #include "../../utils/DfUtils.h"
 #include "../../utils/HistUtils.h"
 
-void muonPreselection(std::string filename, std::string text, std::string imageSaveFolder) {
+void muonPreselectionPlot(std::string filename, std::string text, std::string imageSaveFolder) {
     gStyle->SetFillStyle(1001);
 
     // Draw "Preliminary"

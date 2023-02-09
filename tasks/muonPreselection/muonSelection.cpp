@@ -1,5 +1,5 @@
-#include <iostream>
 #include <ROOT/RDataFrame.hxx>
+#include <iostream>
 using namespace ROOT;
 
 #include "muonUtils.h"
@@ -11,97 +11,103 @@ using namespace ROOT;
 #include "../../utils/DfUtils.h"
 #include "../../utils/HistUtils.h"
 
-
-
 void muonSelection(std::string filename, std::string text, std::string imageSaveFolder) {
-   gStyle->SetFillStyle(1001);
+    gStyle->SetFillStyle(1001);
 
-  //Draw "Preliminary"
-  writeExtraText = true;
-  extraText = "Preliminary";
-  datasetText = text;
+    // Draw "Preliminary"
+    writeExtraText = true;
+    extraText = "Preliminary";
+    datasetText = text;
 
-  ROOT::EnableImplicitMT();
+    ROOT::EnableImplicitMT();
 
+    gROOT->LoadMacro("../../utils/CMSStyle/tdrstyle.C");
+    setTDRStyle();
+    gROOT->LoadMacro("../../utils/CMSStyle/CMS_lumi.C");
 
-  gROOT->LoadMacro("../../utils/CMSStyle/tdrstyle.C");
-  setTDRStyle();
-  gROOT->LoadMacro("../../utils/CMSStyle/CMS_lumi.C");
+    RDataFrame fileDF("Events", filename,
+                      {"LHEPart_pdgId",
+                       "nMuon",
+                       "Muon_pt",
+                       "Muon_eta",
+                       "Muon_phi",
+                       "Muon_charge",
+                       "Muon_looseId",
+                       "Muon_mediumId",
+                       "Muon_tightId",
+                       "Muon_pfIsoId",
+                       "Jet_jetId",
+                       "Jet_puId",
+                       "Jet_pt",
+                       "Jet_muonIdx1",
+                       "Jet_btagDeepFlavB"});
 
- 
+    auto MuonsFromWDF = fileDF.Filter("(LHEPart_pdgId[3]==-13 || LHEPart_pdgId[6]==13)");
 
-  RDataFrame fileDF("Events", filename,
-                    {"LHEPart_pdgId",
-                     "nMuon",
-                     "Muon_pt",
-                     "Muon_eta",
-                     "Muon_phi",
-                     "Muon_charge",
-                     "Muon_looseId",
-                     "Muon_mediumId",
-                     "Muon_tightId",
-                     "Muon_pfIsoId",
-                     "Jet_jetId",
-                     "Jet_puId",
-                     "Jet_pt",
-                     "Jet_muonIdx1",
-                     "Jet_hadronFlavour"});
+    auto TriggeredMuonsDF = MuonsFromWDF.Filter("Muon_pt[0]>26 && abs(Muon_eta[0])<2.4");
 
-  auto MuonsFromWDF=fileDF.Filter("(LHEPart_pdgId[3]==-13 || LHEPart_pdgId[6]==13)");
+    auto LooseMuonsDF = TriggeredMuonsDF.Filter("Muon_looseId[0] && Muon_pfIsoId[0]>1");
+    auto MediumMuonsDF = TriggeredMuonsDF.Filter("Muon_mediumId[0] && Muon_pfIsoId[0]>2");
+    auto TightMuonsDF = TriggeredMuonsDF.Filter("Muon_tightId[0] && Muon_pfIsoId[0]>3");
 
-  auto TriggeredMuonsDF=MuonsFromWDF.Filter("Muon_pt[0]>26 && abs(Muon_eta[0])<2.4");
+    int totalTriggeredMuons = TriggeredMuonsDF.Count().GetValue();
 
-  auto LooseMuonsDF = TriggeredMuonsDF.Filter("Muon_looseId[0] && Muon_pfIsoId[0]>1");
-  auto MediumMuonsDF= TriggeredMuonsDF.Filter("Muon_mediumId[0] && Muon_pfIsoId[0]>2");
-  auto TightMuonsDF = TriggeredMuonsDF.Filter("Muon_tightId[0] && Muon_pfIsoId[0]>3");
+    int totalLooseMuons = LooseMuonsDF.Count().GetValue();
+    int totalMediumMuons = MediumMuonsDF.Count().GetValue();
+    int totalTightMuons = TightMuonsDF.Count().GetValue();
 
-  int totalTriggeredMuons = TriggeredMuonsDF.Count().GetValue();
+    // tight/medium/loose w.r.t both identification and isolation
+    std::cout << "Total triggered muons: " << totalTriggeredMuons << std::endl;
+    std::cout << "Total loose muons: " << totalLooseMuons << "  Fraction:" << (float)totalLooseMuons / totalTriggeredMuons << std::endl;
+    std::cout << "Total medium muons: " << totalMediumMuons << "  Fraction:" << (float)totalMediumMuons / totalTriggeredMuons << std::endl;
+    std::cout << "Total tight muons: " << totalTightMuons << "  Fraction:" << (float)totalTightMuons / totalTriggeredMuons << std::endl;
 
-  int totalLooseMuons=LooseMuonsDF.Count().GetValue();
-  int totalMediumMuons=MediumMuonsDF.Count().GetValue();
-  int totalTightMuons=TightMuonsDF.Count().GetValue();
+    // Using loose muons
+    LooseMuonsDF = LooseMuonsDF.Define("SlimmedJet_pt", "Jet_pt[Jet_jetId>0 && Jet_puId>0]");
 
-  //tight/medium/loose w.r.t both identification and isolation
-  std::cout<<"Total triggered muons: "<<totalTriggeredMuons<<std::endl;
-  std::cout<<"Total loose muons: "<<totalLooseMuons<< "  Fraction:" << (float) totalLooseMuons/totalTriggeredMuons << std::endl;
-  std::cout << "Total medium muons: " << totalMediumMuons << "  Fraction:" << (float) totalMediumMuons / totalTriggeredMuons << std::endl;
-  std::cout << "Total tight muons: " << totalTightMuons << "  Fraction:" << (float) totalTightMuons / totalTriggeredMuons << std::endl;
+    LooseMuonsDF = LooseMuonsDF.Define("LeadingJetsWithoutMuon_pt", "FourJetsWithoutMuon(SlimmedJet_pt,Jet_muonIdx1)");
 
-  //Using loose muons
-  LooseMuonsDF = LooseMuonsDF.Define("flavourOfJetWithMuon", "Jet_hadronFlavour[Jet_muonIdx1==0 && Jet_hadronFlavour!=0][0]");
+    auto histLeadingJetsWithoutMuon_pt = LooseMuonsDF.Define("LeadingJetWithoutMuon_pt", "LeadingJetsWithoutMuon_pt[0]").Histo1D({"LeadingJetsWithoutMuon_pt", "Leading", 100, 0, 300}, "LeadingJetWithoutMuon_pt");
 
-  int cJetsWithMuon=LooseMuonsDF.Filter("flavourOfJetWithMuon==4").Count().GetValue();
-  int bJetsWithMuon=LooseMuonsDF.Filter("flavourOfJetWithMuon==5").Count().GetValue();
+    auto histSecondJetsWithoutMuon_pt = LooseMuonsDF.Define("SecondJetWithoutMuon_pt", "LeadingJetsWithoutMuon_pt[1]").Histo1D({"SecondJetsWithoutMuon_pt", "Second", 100, 0, 300}, "SecondJetWithoutMuon_pt");
 
-  std::cout<<"b Jet with leading muon inside: "<< bJetsWithMuon <<"  Fraction of events: "<<(float) bJetsWithMuon/totalLooseMuons<<std::endl;
-  std::cout<<"c Jet with leading muon inside: "<< cJetsWithMuon <<"  Fraction of events: "<<(float) cJetsWithMuon/totalLooseMuons<<std::endl;
-  std::cout<<"Total jets with leading muon inside: "<< bJetsWithMuon+cJetsWithMuon <<"  Fraction of events: "<<(float) (bJetsWithMuon+cJetsWithMuon)/totalLooseMuons<<std::endl;
+    auto histThirdJetsWithoutMuon_pt = LooseMuonsDF.Define("ThirdJetWithoutMuon_pt", "LeadingJetsWithoutMuon_pt[2]").Histo1D({"ThirdJetsWithoutMuon_pt", "Third", 100, 0, 300}, "ThirdJetWithoutMuon_pt");
 
-  LooseMuonsDF = LooseMuonsDF.Define("SlimmedJet_pt","Jet_pt[Jet_jetId>0 && Jet_puId>0]");
+    auto histFourthJetsWithoutMuon_pt = LooseMuonsDF.Define("FourthJetWithoutMuon_pt", "LeadingJetsWithoutMuon_pt[3]").Histo1D({"FourthJetsWithoutMuon_pt", "Fourth", 100, 0, 300}, "FourthJetWithoutMuon_pt");
 
-  LooseMuonsDF = LooseMuonsDF.Define("LeadingJetsWithoutMuon_pt", "FourJetsWithoutMuon(SlimmedJet_pt,Jet_muonIdx1)");
+    int cutPtJet20 = LooseMuonsDF.Filter("LeadingJetsWithoutMuon_pt[3]>20").Count().GetValue();
+    int cutPtJet30 = LooseMuonsDF.Filter("LeadingJetsWithoutMuon_pt[3]>30").Count().GetValue();
 
-  auto histLeadingJetsWithoutMuon_pt = LooseMuonsDF.Define("LeadingJetWithoutMuon_pt", "LeadingJetsWithoutMuon_pt[0]").Histo1D({"LeadingJetsWithoutMuon_pt", "Leading", 100, 0,300}, "LeadingJetWithoutMuon_pt");
+    std::cout << "Total events with fourth jet pT>20: " << cutPtJet20 << "  Fraction of events: " << (float)cutPtJet20 / totalLooseMuons << std::endl;
+    std::cout << "Total events with fourth jet pT>30: " << cutPtJet30 << "  Fraction of events: " << (float)cutPtJet30 / totalLooseMuons << std::endl;
 
-  auto histSecondJetsWithoutMuon_pt = LooseMuonsDF.Define("SecondJetWithoutMuon_pt", "LeadingJetsWithoutMuon_pt[1]").Histo1D({"SecondJetsWithoutMuon_pt", "Second", 100, 0, 300}, "SecondJetWithoutMuon_pt");
+    StackPlotter orderedPtJetsWithoutMuon({histLeadingJetsWithoutMuon_pt, histSecondJetsWithoutMuon_pt, histThirdJetsWithoutMuon_pt, histFourthJetsWithoutMuon_pt}, "OrdedJetsWithoutMuon p_{t}", "p_{t} [GeV]", imageSaveFolder + "/OrdedJetsWithoutMuon_pt.png");
 
-  auto histThirdJetsWithoutMuon_pt = LooseMuonsDF.Define("ThirdJetWithoutMuon_pt", "LeadingJetsWithoutMuon_pt[2]").Histo1D({"ThirdJetsWithoutMuon_pt", "Third", 100, 0, 300}, "ThirdJetWithoutMuon_pt");
+    //! NON TORNA IL TAGLIO SUL PT.Devono essere 139631 eventi alla fine
+    LooseMuonsDF = LooseMuonsDF.Define("JetMask", "Jet_jetId>0 && Jet_puId>0 && Jet_pt>20");
+    LooseMuonsDF = LooseMuonsDF.Filter("LeadingJetsWithoutMuon_pt[3]>20");
+    LooseMuonsDF = LooseMuonsDF.Define("Btag_prob", "Jet_btagDeepFlavB[JetMask]");
+    LooseMuonsDF = LooseMuonsDF.Define("LeadingJetsWithoutMuon_bTagProb", "FourJetsWithoutMuon(Reverse(Sort(Btag_prob)),Jet_muonIdx1)");
 
-  auto histFourthJetsWithoutMuon_pt = LooseMuonsDF.Define("FourthJetWithoutMuon_pt", "LeadingJetsWithoutMuon_pt[3]").Histo1D({"FourthJetsWithoutMuon_pt", "Fourth", 100, 0, 300}, "FourthJetWithoutMuon_pt");
+    //! Ricorda che qui c'è il taglio sul btag leading
+    auto histLeadingJetsWithoutMuon_bTagProb = LooseMuonsDF.Define("LeadingJetWithoutMuon_bTagProb", "LeadingJetsWithoutMuon_bTagProb[0]").Histo1D({"LeadingJetsWithoutMuon_bTagProb", "Leading", 100, 0, 1}, "LeadingJetWithoutMuon_bTagProb");
 
-  int cutPtJet20 = LooseMuonsDF.Filter("LeadingJetsWithoutMuon_pt[3]>20").Count().GetValue();
-  int cutPtJet30 = LooseMuonsDF.Filter("LeadingJetsWithoutMuon_pt[3]>30").Count().GetValue();
+    auto histSecondJetsWithoutMuon_bTagProb = LooseMuonsDF.Define("SecondJetWithoutMuon_bTagProb", "LeadingJetsWithoutMuon_bTagProb[1]").Histo1D({"SecondJetsWithoutMuon_bTagProb", "Second", 100, 0, 1}, "SecondJetWithoutMuon_bTagProb");
 
-  std::cout<<"Total events with fourth jet pT>20: "<<cutPtJet20<<"  Fraction of events: "<<(float) cutPtJet20/totalLooseMuons<<std::endl;
-  std::cout<<"Total events with fourth jet pT>30: "<<cutPtJet30<<"  Fraction of events: "<<(float) cutPtJet30/totalLooseMuons<<std::endl;
+    auto histThirdJetsWithoutMuon_bTagProb = LooseMuonsDF.Define("ThirdJetWithoutMuon_bTagProb", "LeadingJetsWithoutMuon_bTagProb[2]").Histo1D({"ThirdJetsWithoutMuon_bTagProb", "Third", 100, 0, 1}, "ThirdJetWithoutMuon_bTagProb");
 
-  StackPlotter orderedJetsWithoutMuon({histLeadingJetsWithoutMuon_pt,histSecondJetsWithoutMuon_pt,histThirdJetsWithoutMuon_pt,histFourthJetsWithoutMuon_pt},"OrdedJetsWithoutMuon p_{t}","p_{t} [GeV]",imageSaveFolder+"/OrdedJetsWithoutMuon_pt.png");
+    auto histFourthJetsWithoutMuon_bTagProb = LooseMuonsDF.Define("FourthJetWithoutMuon_bTagProb", "LeadingJetsWithoutMuon_bTagProb[3]").Histo1D({"FourthJetsWithoutMuon_bTagProb", "Fourth", 100, 0, 1}, "FourthJetWithoutMuon_bTagProb");
 
-  std::vector<StackPlotter *> stackCollection {
-    &orderedJetsWithoutMuon
-  };
+    StackPlotter orderedBtagJetsWithoutMuon({histLeadingJetsWithoutMuon_bTagProb, histSecondJetsWithoutMuon_bTagProb, histThirdJetsWithoutMuon_bTagProb, histFourthJetsWithoutMuon_bTagProb}, "JetsWithoutMuon Jet_btagDeepFlavB", "Probability", imageSaveFolder + "/OrdedJetsWithoutMuon_bTagProb.png", false, false, true);
 
-  for (auto v : stackCollection) {
-      v->Save();
-  }
+    orderedBtagJetsWithoutMuon.SetMinYlog(100);
+
+    std::vector<StackPlotter *> stackCollection{
+        &orderedPtJetsWithoutMuon,
+        &orderedBtagJetsWithoutMuon};
+
+    for (auto v : stackCollection) {
+        v->Save();
+    }
+    exit(0);
 }
