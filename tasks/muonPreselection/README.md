@@ -28,17 +28,25 @@
 
 - Muon_pt[0]>26
 
-**Total triggered leading muons:** 186533
+**Total triggered leading muons:** 186533 (184272 for background)
 
 ---
 
 ## Identification and Isolation
 
-|        | Cuts                                    | Events | Fraction (over triggered muons) |
-| ------ |:---------------------------------------:| ------ |:-------------------------------:|
-| Tight  | (Muon_thightId[0] && Muon_pfIsoId[0]>3) | 149597 | 0.80                            |
-| Medium | (Muon_mediumId[0] && Muon_pfIsoId[0]>2) | 156505 | 0.84                            |
-| Loose  | (Muon_looseId[0] && Muon_pfIsoId[0]>1)  | 160427 | 0.86                            |
+| [signal] | Cuts                                    | Events | Fraction (over triggered muons) |
+|:--------:|:---------------------------------------:| ------ |:-------------------------------:|
+| Tight    | (Muon_thightId[0] && Muon_pfIsoId[0]>3) | 149597 | 0.80                            |
+| Medium   | (Muon_mediumId[0] && Muon_pfIsoId[0]>2) | 156505 | 0.84                            |
+| Loose    | (Muon_looseId[0] && Muon_pfIsoId[0]>1)  | 160427 | 0.86                            |
+
+| [background] | Cuts                                    | Events | Fraction (over triggered muons) |
+|:------------:|:---------------------------------------:| ------ |:-------------------------------:|
+| Tight        | (Muon_thightId[0] && Muon_pfIsoId[0]>3) | 147781 | 0.80                            |
+| Medium       | (Muon_mediumId[0] && Muon_pfIsoId[0]>2) | 154455 | 0.83                            |
+| Loose        | (Muon_looseId[0] && Muon_pfIsoId[0]>1)  | 147781 | 0.86                            |
+
+
 
 From now we will consider only loose muons
 
@@ -52,18 +60,15 @@ From now we will consider only loose muons
 
 - Jet_muonIdx1!=0
 
-| Cut on fourth jet $p_t$ | Events | Fraction (over loose muons) |
-|:-----------------------:| ------ |:---------------------------:|
-| 20 GeV                  | 139631 | 0.87                        |
-| 30 GeV                  | 90745  | 0.56                        |
+| [signal] | Cut on fourth jet $p_t$ | Events | Fraction (over loose muons) |
+|:--------:|:-----------------------:| ------ |:---------------------------:|
+|          | 20 GeV                  | 139631 | 0.87                        |
+|          | 30 GeV                  | 90745  | 0.56                        |
 
-### Muon from W inside jet from $t\bar{t}$
-
-If we count how many jets have simoultaneusly 
-
-- Jet_muonIdx==0 && (Jet_hadronFlavour==4 || Jet_hadronFlavour==5)
-
-There are 6339 events ( Fraction over loose muons: 0.04)
+| [background] | Cut on fourth jet $p_t$ | Events | Fraction (over loose muons) |
+|:------------:|:-----------------------:| ------ |:---------------------------:|
+|              | 20 GeV                  | 139741 | 0.88                        |
+|              | 30 GeV                  | 93562  | 0.59                        |
 
 --- 
 
