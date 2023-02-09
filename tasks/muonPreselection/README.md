@@ -28,7 +28,7 @@
 
 - Muon_pt[0]>26
 
-**Total triggered muons:** 186533
+**Total triggered leading muons:** 186533
 
 ---
 
