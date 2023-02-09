@@ -1,21 +1,82 @@
-(prendi il dizionario del nanoaod che stai usando)
+> ## TODO
+> 
+> - Discard the events below the trigger cuts and select only the events $W\to\mu$
+> 
+> - Study the acceptance for loose, medium and tight cuts (both on identification and isolation)
+> 
+> - Remove jets that contains the leading muon and impose the cut jet_jetid>0 e jet_puid>0
+> 
+> - After the cleaning of the jets, order the remaining and take the first 4
+> 
+> - Compute the acceptance for a cut of 20 and 30 GeV  on the fourth jet
+> 
+> ## Info
+> 
+> - [MuonID RunII](https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2)
 
-Fai i seguienti tagli:
+# Muons
 
-- accettanza eta: abs(Muon_eta)<2.4
-- accettanza pt: Muon_pt[0]>26
-- Seleziona solo eventi con un mu dal W (LHEPart_pdgId[3]==-13 ||  LHEPart_pdgId[6]==13)
+## Main cuts
 
-Vedi quanti eventi perdi prendendo muoni loose (Muon_looseId[0] && Muon_pfIsoId[0]>1)
+#### Muon from W cut
+
+- (LHEPart_pdgId[3]==-13 || LHEPart_pdgId[6]==13)
+
+#### Trigger cuts
+
+- abs(Muon_eta[0])<2.4
+
+- Muon_pt[0]>26
+
+**Total triggered muons:** 186533
 
 ---
 
-Nei jet c'è anche il muone. Rimuovi il muone dalla collezione di jet, ordina i primi 4 restanti e vedi gli spettri del pt
+## Identification and Isolation
 
-Fissa anche i tagli jet_jetid>0 e jet_puid>0
+|        | Cuts                                    | Events | Fraction (over triggered muons) |
+| ------ |:---------------------------------------:| ------ |:-------------------------------:|
+| Tight  | (Muon_thightId[0] && Muon_pfIsoId[0]>3) | 149597 | 0.80                            |
+| Medium | (Muon_mediumId[0] && Muon_pfIsoId[0]>2) | 156505 | 0.84                            |
+| Loose  | (Muon_looseId[0] && Muon_pfIsoId[0]>1)  | 160427 | 0.86                            |
 
-Calcola quanti eventi perdi con un taglio sul quarto jet a 20 e 30 gev
+From now we will consider only loose muons
+
+
+
+---
+
+# Jets
+
+### Cuts
+
+- jet_jetid>0 e jet_puid>0
+
+- Jet_muonIdx1!=0
+
+| Cut on fourth jet $p_t$ | Events | Fraction (over loose muons) |
+|:-----------------------:| ------ |:---------------------------:|
+| 20 GeV                  | 160389 | 0.9997                      |
+| 30 GeV                  | 160156 | 0.9993                      |
+
+### Muon from W inside jet from $t\bar{t}$
+
+If we count how many jets have simoultaneusly 
+
+- Jet_muonIdx==0 && (Jet_hadronFlavour==4 || Jet_hadronFlavour==5)
+
+There are 6339 events ( Fraction over loose muons: 0.04)
 
 --- 
 
-Leggi twiki su oggetti muoni e vedi anche quelli sui jet cosa sono
+---
+
+# Questions
+
+- Should we impose a cut over the impact parameter? (Suggestion from the TWiki)
+
+- What is the difference between global/standalone/tracker/prompt muons?
+
+- Understand better the isolation
+
+- What are exactly Jet_jetId and Jet_puId
