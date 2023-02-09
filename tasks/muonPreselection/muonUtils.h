@@ -35,3 +35,32 @@ RVec<float> orderAbs(const RVec<float> &Rvec){
     return Reverse(Sort(abs(Rvec)));
 
 }
+
+RVec<float> FourJetsWithoutMuon(const RVec<float> &JetVec,RVec<int> &Jet_muonIdx1){
+    RVec<float> RvecWithoutMuon;
+    
+    bool lessThen5=false;
+    int finalSize;
+    if (JetVec.size() <= 4 && JetVec.size() > 0) {
+        finalSize=JetVec.size();
+        lessThen5 = true;
+    } else if (JetVec.size() == 0){
+        return RvecWithoutMuon;
+    } else {
+        finalSize = 4;
+    }
+
+    int i = 0;
+    while(RvecWithoutMuon.size()<=finalSize) {
+        if(Jet_muonIdx1[i]!=0){
+            RvecWithoutMuon.push_back(JetVec[i]);
+        }else{
+            if (lessThen5) {
+                finalSize = finalSize - 1;
+            }
+        }
+        i++;
+    }
+    return RvecWithoutMuon;
+}
+    
