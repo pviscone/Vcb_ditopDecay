@@ -42,8 +42,6 @@
 
 From now we will consider only loose muons
 
-
-
 ---
 
 # Jets
@@ -56,8 +54,8 @@ From now we will consider only loose muons
 
 | Cut on fourth jet $p_t$ | Events | Fraction (over loose muons) |
 |:-----------------------:| ------ |:---------------------------:|
-| 20 GeV                  | 160389 | 0.9997                      |
-| 30 GeV                  | 160156 | 0.9993                      |
+| 20 GeV                  | 139631 | 0.87                        |
+| 30 GeV                  | 90745  | 0.56                        |
 
 ### Muon from W inside jet from $t\bar{t}$
 

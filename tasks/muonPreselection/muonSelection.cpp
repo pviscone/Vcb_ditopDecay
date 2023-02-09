@@ -89,8 +89,8 @@ void muonSelection(std::string filename, std::string text, std::string imageSave
 
   auto histFourthJetsWithoutMuon_pt = LooseMuonsDF.Define("FourthJetWithoutMuon_pt", "LeadingJetsWithoutMuon_pt[3]").Histo1D({"FourthJetsWithoutMuon_pt", "Fourth", 100, 0, 300}, "FourthJetWithoutMuon_pt");
 
-  int cutPtJet20 = LooseMuonsDF.Filter("LeadingJetsWithoutMuon_pt[0]>20").Count().GetValue();
-  int cutPtJet30 = LooseMuonsDF.Filter("LeadingJetsWithoutMuon_pt[0]>30").Count().GetValue();
+  int cutPtJet20 = LooseMuonsDF.Filter("LeadingJetsWithoutMuon_pt[3]>20").Count().GetValue();
+  int cutPtJet30 = LooseMuonsDF.Filter("LeadingJetsWithoutMuon_pt[3]>30").Count().GetValue();
 
   std::cout<<"Total events with fourth jet pT>20: "<<cutPtJet20<<"  Fraction of events: "<<(float) cutPtJet20/totalLooseMuons<<std::endl;
   std::cout<<"Total events with fourth jet pT>30: "<<cutPtJet30<<"  Fraction of events: "<<(float) cutPtJet30/totalLooseMuons<<std::endl;
