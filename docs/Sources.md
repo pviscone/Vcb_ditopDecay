@@ -1,4 +1,4 @@
-- [NANOAOD object dictionary](https://cms-nanoaod-integration.web.cern.ch/integration/master/mc94X_doc.html)
+- [NANOAOD object dictionary](https://cms-nanoaod-integration.web.cern.ch/autoDoc/NanoAODv9/2018UL/doc_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1.html)
 
 - [CRAB3ConfigurationFile](https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile)
 
