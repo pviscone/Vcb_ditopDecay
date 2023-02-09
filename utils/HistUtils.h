@@ -60,6 +60,7 @@ private:
     bool drawVerticalLine=false;
     float verticalLinePosition=0;
     std::string normOption="";
+    float minYlog=0.1;
 
 
 public:
@@ -120,6 +121,9 @@ public:
     };
     void SetIPos(int iPos) {
         this->iPos = iPos;
+    };
+    void SetMinYlog(float minYlog) {
+        this->minYlog = minYlog;
     };
     void SetMaxStatBoxPrinted(int maxStatBoxPrinted) {
         if(maxStatBoxPrinted>nStatBox){
@@ -305,7 +309,7 @@ public:
             if (!log) {
                 histVector[idx]->GetYaxis()->SetRangeUser(0, yAxisMultiplier * std::max(histVector[idx]->GetMaximum(), histVector[idx]->GetMaximum()));
             } else {
-                histVector[idx]->GetYaxis()->SetRangeUser(0.1, yAxisMultiplier * std::max(histVector[idx]->GetMaximum(), 11.5 * histVector[idx]->GetMaximum()));
+                histVector[idx]->GetYaxis()->SetRangeUser(minYlog, yAxisMultiplier * std::max(histVector[idx]->GetMaximum(), 11.5 * histVector[idx]->GetMaximum()));
                 gPad->SetLogy();
             }
 
