@@ -1,4 +1,5 @@
 #include <ROOT/RDataFrame.hxx>
+#include <TMultiGraph.h>
 #include <iostream>
 using namespace ROOT;
 
@@ -78,7 +79,7 @@ void ROC(std::string imageSaveFolder) {
     LooseMuonsDF_background = LooseMuonsDF_background.Define("Btag_prob", "Jet_btagDeepFlavB[JetMask]");
     LooseMuonsDF_background = LooseMuonsDF_background.Define("LeadingJetsWithoutMuon_bTagProb", "FourJetsWithoutMuon(Reverse(Sort(Btag_prob)),Jet_muonIdx1)");
 
-    int N = 40;
+    int N = 100;
     RVec<float> CutsVec = RVec<float>(N + 1);
     int totalEvents_signal = LooseMuonsDF_signal.Count().GetValue();
     int totalEvents_background = LooseMuonsDF_background.Count().GetValue();
@@ -96,49 +97,70 @@ void ROC(std::string imageSaveFolder) {
     }
     CutsVec[N] = 1.;
 
+    std::vector<ROOT::RDF::RResultPtr<double>> count_signal_rr;
+    std::vector<ROOT::RDF::RResultPtr<double>> count_background_rr;
     for (int i = 0; i <= N; i++) {
         std::cout << i <<":  Cut: " << CutsVec[i] << std::endl;
-        cuttedDF_signal = cuttedDF_signal.Filter("LeadingJetsWithoutMuon_bTagProb[0]>" + std::to_string(CutsVec[i]));
-        cuttedDF_background = cuttedDF_background.Filter("LeadingJetsWithoutMuon_bTagProb[0]>" + std::to_string(CutsVec[i]));
-        int count_signal = (int)cuttedDF_signal.Count().GetValue();
-        LeadingBtagAcceptance_signal.push_back((float)count_signal / totalEvents_signal);
-        int count_background = (int)cuttedDF_background.Count().GetValue();
-        LeadingBtagAcceptance_background.push_back((float)count_background / totalEvents_background);
+        cuttedDF_signal = cuttedDF_signal.Define("BtagMask"+std::to_string(i),"LeadingJetsWithoutMuon_bTagProb[0]>" + std::to_string(CutsVec[i]));
+        cuttedDF_background = cuttedDF_background.Define("BtagMask"+std::to_string(i),"LeadingJetsWithoutMuon_bTagProb[0]>" + std::to_string(CutsVec[i]));
+        count_signal_rr.push_back(cuttedDF_signal.Sum("BtagMask" + std::to_string(i)));
+        count_background_rr.push_back(cuttedDF_background.Sum("BtagMask" + std::to_string(i)));
     }
 
+    for(int i=0; i<=N;i++){
+
+        int count_signal = (int) count_signal_rr[i].GetValue();
+        LeadingBtagAcceptance_signal.push_back((float)count_signal / totalEvents_signal);
+        int count_background = (int) count_background_rr[i].GetValue();
+        LeadingBtagAcceptance_background.push_back((float)count_background / totalEvents_background);
+        std::cout << i << ":  Cut: " << CutsVec[i] << "  " << count_signal << std::endl;
+    }
+
+    RVec<float> x={0,1};
+    RVec<float> y={1,0};
+    TGraph diagonal=TGraph(2,x.data(),y.data());
+    diagonal.SetLineWidth(2);
+
     TCanvas *c = new TCanvas("c", "c", 800, 600);
-    TGraph *graph_signalAcceptance = new TGraph(N + 1, CutsVec.data(), LeadingBtagAcceptance_signal.data());
-    graph_signalAcceptance->Draw("ACP");
-    graph_signalAcceptance->GetXaxis()->SetTitle("Cut on leading btag probability");
-    graph_signalAcceptance->GetYaxis()->SetTitle("Signal acceptance");
-    graph_signalAcceptance->SetTitle("acceptance vs cut on leading btag probability");
-    graph_signalAcceptance->SetLineColor(2);
-    graph_signalAcceptance->SetLineWidth(4);
-    graph_signalAcceptance->GetYaxis()->SetRangeUser(0., 1);
-    graph_signalAcceptance->GetXaxis()->SetRangeUser(0., 1);
+    TGraph graph_signalAcceptance = TGraph (N + 1, CutsVec.data(), LeadingBtagAcceptance_signal.data());
+    graph_signalAcceptance.GetXaxis()->SetTitle("Cut on leading btag probability");
+    graph_signalAcceptance.GetYaxis()->SetTitle("Signal acceptance");
+    graph_signalAcceptance.SetTitle("acceptance vs cut on leading btag probability");
+    graph_signalAcceptance.SetLineColor(2);
+    graph_signalAcceptance.SetLineWidth(4);
+    graph_signalAcceptance.GetYaxis()->SetRangeUser(0., 1);
+    graph_signalAcceptance.GetXaxis()->SetRangeUser(0., 1);
+    graph_signalAcceptance.Draw("ACP");
+    c->SetGrid();
     c->SaveAs((imageSaveFolder + "/LeadingBtagAcceptance_signal.png").c_str());
 
     TCanvas *c1 = new TCanvas("c1", "c1", 800, 600);
-    TGraph *graph_backgroundRejection = new TGraph(N + 1, CutsVec.data(), (1 - LeadingBtagAcceptance_background).data());
-    graph_backgroundRejection->Draw("ACP");
-    graph_backgroundRejection->GetXaxis()->SetTitle("Cut on leading btag probability");
-    graph_backgroundRejection->GetYaxis()->SetTitle("Background Rejection");
-    graph_backgroundRejection->SetTitle("rejection vs cut on leading btag probability");
-    graph_backgroundRejection->SetLineColor(2);
-    graph_backgroundRejection->SetLineWidth(4);
-    graph_backgroundRejection->GetYaxis()->SetRangeUser(0., 1);
-    graph_backgroundRejection->GetXaxis()->SetRangeUser(0., 1);
+    TGraph graph_backgroundRejection = TGraph(N + 1, CutsVec.data(), (1 - LeadingBtagAcceptance_background).data());
+    graph_backgroundRejection.Draw("ACP");
+    graph_backgroundRejection.GetXaxis()->SetTitle("Cut on leading btag probability");
+    graph_backgroundRejection.GetYaxis()->SetTitle("Background Rejection");
+    graph_backgroundRejection.SetTitle("rejection vs cut on leading btag probability");
+    graph_backgroundRejection.SetLineColor(2);
+    graph_backgroundRejection.SetLineWidth(4);
+    graph_backgroundRejection.GetYaxis()->SetRangeUser(0., 1);
+    graph_backgroundRejection.GetXaxis()->SetRangeUser(0., 1);
+    graph_backgroundRejection.Draw("ACP");
+    c1->SetGrid();
     c1->SaveAs((imageSaveFolder + "/LeadingBtagRejection_background.png").c_str());
 
     TCanvas *c2 = new TCanvas("c2", "c2", 800, 600);
-    TGraph *graph_ROC = new TGraph(N + 1, LeadingBtagAcceptance_signal.data(), (1 - LeadingBtagAcceptance_background).data());
-    graph_ROC->Draw("ACP");
-    graph_ROC->GetXaxis()->SetTitle("Signal efficiency");
-    graph_ROC->GetYaxis()->SetTitle("Background rejection");
-    graph_ROC->SetTitle("ROC curve");
-    graph_ROC->SetLineColor(2);
-    graph_ROC->SetLineWidth(4);
-    graph_ROC->GetYaxis()->SetRangeUser(0., 1);
-    graph_ROC->GetXaxis()->SetRangeUser(0., 1);
+    TGraph graph_ROC =TGraph(N + 1, LeadingBtagAcceptance_signal.data(), (1 - LeadingBtagAcceptance_background).data());
+    TMultiGraph mg3;
+    graph_ROC.SetLineColor(2);
+    graph_ROC.SetLineWidth(4);
+    mg3.GetXaxis()->SetTitle("Signal efficiency");
+    mg3.GetYaxis()->SetTitle("Background rejection");
+    mg3.SetTitle("ROC curve");
+    mg3.GetYaxis()->SetRangeUser(0., 1);
+    mg3.GetXaxis()->SetRangeUser(0., 1);
+    mg3.Add(&graph_ROC);
+    mg3.Add(&diagonal);
+    mg3.Draw("ACP");
+    c2->SetGrid();
     c2->SaveAs((imageSaveFolder + "/LeadingBtagAcceptance_ROC.png").c_str());
 }
