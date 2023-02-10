@@ -46,8 +46,6 @@
 | Medium       | (Muon_mediumId[0] && Muon_pfIsoId[0]>2) | 154455 | 0.83                            |
 | Loose        | (Muon_looseId[0] && Muon_pfIsoId[0]>1)  | 147781 | 0.86                            |
 
-
-
 From now we will consider only loose muons
 
 ---
@@ -70,16 +68,16 @@ From now we will consider only loose muons
 |              | 20 GeV                  | 139741 | 0.88                        |
 |              | 30 GeV                  | 93562  | 0.59                        |
 
+# Results
+
+In the end, after all this cuts and the remotion of the muon, we choosed to impose a cut on the Leading Jet_btagDeepFlavB
+
+| Jet_btagDeepFlavB | cut  | Signal acceptance | Background acceptance |
+| ----------------- | ---- | ----------------- |:---------------------:|
+| Leading           | >0.1 | 0.96              | 0.9                   |
+
+On the subleading Jet_btagDeepFlavB we choosed to not impose a cut because the efficiencies drop instantly
+
+
+
 --- 
-
----
-
-# Questions
-
-- Should we impose a cut over the impact parameter? (Suggestion from the TWiki)
-
-- What is the difference between global/standalone/tracker/prompt muons?
-
-- Understand better the isolation
-
-- What are exactly Jet_jetId and Jet_puId
