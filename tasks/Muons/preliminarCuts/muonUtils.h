@@ -1,8 +1,5 @@
 #pragma once
 
-#include "../../utils/CMSStyle/CMS_lumi.C"
-#include "../../utils/CMSStyle/CMS_lumi.h"
-#include "../../utils/CMSStyle/tdrstyle.C"
 #include <Math/Vector4D.h>
 #include <ROOT/RVec.hxx>
 #include <TAxis.h>
@@ -63,4 +60,5 @@ RVec<float> FourJetsWithoutMuon(const RVec<float> &JetVec,RVec<int> &Jet_muonIdx
     }
     return RvecWithoutMuon;
 }
-    
+
+

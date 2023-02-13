@@ -13,6 +13,13 @@
 > ## Info
 > 
 > - [MuonID RunII](https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2)
+> 
+> ### Scripts
+> 
+> - muonPreselectionPlot.cpp (plot of pt/eta of muons)
+> - muonSelection.cpp (acceptance of different cuts on muon identification/isolation)
+> - BtaggingCuts.cpp (acceptance of cuts on the b tagging probability)
+> - saveMuonCuts.cpp (skimming with the choosed cuts)
 
 # Muons
 
@@ -77,7 +84,5 @@ In the end, after all this cuts and the remotion of the muon, we choosed to impo
 | Leading           | >0.1 | 0.96              | 0.9                   |
 
 On the subleading Jet_btagDeepFlavB we choosed to not impose a cut because the efficiencies drop instantly
-
-
 
 --- 

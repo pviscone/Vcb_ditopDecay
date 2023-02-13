@@ -25,7 +25,7 @@ void BtaggingCuts(std::string imageSaveFolder) {
     setTDRStyle();
     gROOT->LoadMacro("../../utils/CMSStyle/CMS_lumi.C");
 
-    RDataFrame SignalDF("Events", "TTbarSemileptonic_cbOnly_pruned_optimized.root",
+    RDataFrame SignalDF("Events", "../TTbarSemileptonic_cbOnly_pruned_optimized.root",
                         {"LHEPart_pdgId",
                          "nMuon",
                          "Muon_pt",
@@ -60,7 +60,7 @@ void BtaggingCuts(std::string imageSaveFolder) {
     LooseMuonsDF_signal = LooseMuonsDF_signal.Define("Btag_prob", "Jet_btagDeepFlavB[JetMask]");
     LooseMuonsDF_signal = LooseMuonsDF_signal.Define("LeadingJetsWithoutMuon_bTagProb", "FourJetsWithoutMuon(Reverse(Sort(Btag_prob)),Jet_muonIdx1)");
 
-    RDataFrame BackgroundDF("Events", "TTbarSemileptonic_Nocb_optimized.root",
+    RDataFrame BackgroundDF("Events", "../TTbarSemileptonic_Nocb_optimized.root",
                             {"LHEPart_pdgId",
                              "nMuon",
                              "Muon_pt",
