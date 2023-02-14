@@ -12,17 +12,17 @@
 #include <TTree.h>
 #include <stdlib.h>
 
-#include "muonUtils.h"
 
-#include "../../utils/itertools/product.hpp"
-#include "../../utils/itertools/zip.hpp"
 
-#include "../../utils/CMSStyle/CMS_lumi.C"
-#include "../../utils/CMSStyle/CMS_lumi.h"
-#include "../../utils/CMSStyle/tdrstyle.C"
+#include "../../../utils/itertools/product.hpp"
+#include "../../../utils/itertools/zip.hpp"
 
-#include "../../utils/DfUtils.h"
-#include "../../utils/HistUtils.h"
+#include "../../../utils/CMSStyle/CMS_lumi.C"
+#include "../../../utils/CMSStyle/CMS_lumi.h"
+#include "../../../utils/CMSStyle/tdrstyle.C"
+
+#include "../../../utils/DfUtils.h"
+#include "../../../utils/HistUtils.h"
 
 void muonPreselectionPlot(std::string filename, std::string text, std::string imageSaveFolder) {
     gStyle->SetFillStyle(1001);
@@ -33,9 +33,9 @@ void muonPreselectionPlot(std::string filename, std::string text, std::string im
     datasetText = text;
 
     ROOT::EnableImplicitMT();
-    gROOT->LoadMacro("../../utils/CMSStyle/tdrstyle.C");
+    gROOT->LoadMacro("../../../utils/CMSStyle/tdrstyle.C");
     setTDRStyle();
-    gROOT->LoadMacro("../../utils/CMSStyle/CMS_lumi.C");
+    gROOT->LoadMacro("../../../utils/CMSStyle/CMS_lumi.C");
     TH1::SetDefaultSumw2();
 
     ROOT::EnableImplicitMT();
@@ -47,7 +47,7 @@ void muonPreselectionPlot(std::string filename, std::string text, std::string im
                       "Muon_phi",
                       "Muon_charge",});
 
-    auto muonsDF=fileDF.Filter("selectMuonEvents(LHEPart_pdgId)");
+    auto muonsDF = fileDF.Filter("(LHEPart_pdgId[3]==-13 || LHEPart_pdgId[6]==13)");
 
     auto histNmuon = muonsDF.Histo1D({"nMuon", "nMuon", 10, 0, 10}, "nMuon");
 
@@ -70,7 +70,7 @@ void muonPreselectionPlot(std::string filename, std::string text, std::string im
     StackPlotter OrderedPt({histLeadingMuonPt,histSecondMuonPt,histThirdMuonPt,histFourthMuonPt}, "Ordered muon p_{t}", "p_{t} [GeV]", imageSaveFolder + "/orderedMuonPt.png");
 
 //-----------------------------------------------------
-    muonsDF = muonsDF.Define("orderedMuonEta", "orderAbs(Muon_eta)");
+    muonsDF = muonsDF.Define("orderedMuonEta", "Reverse(Sort(abs(Muon_eta)))");
 
     auto histMuonEta = muonsDF.Histo1D({"Muon_eta", "Muon_eta", 60,0,2.8}, "orderedMuonEta");
 

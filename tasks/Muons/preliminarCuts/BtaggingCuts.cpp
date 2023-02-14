@@ -1,16 +1,17 @@
 #include <ROOT/RDataFrame.hxx>
 #include <TMultiGraph.h>
 #include <iostream>
+#include <regex>
 using namespace ROOT;
 
-#include "muonUtils.h"
 
-#include "../../utils/CMSStyle/CMS_lumi.C"
-#include "../../utils/CMSStyle/CMS_lumi.h"
-#include "../../utils/CMSStyle/tdrstyle.C"
 
-#include "../../utils/DfUtils.h"
-#include "../../utils/HistUtils.h"
+#include "../../../utils/CMSStyle/CMS_lumi.C"
+#include "../../../utils/CMSStyle/CMS_lumi.h"
+#include "../../../utils/CMSStyle/tdrstyle.C"
+
+#include "../../../utils/DfUtils.h"
+#include "../../../utils/HistUtils.h"
 
 void BtaggingCuts(std::string imageSaveFolder) {
     gStyle->SetFillStyle(1001);
@@ -21,9 +22,9 @@ void BtaggingCuts(std::string imageSaveFolder) {
 
     ROOT::EnableImplicitMT();
 
-    gROOT->LoadMacro("../../utils/CMSStyle/tdrstyle.C");
+    gROOT->LoadMacro("../../../utils/CMSStyle/tdrstyle.C");
     setTDRStyle();
-    gROOT->LoadMacro("../../utils/CMSStyle/CMS_lumi.C");
+    gROOT->LoadMacro("../../../utils/CMSStyle/CMS_lumi.C");
 
     RDataFrame SignalDF("Events", "../TTbarSemileptonic_cbOnly_pruned_optimized.root",
                         {"LHEPart_pdgId",
@@ -42,23 +43,19 @@ void BtaggingCuts(std::string imageSaveFolder) {
                          "Jet_muonIdx1",
                          "Jet_btagDeepFlavB"});
 
-    auto MuonsFromWDF_signal = SignalDF.Filter("(LHEPart_pdgId[3]==-13 || LHEPart_pdgId[6]==13)");
-    auto TriggeredMuonsDF_signal = MuonsFromWDF_signal.Filter("Muon_pt[0]>26 && abs(Muon_eta[0])<2.4");
-    auto LooseMuonsDF_signal = TriggeredMuonsDF_signal.Filter("Muon_looseId[0] && Muon_pfIsoId[0]>1");
-    
-    //Cut on jets
-    LooseMuonsDF_signal = LooseMuonsDF_signal.Define("SlimmedJet_pt", "Jet_pt[Jet_jetId>0 && Jet_puId>0]");
-    
-    //Removing muon from jets
-    LooseMuonsDF_signal = LooseMuonsDF_signal.Define("LeadingJetsWithoutMuon_pt", "FourJetsWithoutMuon(SlimmedJet_pt,Jet_muonIdx1)");
+    auto LooseMuonsDF_signal = SignalDF.Filter("(LHEPart_pdgId[3]==-13 || LHEPart_pdgId[6]==13)").Filter("Muon_pt[0]>26 && abs(Muon_eta[0])<2.4");
 
-    //Clearing jets
-    LooseMuonsDF_signal = LooseMuonsDF_signal.Define("JetMask", "Jet_jetId>0 && Jet_puId>0 && Jet_pt>20");
-    LooseMuonsDF_signal = LooseMuonsDF_signal.Filter("LeadingJetsWithoutMuon_pt[3]>20");
-
+    LooseMuonsDF_signal = LooseMuonsDF_signal.Filter("Muon_looseId[0] && Muon_pfIsoId[0]>1");
+    LooseMuonsDF_signal = LooseMuonsDF_signal.Define("JetMask", "Jet_jetId>0 && Jet_puId>0 && Jet_muonIdx1!=0 && Jet_pt>20");
+    for (auto &name : LooseMuonsDF_signal.GetColumnNames()) {
+        if (regex_match(name, std::regex("Jet_.*"))) {
+            LooseMuonsDF_signal = LooseMuonsDF_signal.Redefine(name, name + "[JetMask]");
+        }
+    }
+    LooseMuonsDF_signal = LooseMuonsDF_signal.Redefine("nJet", "Jet_pt.size()");
+    LooseMuonsDF_signal = LooseMuonsDF_signal.Filter("nJet>=4");
     //Btagging
-    LooseMuonsDF_signal = LooseMuonsDF_signal.Define("Btag_prob", "Jet_btagDeepFlavB[JetMask]");
-    LooseMuonsDF_signal = LooseMuonsDF_signal.Define("LeadingJetsWithoutMuon_bTagProb", "FourJetsWithoutMuon(Reverse(Sort(Btag_prob)),Jet_muonIdx1)");
+    LooseMuonsDF_signal = LooseMuonsDF_signal.Define("LeadingJetsWithoutMuon_bTagProb", "Reverse(Sort(Jet_btagDeepFlavB))");
 
     RDataFrame BackgroundDF("Events", "../TTbarSemileptonic_Nocb_optimized.root",
                             {"LHEPart_pdgId",
@@ -77,17 +74,21 @@ void BtaggingCuts(std::string imageSaveFolder) {
                              "Jet_muonIdx1",
                              "Jet_btagDeepFlavB"});
 
-    auto MuonsFromWDF_background = BackgroundDF.Filter("(LHEPart_pdgId[3]==-13 || LHEPart_pdgId[6]==13)");
-    auto TriggeredMuonsDF_background = MuonsFromWDF_background.Filter("Muon_pt[0]>26 && abs(Muon_eta[0])<2.4");
-    auto LooseMuonsDF_background = TriggeredMuonsDF_background.Filter("Muon_looseId[0] && Muon_pfIsoId[0]>1");
-    LooseMuonsDF_background = LooseMuonsDF_background.Define("SlimmedJet_pt", "Jet_pt[Jet_jetId>0 && Jet_puId>0]");
-    LooseMuonsDF_background = LooseMuonsDF_background.Define("LeadingJetsWithoutMuon_pt", "FourJetsWithoutMuon(SlimmedJet_pt,Jet_muonIdx1)");
-    LooseMuonsDF_background = LooseMuonsDF_background.Define("JetMask", "Jet_jetId>0 && Jet_puId>0 && Jet_pt>20");
-    LooseMuonsDF_background = LooseMuonsDF_background.Filter("LeadingJetsWithoutMuon_pt[3]>20");
-    LooseMuonsDF_background = LooseMuonsDF_background.Define("Btag_prob", "Jet_btagDeepFlavB[JetMask]");
-    LooseMuonsDF_background = LooseMuonsDF_background.Define("LeadingJetsWithoutMuon_bTagProb", "FourJetsWithoutMuon(Reverse(Sort(Btag_prob)),Jet_muonIdx1)");
+    auto LooseMuonsDF_background = BackgroundDF.Filter("(LHEPart_pdgId[3]==-13 || LHEPart_pdgId[6]==13)").Filter("Muon_pt[0]>26 && abs(Muon_eta[0])<2.4");
 
-//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    LooseMuonsDF_background = LooseMuonsDF_background.Filter("Muon_looseId[0] && Muon_pfIsoId[0]>1");
+    LooseMuonsDF_background = LooseMuonsDF_background.Define("JetMask", "Jet_jetId>0 && Jet_puId>0 && Jet_muonIdx1!=0 && Jet_pt>20");
+    for (auto &name : LooseMuonsDF_background.GetColumnNames()) {
+        if (regex_match(name, std::regex("Jet_.*"))) {
+            LooseMuonsDF_background = LooseMuonsDF_background.Redefine(name, name + "[JetMask]");
+        }
+    }
+    LooseMuonsDF_background = LooseMuonsDF_background.Redefine("nJet", "Jet_pt.size()");
+    LooseMuonsDF_background = LooseMuonsDF_background.Filter("nJet>=4");
+    // Btagging
+    LooseMuonsDF_background = LooseMuonsDF_background.Define("LeadingJetsWithoutMuon_bTagProb", "Reverse(Sort(Jet_btagDeepFlavB))");
+
+    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     int N = 100;
     RVec<float> CutsVec = RVec<float>(N + 1);
@@ -168,7 +169,7 @@ void BtaggingCuts(std::string imageSaveFolder) {
     mg.Add(&graph_signalAcceptance);
     mg.Add(&graph_backgroundAcceptance);
 
-    mg.Draw("AC");
+    mg.Draw("ACP");
 
     auto legend = new TLegend(0.7, 0.7, 0.95, 0.9);
     legend->AddEntry(&graph_signalAcceptance, "signal Leading", "l");
@@ -198,9 +199,9 @@ void BtaggingCuts(std::string imageSaveFolder) {
     mg1.GetXaxis()->SetTitle("cut on btag probability");
     mg1.SetTitle("btag acceptance");
 
-    mg1.GetYaxis()->SetRangeUser(0.8, 1);
-    mg1.GetXaxis()->SetRangeUser(0., 0.1);
-    mg1.Draw("AC");
+    mg1.GetYaxis()->SetRangeUser(0.7, 1.01);
+    mg1.GetXaxis()->SetRangeUser(0., 0.15);
+    mg1.Draw("ACP");
     auto legend2 = new TLegend(0.7, 0.7, 0.95, 0.9);
     legend2->SetHeader("Cut on jet btag leading probability>0.1","C");
     legend2->AddEntry(&graph_signalAcceptance2, "signal Second", "l");
@@ -209,26 +210,23 @@ void BtaggingCuts(std::string imageSaveFolder) {
     c1->SetGrid();
     c1->SaveAs((imageSaveFolder + "/SecondBtagAcceptance.png").c_str());
 
-    /*
-
-        RVec<float> x={0,1};
-        RVec<float> y={1,0};
-        TGraph diagonal=TGraph(2,x.data(),y.data());
-        diagonal.SetLineWidth(2);
-
+    RVec<float> x = {0, 1};
+    RVec<float> y = {1, 0};
+    TGraph diagonal = TGraph(2, x.data(), y.data());
+    diagonal.SetLineWidth(2);
     TCanvas *c2 = new TCanvas("c2", "c2", 800, 600);
-        TGraph graph_ROC =TGraph(N + 1, LeadingBtagAcceptance_signal.data(), (1 - LeadingBtagAcceptance_background).data());
-        TMultiGraph mg3;
-        graph_ROC.SetLineColor(2);
-        graph_ROC.SetLineWidth(4);
-        mg3.GetXaxis()->SetTitle("Signal efficiency");
-        mg3.GetYaxis()->SetTitle("Background rejection");
-        mg3.SetTitle("ROC curve");
-        mg3.GetYaxis()->SetRangeUser(0., 1);
-        mg3.GetXaxis()->SetRangeUser(0., 1);
-        mg3.Add(&graph_ROC);
-        mg3.Add(&diagonal);
-        mg3.Draw("ACP");
-        c2->SetGrid();
-        c2->SaveAs((imageSaveFolder + "/LeadingBtagAcceptance_ROC.png").c_str()); */
+    TGraph graph_ROC = TGraph(N + 1, LeadingBtagAcceptance_signal.data(), (1 - LeadingBtagAcceptance_background).data());
+    TMultiGraph mg3;
+    graph_ROC.SetLineColor(2);
+    graph_ROC.SetLineWidth(4);
+    mg3.GetXaxis()->SetTitle("Signal efficiency");
+    mg3.GetYaxis()->SetTitle("Background rejection");
+    mg3.SetTitle("ROC curve");
+    mg3.GetYaxis()->SetRangeUser(0., 1);
+    mg3.GetXaxis()->SetRangeUser(0., 1);
+    mg3.Add(&graph_ROC);
+    mg3.Add(&diagonal);
+    mg3.Draw("ACP");
+    c2->SetGrid();
+    c2->SaveAs((imageSaveFolder + "/LeadingBtagAcceptance_ROC.png").c_str());
 }
