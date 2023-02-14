@@ -1,9 +1,5 @@
 *.root
 *.pyc
-tasks/**/*.png
-tasks/**/*.jpg
-tasks/**/*.jpeg
-tasks/**/*.gif
 /**/prova.cpp
 check/*
 tasks/generateCbEvents/genproductions/*
