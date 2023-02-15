@@ -34,5 +34,4 @@
 
 # TODO:
 
-- Add the images to git LFS
-- **REMEMBER TO UPDATE IMAGES AND ROOT FILES TO EOS**
+- **REMEMBER TO UPDATE ROOT FILES TO EOS** (or consider to add them to git lfs)
