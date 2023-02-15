@@ -5,6 +5,7 @@ using namespace ROOT;
 
 
 void saveMuonCuts(std::string filename){
+    EnableImplicitMT();
     RDataFrame df("Events",filename);
     auto dfCuts = df.Filter("(LHEPart_pdgId[3]==-13 || LHEPart_pdgId[6]==13)").Filter("Muon_pt[0]>26 && abs(Muon_eta[0])<2.4");
 
