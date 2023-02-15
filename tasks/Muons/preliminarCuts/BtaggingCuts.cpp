@@ -114,8 +114,9 @@ void BtaggingCuts(std::string imageSaveFolder) {
     std::vector<ROOT::RDF::RResultPtr<double>> count_background_rr;
     std::vector<ROOT::RDF::RResultPtr<double>> count_signal_rrSecond;
     std::vector<ROOT::RDF::RResultPtr<double>> count_background_rrSecond;
-    auto cuttedDF_signalSecond = cuttedDF_signal.Filter("LeadingJetsWithoutMuon_bTagProb[0]>0.1");
-    auto cuttedDF_backgroundSecond = cuttedDF_background.Filter("LeadingJetsWithoutMuon_bTagProb[0]>0.1");
+    // Medium cut on btagDeepFlavB
+    auto cuttedDF_signalSecond = cuttedDF_signal.Filter("LeadingJetsWithoutMuon_bTagProb[0]>0.2783");
+    auto cuttedDF_backgroundSecond = cuttedDF_background.Filter("LeadingJetsWithoutMuon_bTagProb[0]>0.2783");
     for (int i = 0; i <= N; i++) {
         cuttedDF_signal = cuttedDF_signal.Define("BtagMask"+std::to_string(i),"LeadingJetsWithoutMuon_bTagProb[0]>" + std::to_string(CutsVec[i]));
         cuttedDF_background = cuttedDF_background.Define("BtagMask"+std::to_string(i),"LeadingJetsWithoutMuon_bTagProb[0]>" + std::to_string(CutsVec[i]));
@@ -160,8 +161,8 @@ void BtaggingCuts(std::string imageSaveFolder) {
 
 
 
-    mg.GetYaxis()->SetTitle("btag acceptance");
-    mg.GetXaxis()->SetTitle("cut on btag probability");
+    mg.GetYaxis()->SetTitle("acceptance");
+    mg.GetXaxis()->SetTitle("cut on btagDeepFlavB");
     mg.SetTitle("btag acceptance");
 
     mg.GetYaxis()->SetRangeUser(0.9, 1);
@@ -195,15 +196,15 @@ void BtaggingCuts(std::string imageSaveFolder) {
     graph_signalAcceptance2.SetName("signalSecond");
     mg1.Add(&graph_backgroundAcceptance2);
     mg1.Add(&graph_signalAcceptance2);
-    mg1.GetYaxis()->SetTitle("btag acceptance");
-    mg1.GetXaxis()->SetTitle("cut on btag probability");
+    mg1.GetYaxis()->SetTitle("acceptance");
+    mg1.GetXaxis()->SetTitle("cut on btagDeepFlavB");
     mg1.SetTitle("btag acceptance");
 
     mg1.GetYaxis()->SetRangeUser(0.7, 1.01);
     mg1.GetXaxis()->SetRangeUser(0., 0.15);
     mg1.Draw("ACP");
     auto legend2 = new TLegend(0.7, 0.7, 0.95, 0.9);
-    legend2->SetHeader("Cut on jet btag leading probability>0.1","C");
+    legend2->SetHeader("Cut on jet btag leading probability>0.2783","C");
     legend2->AddEntry(&graph_signalAcceptance2, "signal Second", "l");
     legend2->AddEntry(&graph_backgroundAcceptance2, "background Second", "l");
     legend2->Draw();

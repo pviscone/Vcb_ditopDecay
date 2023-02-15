@@ -13,6 +13,7 @@
 > ## Info
 > 
 > - [MuonID RunII](https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2)
+> - [b tag Working points 20UL18](https://btv-wiki.docs.cern.ch/ScaleFactors/UL2018/)
 > 
 > ### Scripts
 > 
@@ -66,12 +67,12 @@ From now we will consider only loose muons
 - Jet_muonIdx1!=0
 
 | [signal] | Cut on fourth jet $p_t$ | Events | Fraction (over loose muons) |
-|:--------:|:-----------------------:| ------ |:---------------------------:|
+|:--------:|:-----------------------:|:------:|:---------------------------:|
 |          | 20 GeV                  | 133551 | 0.83                        |
 |          | 30 GeV                  | 87046  | 0.54                        |
 
 | [background] | Cut on fourth jet $p_t$ | Events | Fraction (over loose muons) |
-|:------------:|:-----------------------:| ------ |:---------------------------:|
+|:------------:|:-----------------------:|:------:|:---------------------------:|
 |              | 20 GeV                  | 134597 | 0.84                        |
 |              | 30 GeV                  | 90403  | 0.57                        |
 
@@ -79,10 +80,10 @@ From now we will consider only loose muons
 
 In the end, after all this cuts and the remotion of the muon, we choosed to impose a cut on the Leading Jet_btagDeepFlavB
 
-| Jet_btagDeepFlavB | cut  | Signal acceptance | Background acceptance |
-| ----------------- | ---- | ----------------- |:---------------------:|
-| Leading           | >0.1 | 0.99              | 0.965                 |
+| Jet_btagDeepFlavB | cut              | Signal acceptance | Background acceptance |
+|:-----------------:|:----------------:|:-----------------:|:---------------------:|
+| Leading           | >0.2783 (medium) | 0.968 (129312)    | 0.921  (124010)       |
 
-On the subleading Jet_btagDeepFlavB we choosed to not impose a cut because the efficiencies drop instantly (ARE YOU SURE ABOUT THAT?)
+On the subleading Jet_btagDeepFlavB we choosed to not impose a cut because the efficiencies drop instantly
 
 --- 

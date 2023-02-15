@@ -3,8 +3,6 @@
 #include <regex>
 using namespace ROOT;
 
-#include "./muonUtils.h"
-
 
 void saveMuonCuts(std::string filename){
     RDataFrame df("Events",filename);
@@ -35,9 +33,10 @@ void saveMuonCuts(std::string filename){
     int nMuonsJetsFilter = dfCuts.Count().GetValue();
     std::cout << "Number muons (after jet pt filtering): " << nMuonsJetsFilter << std::endl;
 
-    dfCuts = dfCuts.Filter("Reverse(Sort(Jet_btagDeepFlavB))[0]>0.1");
+    // Medium cut on btagDeepFlavB
+    dfCuts = dfCuts.Filter("Reverse(Sort(Jet_btagDeepFlavB))[0]>0.2783");
 
     int nMuonsBtagFilter = dfCuts.Count().GetValue();
     std::cout << "Number muons (after btag filtering): " << nMuonsBtagFilter << std::endl;
-    //dfCuts.Snapshot("Events", filename.replace(filename.find(".root"), 5, "_MuonSelection.root"));
+    dfCuts.Snapshot("Events", filename.replace(filename.find(".root"), 5, "_MuonSelection.root"));
 }
