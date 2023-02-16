@@ -39,10 +39,7 @@ def neutrino_pz(lept_pt, lept_eta, lept_phi, MET_pt, MET_phi):
     res0 = ((-b-np.sqrt(delta))/(2*a))
     res1 = ((-b+np.sqrt(delta))/(2*a))
     res = np.array([res0, res1])
-    argmin = np.argmin([np.abs(res0), np.abs(res1)], axis=0)
-    argmax = np.argmax([np.abs(res0), np.abs(res1)], axis=0)
-    res[0] = np.array([res[elem, idx] for idx, elem in enumerate(argmin)])
-    res[1] = np.array([res[elem, idx] for idx, elem in enumerate(argmax)])
+    res=res[np.abs(res).argsort(axis=0),np.arange(res.shape[1])[None,:]]
     res = list(res)
     res.append(~mask)
     return res
