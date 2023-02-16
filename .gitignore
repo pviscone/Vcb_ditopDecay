@@ -1,6 +1,7 @@
 *.root
 *.pyc
 *.gz
+*.ipynb
 /**/prova.cpp
 check/*
 tasks/generateCbEvents/genproductions/*
