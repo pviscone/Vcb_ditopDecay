@@ -1,12 +1,13 @@
 #%% Includes and function definitions
-
+#%load_ext autoreload
+#%autoreload 2
 import uproot
 import ROOT
 import numpy as np
 import re
 import matplotlib.pyplot as plt
 import pandas as pd
-import forestplot as fp
+from histogrammer import Histogrammer
 import mplhep as hep
 import matplotlib as mpl
 import matplotlib.colors as mcolors
@@ -107,7 +108,7 @@ nu_pz_LHE_bad = nu_pz_LHE[~nu_pz[2]]
 
 
 #%% W mass
-
+#You shoul vectorize this function. Maybe there is something else than ROOT.Math.PtEtaPhiMVector
 def Wmass(lept_pt, lept_eta, lept_phi, MET_pt, MET_phi, nu_pz, lept_mass=0.105):
     Wmass_array = []
     for i in range(len(nu_pz)):
@@ -119,163 +120,118 @@ def Wmass(lept_pt, lept_eta, lept_phi, MET_pt, MET_phi, nu_pz, lept_mass=0.105):
     return np.array(Wmass_array)
 
 
+
 Wmass_good_low = Wmass(mu_pt_good, mu_eta_good, mu_phi_good,
                        met_pt_good, met_phi_good, nu_pz_good_low)
 Wmass_good_high = Wmass(mu_pt_good, mu_eta_good, mu_phi_good,
                         met_pt_good, met_phi_good, nu_pz_good_high)
 Wmass_bad = Wmass(mu_pt_bad, mu_eta_bad, mu_phi_bad,
                   met_pt_bad, met_phi_bad, nu_pz_bad)
-
+#%% W mass plot
 plt.figure(figsize=(8, 6))
-plt.hist(Wmass_good_low, bins=50, alpha=1, label="$\Delta>0$",
-         range=(0, 1200), color=mcolors.XKCD_COLORS["xkcd:golden yellow"], histtype="stepfilled", linewidth=1.5, edgecolor="black")
-plt.hist(Wmass_bad, bins=50, alpha=0.7, label=r"$\Delta=0$ (imposed)",
-         range=(0, 1200), color="dodgerblue", edgecolor='blue', histtype="stepfilled", linewidth=1.5)
-
-
-plt.legend()
-plt.xlabel(r"$M_W$ [GeV]")
-plt.ylabel("Counts")
-hep.cms.text("Preliminary")
-plt.yscale("log")
-plt.grid(color="grey", linestyle="--", linewidth=0.5)
+plt.rc('legend', fontsize=13)
+h = Histogrammer(bins=50, histrange=(50, 785), xlabel=r"$M_W$ [GeV]",log="y",grid=False)
+h.add_hist(Wmass_bad, alpha=1, label="$\Delta=0$ (imposed)",
+           color="dodgerblue", edgecolor='blue')
+h.add_hist(Wmass_good_low, alpha=0.8, label="$\Delta>0$", color=mcolors.XKCD_COLORS["xkcd:golden yellow"], edgecolor="black")
+#plt.xlim(0,1200)
+h.plot()
 plt.savefig("./images/Wmass_reconstructed.png")
 
 #%% Pz nu
 plt.figure(figsize=(8, 6))
-plt.style.use(hep.style.CMS)
-plt.hist(np.abs(nu_pz_good_high), bins=75, alpha=0.9,
-         label=r"larger solution $\Delta \geq 0  $", range=(0, 2300), color="dodgerblue", edgecolor='blue', histtype="stepfilled", linewidth=1.5)
-plt.hist(np.abs(nu_pz_good_low), bins=75, alpha=1,
-         label=r"smaller solution $\Delta \geq 0$", range=(0, 2300), color=mcolors.XKCD_COLORS["xkcd:golden yellow"], histtype="stepfilled", linewidth=1.5, edgecolor="black")
-plt.hist(np.abs(nu_pz_bad), bins=75, alpha=0.45,
-         label=r"$\Delta=0 $ (imposed)", range=(0, 2300), color="fuchsia", edgecolor='violet', histtype="stepfilled", linewidth=1.5)
-plt.legend()
-plt.xlabel(r"$P_z^{\nu}$ [GeV]")
-plt.ylabel("Counts")
-hep.cms.text("Preliminary")
-plt.yscale("log")
-plt.grid(color="grey", linestyle="--", linewidth=0.5)
+plt.rc('legend', fontsize=13)
+h=Histogrammer(bins=75, histrange=(0, 2300), xlabel=f"$P_z^{{\\nu}}$ [GeV]",log="y")
+h.add_hist(np.abs(nu_pz_good_high),alpha=0.9,
+         label=r"MaxAbs $\Delta \geq 0  $",color="dodgerblue", edgecolor='blue', linewidth=1.5)
+h.add_hist(np.abs(nu_pz_good_low), alpha=1,
+         label=r"MinAbs $\Delta \geq 0$", color=mcolors.XKCD_COLORS["xkcd:golden yellow"],linewidth=1.5, edgecolor="black")
+h.add_hist(np.abs(nu_pz_bad), alpha=0.45,
+         label=r"$\Delta=0 $ (imposed)", color="fuchsia", edgecolor='violet',  linewidth=1.5)
+h.plot()
+
 plt.savefig("./images/Pznu_reconstructed.png")
 
 #%% Pz nu LHE comparison
 
 plt.figure(figsize=(18, 12))
 mpl.rc("font", size=18)
+plt.rc('legend', fontsize=13)
+histrangeabs=(0,300)
+histrangediff=(-300,300)
 plt.subplot(2, 2, 1)
+h1=Histogrammer(bins=75, histrange=histrangeabs,
+             xlabel=f"$|P_z^{{\\nu}}|$ [GeV]",  grid=False)
+h1.add_hist(np.abs(nu_pz_good_high), alpha=0.8, label=r"AbsMax $\Delta \geq 0$",
+              color="dodgerblue", edgecolor='blue', linewidth=2.5)
 
-plt.hist(nu_pz_good_high, bins=75, alpha=0.8,
-         label=r"larger solution $\Delta \geq 0  $", range=(-2300, 2300), color="dodgerblue", edgecolor='blue', histtype="stepfilled", linewidth=2.5)
+h1.add_hist(np.abs(nu_pz_good_low), alpha=0.7, label=r"MinAbs $\Delta \geq 0$",
+              color=mcolors.XKCD_COLORS["xkcd:golden yellow"], linewidth=2.5, edgecolor="black")
+h1.add_hist(np.abs(nu_pz_LHE_good), alpha=0.7, label=r"LHE",
+            edgecolor="fuchsia", color='violet', linewidth=2)
 
-plt.hist(nu_pz_LHE_good, bins=75, alpha=0.7,
-         label=r"LHE", range=(-2300, 2300), color="violet", edgecolor='fuchsia', histtype="stepfilled", linewidth=2)
-plt.hist(nu_pz_good_low, bins=75, alpha=0.7,
-         label=r"smaller solution $\Delta \geq 0$", range=(-2300, 2300), color=mcolors.XKCD_COLORS["xkcd:golden yellow"], histtype="stepfilled", linewidth=0, edgecolor=mcolors.XKCD_COLORS["xkcd:golden yellow"])
-
-plt.legend()
-plt.xlabel(r"$P_z^{\nu}$ [GeV]")
-plt.ylabel("Counts")
-hep.cms.text("Preliminary")
-plt.yscale("log")
-plt.grid(color="grey", linestyle="--", linewidth=0.5)
-
+h1.plot()
+plt.ylim(0,7000)
 plt.subplot(2, 2, 3)
-
-plt.hist(nu_pz_good_high-nu_pz_LHE_good, bins=75, alpha=0.8,
-         label=r"larger solution $\Delta \geq 0$", range=(-2300, 2300), color="dodgerblue", edgecolor='blue', histtype="stepfilled", linewidth=2)
-plt.hist(nu_pz_good_low-nu_pz_LHE_good, bins=75, alpha=0.7,
-         label=r"smaller solution $\Delta \geq 0$", range=(-2300, 2300), color=mcolors.XKCD_COLORS["xkcd:golden yellow"], histtype="stepfilled", linewidth=0, edgecolor=mcolors.XKCD_COLORS["xkcd:golden yellow"])
-
-plt.legend()
-plt.xlabel(r"$p_z^{\nu}-p_z^{LHE}$  [GeV]")
-plt.ylabel("Counts")
-hep.cms.text("Preliminary")
-plt.yscale("log")
-plt.grid(color="grey", linestyle="--", linewidth=0.5)
-
+h3 = Histogrammer(bins=75, histrange=histrangediff,
+                  xlabel=f"$P_z^{{\\nu}}-P_z^{{LHE}}$ [GeV]",  grid=False)
+h3.add_hist(nu_pz_good_high-nu_pz_LHE_good, alpha=0.8, label=r"AbsMax $\Delta \geq 0$", color="dodgerblue", edgecolor='blue', linewidth=2)
+h3.add_hist(nu_pz_good_low-nu_pz_LHE_good, alpha=0.7, label=r"MinAbs $\Delta \geq 0$", color=mcolors.XKCD_COLORS["xkcd:golden yellow"], linewidth=2.5, edgecolor="black")
+h3.plot()
+plt.ylim(0, 7000)
 
 plt.subplot(2, 2, 2)
-
-plt.hist(nu_pz_bad, bins=75, alpha=0.8,
-         label=r"$\Delta \leq 0  $", range=(-2300, 2300), color="dodgerblue", edgecolor='blue', histtype="stepfilled", linewidth=2)
-
-plt.hist(nu_pz_LHE_bad, bins=75, alpha=0.7,
-         label=r"LHE", range=(-2300, 2300), color=mcolors.XKCD_COLORS["xkcd:golden yellow"], histtype="stepfilled", linewidth=0, edgecolor=mcolors.XKCD_COLORS["xkcd:golden yellow"])
-
-plt.legend()
-plt.xlabel(r"$P_z^{\nu}$ [GeV]")
-plt.ylabel("Counts")
-hep.cms.text("Preliminary")
-plt.yscale("log")
-plt.grid(color="grey", linestyle="--", linewidth=0.5)
-
+h2 = Histogrammer(bins=75, histrange=histrangeabs,
+                  xlabel=f"$|P_z^{{\\nu}}|$ [GeV]",  grid=False)
+h2.add_hist(np.abs(nu_pz_bad), alpha=0.8, label=r"$\Delta \leq 0$ (imposed)", color="dodgerblue", edgecolor='blue', linewidth=2)
+h2.add_hist(np.abs(nu_pz_LHE_bad), alpha=0.7, label=r"LHE", color=mcolors.XKCD_COLORS["xkcd:golden yellow"], linewidth=2.5, edgecolor="black")
+h2.plot()
+plt.ylim(0, 7000)
 
 plt.subplot(2, 2, 4)
-
-
-plt.hist(nu_pz_bad-nu_pz_LHE_bad, bins=75, alpha=1,
-         label=r"$\Delta \leq 0$", range=(-2300, 2300), color=mcolors.XKCD_COLORS["xkcd:golden yellow"], histtype="stepfilled", linewidth=1, edgecolor=mcolors.XKCD_COLORS["xkcd:golden yellow"])
-
-plt.legend()
-plt.xlabel(r"$p_z^{\nu}-p_z^{LHE}$  [GeV]")
-plt.ylabel("Counts")
-hep.cms.text("Preliminary")
-plt.yscale("log")
-plt.grid(color="grey", linestyle="--", linewidth=0.5)
+h4 = Histogrammer(bins=75, histrange=histrangediff,
+                  xlabel=f"$P_z^{{\\nu}}-P_z^{{LHE}}$ [GeV]",  grid=False)
+h4.add_hist(nu_pz_bad-nu_pz_LHE_bad, alpha=1, label=r"$\Delta \leq 0$", color="dodgerblue", edgecolor='blue', linewidth=2)
+h4.plot()
+plt.ylim(0, 3000)
 plt.savefig("./images/Pznu_LHE_comparison.png")
 
 #%% MET vs LHE
 
 plt.figure(figsize=(12, 12))
 mpl.rc("font", size=18)
+plt.rc('legend', fontsize=13)
 plt.subplot(2, 2, 1)
-plt.hist(met_pt, bins=75, alpha=0.8,
-         label=r"MET", range=(0, 1000), color="dodgerblue", edgecolor='blue', histtype="stepfilled", linewidth=2)
-plt.hist(nu_pt_LHE, bins=75, alpha=0.8,
-         label=r"LHE", range=(0, 1000), color=mcolors.XKCD_COLORS["xkcd:golden yellow"], histtype="stepfilled", linewidth=0, edgecolor=mcolors.XKCD_COLORS["xkcd:golden yellow"])
+h1 = Histogrammer(N=False,bins=75, histrange=(0,1000),
+                  xlabel=f"$P_t$ [GeV]", log="y", grid=False)
+h1.add_hist(met_pt, alpha=1, label=r"MET", color="dodgerblue", edgecolor='blue', linewidth=2)
+h1.add_hist(nu_pt_LHE, alpha=0.7, label=r"LHE", color=mcolors.XKCD_COLORS["xkcd:golden yellow"], linewidth=1, edgecolor="black")
+h1.plot()
 
-plt.legend()
-plt.xlabel(r"$p_t$  [GeV]")
-plt.ylabel("Counts")
-hep.cms.text("Preliminary")
-plt.yscale("log")
-plt.grid(color="grey", linestyle="--", linewidth=0.5)
 
 
 plt.subplot(2, 2, 3)
-
-plt.hist(met_pt-nu_pt_LHE, bins=75, alpha=0.8,
-         label=r"MET-LHE", range=(-220, 220), color="dodgerblue", edgecolor='blue', histtype="stepfilled", linewidth=2)
-
-plt.legend()
-plt.xlabel(r"$\Delta p_t$  [GeV]")
-plt.ylabel("Counts")
-hep.cms.text("Preliminary")
-plt.yscale("log")
-plt.grid(color="grey", linestyle="--", linewidth=0.5)
+h3 = Histogrammer(N=False,bins=75, histrange=(-220,220),
+                  xlabel=f"$\Delta P_t$ [GeV]", log="y", grid=False)
+h3.add_hist(met_pt-nu_pt_LHE, alpha=1, label=r"MET-LHE", color="dodgerblue", edgecolor='black', linewidth=2)
+h3.plot()
 
 
 plt.subplot(2, 2, 2)
-plt.hist(met_phi, bins=75, alpha=0.8,
-         label=r"MET", range=(-3.14, 3.14), color="dodgerblue", edgecolor='blue', histtype="stepfilled", linewidth=2)
-plt.hist(nu_phi_LHE, bins=75, alpha=0.8,
-         label=r"LHE", range=(-3.14, 3.14), color=mcolors.XKCD_COLORS["xkcd:golden yellow"], histtype="stepfilled", linewidth=0, edgecolor=mcolors.XKCD_COLORS["xkcd:golden yellow"])
+h2 = Histogrammer(N=False,bins=75, histrange=(-3.14,3.14),
+                  xlabel=f"$\phi$", grid=False, ylabel="")
+h2.add_hist(nu_phi_LHE, alpha=1, label=r"LHE",
+            color=mcolors.XKCD_COLORS["xkcd:golden yellow"], linewidth=2.5, edgecolor="black")
+h2.add_hist(met_phi, alpha=0.75, label=r"MET", color="dodgerblue", edgecolor='blue', linewidth=2.5)
 
-plt.legend()
-plt.xlabel(r"$\phi$")
-
-plt.ylim(1000, 2300)
-hep.cms.text("Preliminary")
-
-plt.grid(color="grey", linestyle="--", linewidth=0.5)
+h2.plot()
 
 plt.subplot(2, 2, 4)
+h4 = Histogrammer(N=False,bins=75, histrange=(-3.14, 3.14),
+                  xlabel=f"$\\Delta \\phi$", grid=False,ylabel="")
+h4.add_hist(deltaPhi(met_phi, nu_phi_LHE), alpha=1, label=r"MET-LHE", color="dodgerblue", edgecolor='black', linewidth=2)
+h4.plot()
 
-plt.hist(deltaPhi(met_phi, nu_phi_LHE), bins=75, alpha=0.8,
-         label=r"MET-LHE", range=(-3.14, 3.14), color="dodgerblue", edgecolor='blue', histtype="stepfilled", linewidth=2)
-
-plt.legend()
-plt.xlabel(r"$\Delta \phi$")
-hep.cms.text("Preliminary")
-plt.grid(color="grey", linestyle="--", linewidth=0.5)
 plt.savefig("./images/MET_LHE_comparison.png")
+
+# %%
