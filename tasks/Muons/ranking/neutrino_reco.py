@@ -162,7 +162,7 @@ histrangediff=(-300,300)
 plt.subplot(2, 2, 1)
 h1=Histogrammer(bins=75, histrange=histrangeabs,
              xlabel=f"$|P_z^{{\\nu}}|$ [GeV]",  grid=False)
-h1.add_hist(np.abs(nu_pz_good_high), alpha=0.8, label=r"AbsMax $\Delta \geq 0$",
+h1.add_hist(np.abs(nu_pz_good_high), alpha=0.8, label=r"MaxAbs $\Delta \geq 0$",
               color="dodgerblue", edgecolor='blue', linewidth=2.5)
 
 h1.add_hist(np.abs(nu_pz_good_low), alpha=0.7, label=r"MinAbs $\Delta \geq 0$",
@@ -175,7 +175,7 @@ plt.ylim(0,7000)
 plt.subplot(2, 2, 3)
 h3 = Histogrammer(bins=75, histrange=histrangediff,
                   xlabel=f"$P_z^{{\\nu}}-P_z^{{LHE}}$ [GeV]",  grid=False)
-h3.add_hist(nu_pz_good_high-nu_pz_LHE_good, alpha=0.8, label=r"AbsMax $\Delta \geq 0$", color="dodgerblue", edgecolor='blue', linewidth=2)
+h3.add_hist(nu_pz_good_high-nu_pz_LHE_good, alpha=0.8, label=r"MaxAbs $\Delta \geq 0$", color="dodgerblue", edgecolor='blue', linewidth=2)
 h3.add_hist(nu_pz_good_low-nu_pz_LHE_good, alpha=0.7, label=r"MinAbs $\Delta \geq 0$", color=mcolors.XKCD_COLORS["xkcd:golden yellow"], linewidth=2.5, edgecolor="black")
 h3.plot()
 plt.ylim(0, 7000)
