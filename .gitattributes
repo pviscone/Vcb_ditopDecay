@@ -3,4 +3,5 @@ tasks/ttbarKinematics/powheg/TT_hdamp_NNPDF31_NNLO_ljets/* linguist-vendored
 *.jpg filter=lfs diff=lfs merge=lfs -text
 *.jpeg filter=lfs diff=lfs merge=lfs -text
 *.gif filter=lfs diff=lfs merge=lfs -text
+*.npy filter=lfs diff=lfs merge=lfs -text
 *.ipynb  text
