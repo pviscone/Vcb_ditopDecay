@@ -111,6 +111,9 @@ nu_pz_LHE = nu_pt_LHE*np.sinh(nu_eta_LHE)
 nu_pz_LHE_good = nu_pz_LHE[nu_pz[2]]
 nu_pz_LHE_bad = nu_pz_LHE[~nu_pz[2]]
 
+""" np.save("nu_pz",nu_pz[0])
+np.save("nu_pz_det_mask",nu_pz[2]) """
+
 
 #%% W mass
 #You shoul vectorize this function. Maybe there is something else than ROOT.Math.PtEtaPhiMVector
