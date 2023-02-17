@@ -1,6 +1,10 @@
 #%% Includes and function definitions
 #%load_ext autoreload
 #%autoreload 2
+import sys
+
+sys.path.append("../../../utils")
+
 import uproot
 import ROOT
 import numpy as np
@@ -11,6 +15,7 @@ from histogrammer import Histogrammer
 import mplhep as hep
 import matplotlib as mpl
 import matplotlib.colors as mcolors
+
 
 plt.style.use(hep.style.CMS)
 signal = uproot.open(
