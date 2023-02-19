@@ -12,6 +12,8 @@ The object that I used are:
 
 - MET_*
 
-- Scrivi qui quello che hai fatto
-  
-  
+## Results
+
+In the end we decided to follow another approach and reconstruct the event "by hand"
+
+Anyway from the ranking plot we can see that there isn't 1D feature that clearly distinguish the signal from the background
