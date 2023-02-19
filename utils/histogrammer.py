@@ -1,17 +1,21 @@
 import matplotlib as mpl
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 import mplhep
 import sys
 
-plt.style.use(mplhep.style.CMS)
+xkcd_yellow = mcolors.XKCD_COLORS["xkcd:golden yellow"]
+#plt.style.use(mplhep.style.CMS)
 class Histogrammer():
     def __init__(self, xlabel="", ylabel="Counts", title="", cmsText="Preliminary", legendloc="best",
-                 fontsize=20,legend_fontsize=13,
+                 fontsize=30,legend_fontsize=21,
                  histrange=None,histtype="stepfilled",linewidth=2,
                  legend=True, mean=True, rms=True, N=False, total_stats=False,
                  log=False, grid=False,  xlim=None, ylim=None,
-                 **kwargs):
+                 cms_kwargs={"loc":2},**kwargs):
+        #mplhep.style.use("CMS")
+        mplhep.style.use(["CMS", "fira", "firamath"])
         self.hist_list = []
         self.range=histrange
         self.histtype=histtype
@@ -32,6 +36,7 @@ class Histogrammer():
         self.legendloc = legendloc
         self.total_stats=total_stats
         self.common_kwargs = kwargs
+        self.cms_kwargs = cms_kwargs
         
         
 
@@ -122,9 +127,13 @@ class Histogrammer():
         if(self.legend):
             plt.legend(loc=self.legendloc)
         if(self.cmsText):
-            mplhep.cms.text(self.cmsText)
+            mplhep.cms.text(self.cmsText,**self.cms_kwargs)
             
-        plt.xlim(self.range[0],self.range[1])
+        if self.xlim:
+            plt.xlim(self.xlim[0],self.xlim[1])
+        elif self.range:
+            plt.xlim(self.range[0],self.range[1])
+
         if(self.ylim):
             plt.ylim(self.ylim)
         else:
