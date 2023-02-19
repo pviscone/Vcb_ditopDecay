@@ -12,7 +12,7 @@ import mplhep as hep
 import vector
 import awkward as ak
 
-
+xkcd_yellow = mcolors.XKCD_COLORS["xkcd:golden yellow"]
 plt.style.use(hep.style.CMS)
 signal = uproot.open(
     "../TTbarSemileptonic_cbOnly_pruned_optimized_MuonSelection.root")["Events"]
@@ -36,6 +36,10 @@ def deltaR(eta1,eta2,phi1,phi2):
     return np.sqrt((eta1-eta2)**2+deltaPhi(phi1,phi2)**2)
 
 #%%
+
+# _good =right b jet (t->b(W->lv))
+# _bad =all other jets
+
 pdgId_Wdecay= get("LHEPart_pdgId")[:,[3,6]].to_numpy()
 
 LHEmask = np.bitwise_or(pdgId_Wdecay ==13, pdgId_Wdecay == -13)
@@ -94,10 +98,12 @@ others_Jet_mask = [remove(list(range(len(event))), bJetIdx)
 otherJet_4Vect = Jet_4Vect[others_Jet_mask]
 
 # %% Rmin
-h=Histogrammer(xlabel="$\Delta R_{min}$",bins=100,histrange=(0,1),ylim=(0,8000),legend_fontsize=20)
-h.add_hist(deltaRmin_jet_leptB, label="$\Delta R_{min}$ jets-$b_{LHE}$(leptonic)",
-           color=mcolors.XKCD_COLORS["xkcd:golden yellow"],edgecolor="black",linewidth=1.5)
+h=Histogrammer(xlabel="$\Delta R_{min}$",bins=100,histrange=(0,1),ylim=(0,9000),legend_fontsize=20)
+h.add_hist(deltaRmin_jet_leptB, label="$\Delta R_{min}$ jets-$b_{LHE}^{Lept}$",
+           color=xkcd_yellow,edgecolor="black",linewidth=2)
 h.plot()
+
+plt.savefig("images/deltaRmin_jet_leptB.png")
 
 
 # %%
@@ -105,10 +111,15 @@ h.plot()
 Tmass_good=(bJet_4Vect+nu_4Vect+mu_4Vect).mass
 Tmass_bad=ak.flatten((otherJet_4Vect+nu_4Vect+mu_4Vect).mass)
 
-h=Histogrammer(xlabel="$m_{top}$ [GeV]",bins=100,histrange=(80,700),legend_fontsize=20,ylim=(0,20000))
-h.add_hist(Tmass_bad, label="Other Jets",color="dodgerblue",edgecolor="black",linewidth=1.5)
-h.add_hist(Tmass_good, label="Bjet (leptonic)",alpha=1,color=mcolors.XKCD_COLORS["xkcd:golden yellow"],edgecolor="black",linewidth=1.5)
+h=Histogrammer(xlabel="$M_{top}$ [GeV]",bins=100,histrange=(80,700),legend_fontsize=22,density=True,ylim=(0,0.015),ylabel="Density",fontsize=30,N=True)
+
+h.add_hist(Tmass_good, label="$Bjet_{lept}$ + $W_{lept}$", alpha=1,
+           color="dodgerblue", edgecolor="black", linewidth=1.5)
+
+h.add_hist(Tmass_bad, label="Other Jets + $W_{lept}$", color=xkcd_yellow,edgecolor="black", linewidth=1.5,alpha=0.6)
 h.plot()
+plt.ticklabel_format(axis="y", style="scientific", scilimits=(0, 0))
+plt.savefig("images/Tmass_jets.png")
 
 #%%btag
 
@@ -116,9 +127,14 @@ btag_good=btag[arange,nearest_jet_to_leptB_mask]
 btag_bad=ak.flatten(btag[others_Jet_mask])
 
 h = Histogrammer(xlabel="btagDeepB", bins=100, histrange=(0, 1),legend_fontsize=20, ylim=(0, 20),density=True,ylabel="Density")
-h.add_hist(btag_bad, label="Other Jets",color="dodgerblue",edgecolor="black",linewidth=2.5)
 
-h.add_hist(btag_good, label="B jet (leptonic)",color=mcolors.XKCD_COLORS["xkcd:golden yellow"], edgecolor="black", linewidth=1.5,alpha=0.6)
+h.add_hist(btag_good, label="B jet (leptonic)", color="dodgerblue",
+           edgecolor="black", linewidth=1.5, alpha=1)
+
+h.add_hist(btag_bad, label="Other Jets",color=xkcd_yellow,alpha=0.6,edgecolor="black",linewidth=2.5)
+
+
 
 h.plot()
 plt.xlim(-0.03,1.03)
+plt.savefig("images/btag_jets.png")
