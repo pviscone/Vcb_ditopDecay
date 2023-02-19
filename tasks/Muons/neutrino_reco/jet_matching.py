@@ -1,103 +1,78 @@
+
 #%% Imports
+import mplhep
+import awkward as ak
+from coffea.nanoevents.methods import vector
+from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
 import sys
 
 sys.path.append("../../../utils")
-import uproot
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-import pandas as pd
 from histogrammer import Histogrammer
-import mplhep as hep
-import vector
-import awkward as ak
+
+
 
 xkcd_yellow = mcolors.XKCD_COLORS["xkcd:golden yellow"]
-plt.style.use(hep.style.CMS)
-signal = uproot.open(
-    "../TTbarSemileptonic_cbOnly_pruned_optimized_MuonSelection.root")["Events"]
+mplhep.style.use(["CMS", "fira", "firamath"])
 
 
-def get(key, numpy=False, library="ak"):
-    arr = signal.arrays(key, library=library)[key]
-    if numpy == True:
-        return arr.to_numpy()
-    else:
-        return arr
+# I don't know why but the first plot (only) is always weird.
+# So,as a workaround, these two lines create a dummy plot.
+plt.hist([0])
+plt.close()
 
-
-def deltaPhi(phi1, phi2):
-    dphi = (phi1 - phi2)
-    dphi[dphi > np.pi] = 2*np.pi - dphi[dphi > np.pi]
-    dphi[dphi < -np.pi] = -2*np.pi - dphi[dphi < -np.pi]
-    return dphi
-
-def deltaR(eta1,eta2,phi1,phi2):
-    return np.sqrt((eta1-eta2)**2+deltaPhi(phi1,phi2)**2)
+events = NanoEventsFactory.from_root(
+    "../TTbarSemileptonic_cbOnly_pruned_optimized_MuonSelection.root",
+    schemaclass=NanoAODSchema,
+).events()
 
 #%%
 
-# _good =right b jet (t->b(W->lv))
-# _bad =all other jets
 
-pdgId_Wdecay= get("LHEPart_pdgId")[:,[3,6]].to_numpy()
 
-LHEmask = np.bitwise_or(pdgId_Wdecay ==13, pdgId_Wdecay == -13)
+#Select only the first product of the W decay
+pdgId_Wdecay= events.LHEPart.pdgId[:,[3,6]]
+#Mask for the leptonic decay of the W
+leptonic_LHE_mask=np.bitwise_or(pdgId_Wdecay==13,pdgId_Wdecay==-13)
 
-LeptB_LHE_phi= get("LHEPart_phi")[:,[2,5]].to_numpy()[LHEmask]
-LeptB_LHE_eta= get("LHEPart_eta")[:,[2,5]].to_numpy()[LHEmask]
-LeptB_LHE_pt= get("LHEPart_pt")[:,[2,5]].to_numpy()[LHEmask]
+#Select only the LHE b from the top decay and then select the leptonic one
+LeptB_LHE_4Vect=events.LHEPart[:,[2,5]][leptonic_LHE_mask]
 
-LeptB_LHE_4Vect=vector.awk({"pt":LeptB_LHE_pt,"eta":LeptB_LHE_eta,"phi":LeptB_LHE_phi,"mass":4.2*np.ones_like(LeptB_LHE_pt)})
+All_Jets_4Vect=events.Jet
+bJet_4Vect = events.LHEPart.nearest(All_Jets_4Vect)[:, [2, 5]][leptonic_LHE_mask]
 
-Jet_pt = get("Jet_pt")
-Jet_eta = get("Jet_eta")
-Jet_phi = get("Jet_phi")
-Jet_mass= get("Jet_mass")
-
-Jet_4Vect=vector.awk({"pt":Jet_pt,"eta":Jet_eta,"phi":Jet_phi,"mass":Jet_mass})
+#Select the other jets
+otherJet_mask = (All_Jets_4Vect.delta_r(bJet_4Vect) > 0.00001)
+otherJet_4Vect = All_Jets_4Vect[otherJet_mask]
 
 nu_pz=np.load("nu_pz.npy")
-nu_pt = get("MET_pt",numpy=True)
-nu_phi = get("MET_phi",numpy=True)
+nu_pt = events.MET.pt.to_numpy()
+nu_phi = events.MET.phi.to_numpy()
 nu_eta=np.arcsinh(nu_pz/nu_pt)
 
-nu_4Vect=vector.awk({"pt":nu_pt,"eta":nu_eta,"phi":nu_phi,"mass":0*np.ones_like(nu_pt)})
+nu_4Vect = ak.zip(
+    {
+        "pt": nu_pt,
+        "eta": nu_eta,
+        "phi": nu_phi,
+        "mass": np.zeros_like(nu_pt),
+    },
+    with_name="PtEtaPhiMLorentzVector",
+    behavior=vector.behavior,
+)
+del nu_pt, nu_eta, nu_phi, nu_pz
 
 
-mu_pt = get("Muon_pt[:,0]",numpy=True)
-mu_eta= get("Muon_eta[:,0]",numpy=True)
-mu_phi= get("Muon_phi[:,0]",numpy=True)
-mu_4Vect=vector.awk({"pt":mu_pt,"eta":mu_eta,"phi":mu_phi,"mass":0.105*np.ones_like(mu_pt)})
+mu_4Vect=events.Muon[:,0]
 
-
-btag=get("Jet_btagDeepB")
-# %% deltaR
-
-arange=list(np.arange(len(Jet_pt)))
-nearest_jet_to_leptB_mask = ak.argmin(
-    Jet_4Vect.deltaR(LeptB_LHE_4Vect), axis=1).to_list()
-#nearest_jet_to_leptB_mask = [[elem] for elem in nearest_jet_to_leptB_mask]
-
-
-deltaRmin_jet_leptB = Jet_4Vect.deltaR(LeptB_LHE_4Vect)[arange,nearest_jet_to_leptB_mask]
-
-# I don't know why but the mask return and array instead of aMomentumRecord4D.The second line is a workaround to recast it
-bJet_4Vect = Jet_4Vect[arange,nearest_jet_to_leptB_mask]
-bJet_4Vect = vector.awk({"pt":bJet_4Vect.rho,"eta":bJet_4Vect.eta,"phi":bJet_4Vect.phi,"mass":bJet_4Vect.tau})
-
-
-def remove(lista, elem):
-    lista.remove(elem)
-    return lista
-
-
-others_Jet_mask = [remove(list(range(len(event))), bJetIdx)
-              for event, bJetIdx in zip(Jet_phi, nearest_jet_to_leptB_mask)]
-
-otherJet_4Vect = Jet_4Vect[others_Jet_mask]
 
 # %% Rmin
+
+deltaRmin_jet_leptB = bJet_4Vect.delta_r(LeptB_LHE_4Vect)
+
 h=Histogrammer(xlabel="$\Delta R_{min}$",bins=100,histrange=(0,1),ylim=(0,9000),legend_fontsize=20)
 h.add_hist(deltaRmin_jet_leptB, label="$\Delta R_{min}$ jets-$b_{LHE}^{Lept}$",
            color=xkcd_yellow,edgecolor="black",linewidth=2)
@@ -107,7 +82,8 @@ plt.savefig("images/deltaRmin_jet_leptB.png")
 
 
 # %%
-
+# _good =right b jet (t->b(W->lv))
+# _bad =all other jets
 Tmass_good=(bJet_4Vect+nu_4Vect+mu_4Vect).mass
 Tmass_bad=ak.flatten((otherJet_4Vect+nu_4Vect+mu_4Vect).mass)
 
@@ -122,11 +98,12 @@ plt.ticklabel_format(axis="y", style="scientific", scilimits=(0, 0))
 plt.savefig("images/Tmass_jets.png")
 
 #%%btag
+# _good =right b jet (t->b(W->lv))
+# _bad =all other jets
+btag_good=bJet_4Vect.btagDeepB.to_numpy()
+btag_bad=ak.flatten(otherJet_4Vect.btagDeepB).to_numpy()
 
-btag_good=btag[arange,nearest_jet_to_leptB_mask]
-btag_bad=ak.flatten(btag[others_Jet_mask])
-
-h = Histogrammer(xlabel="btagDeepB", bins=100, histrange=(0, 1),legend_fontsize=20, ylim=(0, 20),density=True,ylabel="Density")
+h = Histogrammer(xlabel="btagDeepB", bins=100, histrange=(0, 1),legend_fontsize=20, ylim=(0, 20),density=True,ylabel="Density",N=True)
 
 h.add_hist(btag_good, label="B jet (leptonic)", color="dodgerblue",
            edgecolor="black", linewidth=1.5, alpha=1)
@@ -138,3 +115,6 @@ h.add_hist(btag_bad, label="Other Jets",color=xkcd_yellow,alpha=0.6,edgecolor="b
 h.plot()
 plt.xlim(-0.03,1.03)
 plt.savefig("images/btag_jets.png")
+
+#!Achtunh! There is a non negligible fraction of events with btagDeepB==-1. How should I interpret this?
+# %%
