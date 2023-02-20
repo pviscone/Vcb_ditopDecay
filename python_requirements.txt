@@ -1,0 +1,8 @@
+numpy
+matplotlib
+mplhep
+awkward
+uproot
+coffea
+vector
+torch
