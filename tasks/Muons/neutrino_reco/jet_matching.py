@@ -1,17 +1,22 @@
 
 #%% Imports
+import sys
+sys.path.append("../../../utils")
+
+
+from histogrammer import Histogrammer
+import importlib
+importlib.reload(histogrammer)
+Histogrammer = histogrammer.Histogrammer
+
 import mplhep
 import awkward as ak
 from coffea.nanoevents.methods import vector
 from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
-import sys
-
-sys.path.append("../../../utils")
 
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-from histogrammer import Histogrammer
 
 
 
@@ -44,6 +49,7 @@ LeptB_LHE_4Vect=events.LHEPart[:,[2,5]][leptonic_LHE_mask]
 All_Jets_4Vect=events.Jet
 bJet_4Vect = events.LHEPart.nearest(All_Jets_4Vect)[:, [2, 5]][leptonic_LHE_mask]
 
+
 #Select the other jets
 otherJet_mask = (All_Jets_4Vect.delta_r(bJet_4Vect) > 0.00001)
 otherJet_4Vect = All_Jets_4Vect[otherJet_mask]
@@ -75,40 +81,49 @@ deltaRmin_jet_leptB = bJet_4Vect.delta_r(LeptB_LHE_4Vect)
 
 h=Histogrammer(xlabel="$\Delta R_{min}$",bins=100,histrange=(0,1),ylim=(0,9000),legend_fontsize=20)
 h.add_hist(deltaRmin_jet_leptB, label="$\Delta R_{min}$ jets-$b_{LHE}^{Lept}$",
-           color=xkcd_yellow,edgecolor="black",linewidth=2)
+           color=xkcd_yellow,edgecolor="black",linewidth=2.5)
 h.plot()
+plt.plot([0.4,0.4],[0,9000],color="red",linestyle="-")
+N_tot=len(deltaRmin_jet_leptB)
 
+deltaR_mask=deltaRmin_jet_leptB < 0.4
+
+N_04=np.sum(deltaR_mask)
+plt.text(0.63,6000,f"$N_{{tot}}$   = {N_tot}\n$N_{{<0.4}}=$ {N_04} ({(N_04/N_tot):.2f})",fontsize=20)
 plt.savefig("images/deltaRmin_jet_leptB.png")
 
+bJet_4Vect_leq04=bJet_4Vect[deltaR_mask]
+nu_4Vect_leq04=nu_4Vect[deltaR_mask]
+mu_4Vect_leq04=mu_4Vect[deltaR_mask]
 
 # %%
 # _good =right b jet (t->b(W->lv))
 # _bad =all other jets
-Tmass_good=(bJet_4Vect+nu_4Vect+mu_4Vect).mass
+Tmass_good=(bJet_4Vect_leq04+nu_4Vect_leq04+mu_4Vect_leq04).mass
 Tmass_bad=ak.flatten((otherJet_4Vect+nu_4Vect+mu_4Vect).mass)
 
-h=Histogrammer(xlabel="$M_{top}$ [GeV]",bins=100,histrange=(80,700),legend_fontsize=22,density=True,ylim=(0,0.015),ylabel="Density",fontsize=30,N=True)
+h=Histogrammer(xlabel="$M_{top}$ [GeV]",bins=100,histrange=(80,700),legend_fontsize=22,density=True,ylim=(0,0.016),ylabel="Density",fontsize=30,N=True,score=(350,0.01))
 
-h.add_hist(Tmass_good, label="$Bjet_{lept}$ + $W_{lept}$", alpha=1,
-           color="dodgerblue", edgecolor="black", linewidth=1.5)
+h.add_hist(Tmass_good, label="$Bjet_{Lept}^{\Delta R_{LHE}\leq 0.4}$ + $W_{lept}$", alpha=1,
+           color="dodgerblue", edgecolor="black", linewidth=3)
 
-h.add_hist(Tmass_bad, label="Other Jets + $W_{lept}$", color=xkcd_yellow,edgecolor="black", linewidth=1.5,alpha=0.6)
+h.add_hist(Tmass_bad, label="Other Jets + $W_{lept}$", color=xkcd_yellow,edgecolor="goldenrod", linewidth=2.5,alpha=0.7)
 h.plot()
 plt.ticklabel_format(axis="y", style="scientific", scilimits=(0, 0))
 plt.savefig("images/Tmass_jets.png")
 
 #%%btag
-# _good =right b jet (t->b(W->lv))
+# _good =right b jet (t->b(W->lv)) (+ <0.4 deltaR cut)
 # _bad =all other jets
-btag_good=bJet_4Vect.btagDeepB.to_numpy()
-btag_bad=ak.flatten(otherJet_4Vect.btagDeepB).to_numpy()
+btag_good=bJet_4Vect_leq04.btagDeepFlavB.to_numpy()
+btag_bad=ak.flatten(otherJet_4Vect.btagDeepFlavB).to_numpy()
 
-h = Histogrammer(xlabel="btagDeepB", bins=100, histrange=(0, 1),legend_fontsize=20, ylim=(0, 20),density=True,ylabel="Density",N=True)
+h = Histogrammer(xlabel="btagDeepFlavB", bins=100, histrange=(0, 1),legend_fontsize=20, ylim=(0, 38),density=True,ylabel="Density",N=True,score=(0.61,25))
 
-h.add_hist(btag_good, label="B jet (leptonic)", color="dodgerblue",
-           edgecolor="black", linewidth=1.5, alpha=1)
+h.add_hist(btag_good, label="$Bjet_{Lept}^{\Delta R_{LHE}\leq 0.4}$", color="dodgerblue",
+           edgecolor="black", linewidth=2.5, alpha=1)
 
-h.add_hist(btag_bad, label="Other Jets",color=xkcd_yellow,alpha=0.6,edgecolor="black",linewidth=2.5)
+h.add_hist(btag_bad, label="Others",color=xkcd_yellow,alpha=0.7,edgecolor="goldenrod",linewidth=2.5)
 
 
 
@@ -116,5 +131,44 @@ h.plot()
 plt.xlim(-0.03,1.03)
 plt.savefig("images/btag_jets.png")
 
-#!Achtunh! There is a non negligible fraction of events with btagDeepB==-1. How should I interpret this?
-# %%
+
+# %% ctag
+# _good =right b jet (t->b(W->lv)) (+ <0.4 deltaR cut)
+# _bad =all other jets
+CvBtag_good = bJet_4Vect_leq04.btagDeepFlavCvB.to_numpy()
+CvBtag_bad = ak.flatten(otherJet_4Vect.btagDeepFlavCvB).to_numpy()
+
+h = Histogrammer(xlabel="btagDeepFlavCvB", bins=100, histrange=(
+    0, 1), legend_fontsize=20, ylim=(0, 38), density=True, ylabel="Density", N=True,score=(0.6,25))
+
+h.add_hist(CvBtag_good, label="$Bjet_{Lept}^{\Delta R_{LHE}\leq 0.4}$", color="dodgerblue",
+           edgecolor="black", linewidth=1.5, alpha=1)
+
+h.add_hist(CvBtag_bad, label="Others", color=xkcd_yellow,
+           alpha=0.7, edgecolor="goldenrod", linewidth=2.5)
+
+
+h.plot()
+plt.xlim(-0.03, 1.03)
+plt.savefig("images/CvBtag_jets.png")
+
+#%% CvLtag
+
+# _good =right b jet (t->b(W->lv)) (+ <0.4 deltaR cut)
+# _bad =all other jets
+CvLtag_good = bJet_4Vect_leq04.btagDeepFlavCvL.to_numpy()
+CvLtag_bad = ak.flatten(otherJet_4Vect.btagDeepFlavCvL).to_numpy()
+
+h = Histogrammer(xlabel="btagDeepFlavCvL", bins=100, histrange=(
+    0, 1), legend_fontsize=20, ylim=(0, 10), density=True, ylabel="Density", N=True,score=(0.6,6.5))
+
+h.add_hist(CvLtag_good, label="$Bjet_{Lept}^{\Delta R_{LHE}\leq 0.4}$", color="dodgerblue",
+           edgecolor="black", linewidth=1.5, alpha=1)
+
+h.add_hist(CvLtag_bad, label="Others", color=xkcd_yellow,
+           alpha=0.7, edgecolor="goldenrod", linewidth=2.5)
+
+
+h.plot()
+plt.xlim(-0.03, 1.03)
+plt.savefig("images/CvLtag_jets.png")
