@@ -11,7 +11,7 @@ class Histogrammer():
     def __init__(self, xlabel="", ylabel="Counts", title="", cmsText="Preliminary", legendloc="best",
                  fontsize=30,legend_fontsize=21,
                  histrange=None,histtype="stepfilled",linewidth=2,
-                 legend=True, mean=True, rms=True, N=False, total_stats=False,
+                 legend=True, mean=True, rms=True, N=False, total_stats=False, score=None,
                  log=False, grid=False,  xlim=None, ylim=None,
                  cms_kwargs={"loc":2},**kwargs):
         #mplhep.style.use("CMS")
@@ -37,6 +37,7 @@ class Histogrammer():
         self.total_stats=total_stats
         self.common_kwargs = kwargs
         self.cms_kwargs = cms_kwargs
+        self.score = score
         
         
 
@@ -142,6 +143,18 @@ class Histogrammer():
                     plt.ylim(0.1, max_hist*8)
             else:
                 plt.ylim(0, max_hist*1.4)
+                
+        if self.score:
+            if len(self.hist_list)!=2:
+                raise ValueError("Score can only be calculated only for 2 histograms")
+            else:
+                hist1_normalized=self.hist_list[0][0]/np.sum(self.hist_list[0][0])
+                hist2_normalized=self.hist_list[1][0]/np.sum(self.hist_list[1][0])
+                if len(hist1_normalized)!=len(hist2_normalized):
+                    raise ValueError("Score can only be calculated only for 2 histograms of the same length")
+                d=0.5*np.sum(np.abs(hist1_normalized-hist2_normalized))
+                plt.text(self.score[0],self.score[1],f"$\\frac{{1}}{{2}} \int |h_1-h_2|$ = {d:.2f}",fontsize=20)
+                
         
 
 class Subplots():
