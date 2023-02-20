@@ -4,7 +4,7 @@ import sys
 sys.path.append("../../../utils")
 
 
-from histogrammer import Histogrammer
+import histogrammer
 import importlib
 importlib.reload(histogrammer)
 Histogrammer = histogrammer.Histogrammer
