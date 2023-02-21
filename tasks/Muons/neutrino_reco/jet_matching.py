@@ -204,3 +204,175 @@ h.add_hist(ak.flatten(events.MET.delta_phi(otherJet_4Vect)), label="$MET-$Other 
 h.plot()
 plt.savefig("images/dphi_MET_jets.png")
 
+#%% min dphi
+otherJet_4Vect_leq04=otherJet_4Vect[deltaR_mask]
+
+
+
+b_other_argminabs_deltaphi=ak.argmin(np.abs(bJet_4Vect_leq04.delta_phi(otherJet_4Vect_leq04)),axis=1).to_numpy(allow_missing=False)
+
+arange=np.arange(len(bJet_4Vect_leq04))
+
+b_other_min_deltaphi = bJet_4Vect_leq04.delta_phi(otherJet_4Vect_leq04)[arange,b_other_argminabs_deltaphi]
+
+#---
+other_other_deltaphi_abs = np.abs(
+    otherJet_4Vect_leq04[:, :, None].delta_phi(otherJet_4Vect_leq04[:, None, :]))
+other_other_deltaphi_abs = other_other_deltaphi_abs[other_other_deltaphi_abs != 0]
+other_other_deltaphi_abs=ak.flatten(other_other_deltaphi_abs,axis=2)
+
+other_other_argminabs_deltaphi=ak.argmin(other_other_deltaphi_abs,axis=1).to_numpy(allow_missing=False)
+
+other_other_min_deltaphi = otherJet_4Vect_leq04[:, :, None].delta_phi(otherJet_4Vect_leq04[:, None, :])
+other_other_min_deltaphi = other_other_min_deltaphi[other_other_min_deltaphi!=0]
+other_other_min_deltaphi=ak.flatten(other_other_min_deltaphi,axis=2)
+other_other_min_deltaphi=other_other_min_deltaphi[arange,other_other_argminabs_deltaphi]
+
+is_min_deltaphi_from_b = np.array(ak.argmin(
+    [np.abs(other_other_min_deltaphi),np.abs( b_other_min_deltaphi)], axis=0), dtype=bool)
+
+min_deltaphi_from_b = b_other_min_deltaphi[is_min_deltaphi_from_b]
+min_deltaphi_from_others = other_other_min_deltaphi[~is_min_deltaphi_from_b]
+
+
+h = Histogrammer(xlabel="$\Delta \phi_{MinAbs}$", bins=100, histrange=(-2, 2), legend_fontsize=20,
+                 ylim=(0, 2.2), density=True, ylabel="Density", N=True,score=(0.4, 1.4))
+
+h.add_hist(min_deltaphi_from_b,
+           label="$Bjet_{Lept}^{\Delta R_{LHE}\leq 0.4}$-Others", color="dodgerblue", edgecolor="black", linewidth=1.5, alpha=1)
+
+h.add_hist(min_deltaphi_from_others, label="Others-Others",color=xkcd_yellow, alpha=0.7, edgecolor="goldenrod", linewidth=2.5)
+h.plot()
+plt.savefig("./images/min_deltaphi_jets.png")
+
+# %% maxdphi
+
+b_other_argmaxabs_deltaphi = ak.argmax(np.abs(bJet_4Vect_leq04.delta_phi(
+    otherJet_4Vect_leq04)), axis=1).to_numpy(allow_missing=False)
+
+arange = np.arange(len(bJet_4Vect_leq04))
+
+b_other_max_deltaphi = bJet_4Vect_leq04.delta_phi(
+    otherJet_4Vect_leq04)[arange, b_other_argmaxabs_deltaphi]
+
+# ---
+other_other_deltaphi_abs = np.abs(
+    otherJet_4Vect_leq04[:, :, None].delta_phi(otherJet_4Vect_leq04[:, None, :]))
+other_other_deltaphi_abs = other_other_deltaphi_abs[other_other_deltaphi_abs != 0]
+other_other_deltaphi_abs = ak.flatten(other_other_deltaphi_abs, axis=2)
+
+other_other_argmaxabs_deltaphi = ak.argmax(
+    other_other_deltaphi_abs, axis=1).to_numpy(allow_missing=False)
+
+other_other_max_deltaphi = otherJet_4Vect_leq04[:, :, None].delta_phi(
+    otherJet_4Vect_leq04[:, None, :])
+other_other_max_deltaphi = other_other_max_deltaphi[other_other_max_deltaphi != 0]
+other_other_max_deltaphi = ak.flatten(other_other_max_deltaphi, axis=2)
+other_other_max_deltaphi = other_other_max_deltaphi[arange,
+                                                    other_other_argmaxabs_deltaphi]
+
+is_max_deltaphi_from_b = np.array(ak.argmax(
+    [np.abs(other_other_max_deltaphi), np.abs(b_other_max_deltaphi)], axis=0), dtype=bool)
+
+max_deltaphi_from_b = b_other_max_deltaphi[is_max_deltaphi_from_b]
+max_deltaphi_from_others = other_other_max_deltaphi[~is_max_deltaphi_from_b]
+
+
+h = Histogrammer(xlabel="$\Delta \phi_{MaxAbs}$", bins=100, histrange=(-3.14, 3.14), legend_fontsize=20,
+                 ylim=(0, 3), density=True, ylabel="Density", N=True, score=(0, 2))
+
+h.add_hist(max_deltaphi_from_b,
+           label="$Bjet_{Lept}^{\Delta R_{LHE}\leq 0.4}$-Others", color="dodgerblue", edgecolor="black", linewidth=1.5, alpha=1)
+
+h.add_hist(max_deltaphi_from_others, label="Others-Others",
+           color=xkcd_yellow, alpha=0.7, edgecolor="goldenrod", linewidth=2.5)
+h.plot()
+plt.savefig("./images/max_deltaphi_jets.png")
+
+#%%maxeta jets
+
+
+b_other_argmaxabs_deltaeta = ak.argmax(np.abs(bJet_4Vect_leq04.eta-(
+    otherJet_4Vect_leq04.eta)), axis=1).to_numpy(allow_missing=False)
+
+arange = np.arange(len(bJet_4Vect_leq04))
+
+b_other_max_deltaeta = bJet_4Vect_leq04.eta-(otherJet_4Vect_leq04.eta)[arange, b_other_argmaxabs_deltaeta]
+
+# ---
+other_other_deltaeta_abs = np.abs(
+    otherJet_4Vect_leq04[:, :, None].eta-(otherJet_4Vect_leq04.eta[:, None, :]))
+other_other_deltaeta_abs = other_other_deltaeta_abs[other_other_deltaeta_abs != 0]
+other_other_deltaeta_abs = ak.flatten(other_other_deltaeta_abs, axis=2)
+
+other_other_argmaxabs_deltaeta = ak.argmax(
+    other_other_deltaeta_abs, axis=1).to_numpy(allow_missing=False)
+
+other_other_max_deltaeta = otherJet_4Vect_leq04[:, :, None].eta-(otherJet_4Vect_leq04.eta[:, None, :])
+other_other_max_deltaeta = other_other_max_deltaeta[other_other_max_deltaeta != 0]
+other_other_max_deltaeta = ak.flatten(other_other_max_deltaeta, axis=2)
+other_other_max_deltaeta = other_other_max_deltaeta[arange,
+                                                    other_other_argmaxabs_deltaeta]
+
+is_max_deltaeta_from_b = np.array(ak.argmax(
+    [np.abs(other_other_max_deltaeta), np.abs(b_other_max_deltaeta)], axis=0), dtype=bool)
+
+max_deltaeta_from_b = b_other_max_deltaeta[is_max_deltaeta_from_b]
+max_deltaeta_from_others = other_other_max_deltaeta[~is_max_deltaeta_from_b]
+
+
+h = Histogrammer(xlabel="$\Delta \eta_{MaxAbs}$", bins=100, histrange=(-9,9), legend_fontsize=20,
+                 ylim=(0, 0.3), density=True, ylabel="Density", N=True, score=(0.05, 0.2))
+
+h.add_hist(max_deltaeta_from_b,
+           label="$Bjet_{Lept}^{\Delta R_{LHE}\leq 0.4}$-Others", color="dodgerblue", edgecolor="black", linewidth=1.5, alpha=1)
+
+h.add_hist(max_deltaeta_from_others, label="Others-Others",
+           color=xkcd_yellow, alpha=0.7, edgecolor="goldenrod", linewidth=2.5)
+h.plot()
+plt.savefig("./images/max_deltaeta_jets.png")
+
+# %%mineta jets
+
+
+b_other_argminabs_deltaeta = ak.argmin(np.abs(bJet_4Vect_leq04.eta-(
+    otherJet_4Vect_leq04.eta)), axis=1).to_numpy(allow_missing=False)
+
+arange = np.arange(len(bJet_4Vect_leq04))
+
+b_other_min_deltaeta = bJet_4Vect_leq04.eta - \
+    (otherJet_4Vect_leq04.eta)[arange, b_other_argminabs_deltaeta]
+
+# ---
+other_other_deltaeta_abs = np.abs(
+    otherJet_4Vect_leq04[:, :, None].eta-(otherJet_4Vect_leq04.eta[:, None, :]))
+other_other_deltaeta_abs = other_other_deltaeta_abs[other_other_deltaeta_abs != 0]
+other_other_deltaeta_abs = ak.flatten(other_other_deltaeta_abs, axis=2)
+
+other_other_argminabs_deltaeta = ak.argmin(
+    other_other_deltaeta_abs, axis=1).to_numpy(allow_missing=False)
+
+other_other_min_deltaeta = otherJet_4Vect_leq04[:,
+                                                :, None].eta-(otherJet_4Vect_leq04.eta[:, None, :])
+other_other_min_deltaeta = other_other_min_deltaeta[other_other_min_deltaeta != 0]
+other_other_min_deltaeta = ak.flatten(other_other_min_deltaeta, axis=2)
+other_other_min_deltaeta = other_other_min_deltaeta[arange,
+                                                    other_other_argminabs_deltaeta]
+
+is_min_deltaeta_from_b = np.array(ak.argmin(
+    [np.abs(other_other_min_deltaeta), np.abs(b_other_min_deltaeta)], axis=0), dtype=bool)
+
+min_deltaeta_from_b = b_other_min_deltaeta[is_min_deltaeta_from_b]
+min_deltaeta_from_others = other_other_min_deltaeta[~is_min_deltaeta_from_b]
+
+
+h = Histogrammer(xlabel="$\Delta \eta_{MinAbs}$", bins=100, histrange=(-2,2), legend_fontsize=20,
+                 ylim=(0, 3.5), density=True, ylabel="Density", N=True, score=(0.5, 2.2))
+
+h.add_hist(min_deltaeta_from_b,
+           label="$Bjet_{Lept}^{\Delta R_{LHE}\leq 0.4}$-Others", color="dodgerblue", edgecolor="black", linewidth=1.5, alpha=1)
+
+h.add_hist(min_deltaeta_from_others, label="Others-Others",
+           color=xkcd_yellow, alpha=0.7, edgecolor="goldenrod", linewidth=2.5)
+h.plot()
+plt.savefig("./images/min_deltaeta_jets.png")
