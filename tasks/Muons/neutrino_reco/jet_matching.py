@@ -204,32 +204,3 @@ h.add_hist(ak.flatten(events.MET.delta_phi(otherJet_4Vect)), label="$MET-$Other 
 h.plot()
 plt.savefig("images/dphi_MET_jets.png")
 
-# %%
-#min max delta phi and eta between bjet and others
-minphi = ak.min(bJet_4Vect_leq04.delta_phi(otherJet_4Vect[deltaR_mask]),axis=1)
-maxphi = ak.max(bJet_4Vect_leq04.delta_phi(otherJet_4Vect[deltaR_mask]),axis=1)
-h = Histogrammer(xlabel="$\Delta \phi$", bins=100, histrange=(-3.14, 3.14), legend_fontsize=20,
-                 ylim=(0, 1.7), density=True, ylabel="Density", score=(0.4, 1.1))
-
-h.add_hist(minphi,
-           label="Min $Bjet_{Lept}^{\Delta R_{LHE}\leq 0.4}-$Others", color="dodgerblue", edgecolor="black", linewidth=1.5, alpha=1)
-h.add_hist(maxphi, label="Max $Bjet_{Lept}^{\Delta R_{LHE}\leq 0.4}-$Others",
-           color=xkcd_yellow, alpha=0.7, edgecolor="goldenrod", linewidth=2.5)
-h.plot()
-plt.savefig("images/min_max_dphi_jets.png")
-
-# %% min max delta eta between bjet and others
-
-minphi = ak.min(bJet_4Vect_leq04.eta-(
-    otherJet_4Vect[deltaR_mask].eta), axis=1)
-maxphi = ak.max(bJet_4Vect_leq04.eta-(
-    otherJet_4Vect[deltaR_mask].eta), axis=1)
-h = Histogrammer(xlabel="$\Delta \eta$", bins=100, histrange=(-7,7), legend_fontsize=20,
-                 ylim=(0, 0.4), density=True, ylabel="Density", score=(1, 0.27))
-
-h.add_hist(minphi,
-           label="Min $Bjet_{Lept}^{\Delta R_{LHE}\leq 0.4}-$Others", color="dodgerblue", edgecolor="black", linewidth=1.5, alpha=1)
-h.add_hist(maxphi, label="Max $Bjet_{Lept}^{\Delta R_{LHE}\leq 0.4}-$Others",
-           color=xkcd_yellow, alpha=0.7, edgecolor="goldenrod", linewidth=2.5)
-h.plot()
-plt.savefig("images/min_max_deta_jets.png")
