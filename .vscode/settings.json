@@ -93,5 +93,8 @@
     },
     "python.analysis.extraPaths": [
         "./utils"
-    ]
+    ],
+    "docify.commentService.programmingLanguage": "python",
+    "docify.commentService.docstringFormat": "Google",
+    "docify.commentService.sidePanelReviewMode": true
 }
