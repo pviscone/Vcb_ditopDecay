@@ -45,6 +45,7 @@ leptonic_LHE_mask=np.bitwise_or(pdgId_Wdecay==13,pdgId_Wdecay==-13)
 
 #Select only the LHE b from the top decay and then select the leptonic one
 LeptB_LHE_4Vect=events.LHEPart[:,[2,5]][leptonic_LHE_mask]
+mu_LHE_4Vect=events.LHEPart[:,[3,6]][leptonic_LHE_mask]
 
 All_Jets_4Vect=events.Jet
 bJet_4Vect = events.LHEPart.nearest(All_Jets_4Vect)[:, [2, 5]][leptonic_LHE_mask]
@@ -73,8 +74,19 @@ del nu_pt, nu_eta, nu_phi, nu_pz
 
 
 mu_4Vect=events.Muon[:,0]
+#%% dR muon LHE
+deltaR_muons = mu_4Vect.delta_r(mu_LHE_4Vect)
 
-
+h=Histogrammer(xlabel="$\Delta R$",bins=100,histrange=(0,1),ylim=(0,100000),legend_fontsize=20,log="y")
+h.add_hist(deltaR_muons, label="$\Delta R$ $ \mu^{leading}-\mu_{LHE}$",
+           color=xkcd_yellow,edgecolor="black",linewidth=2.5)
+h.plot()
+plt.plot([0.4,0.4],[0,100000],color="red",linestyle="-")
+N_tot_muons=len(deltaR_muons)
+deltaRMu_mask=deltaR_muons < 0.4
+N_04_muons=np.sum(deltaRMu_mask)
+plt.text(0.63,6000,f"$N_{{tot}}$   = {N_tot_muons}\n$N_{{<0.4}}=$ {N_04_muons} ({(N_04_muons/N_tot_muons):.2f})",fontsize=20)
+plt.savefig("images/deltaR_Mu_LHE.png")
 # %% Rmin
 
 deltaRmin_jet_leptB = bJet_4Vect.delta_r(LeptB_LHE_4Vect)
@@ -87,14 +99,16 @@ plt.plot([0.4,0.4],[0,9000],color="red",linestyle="-")
 N_tot=len(deltaRmin_jet_leptB)
 
 deltaR_mask=deltaRmin_jet_leptB < 0.4
+bJet_4Vect_leq04=bJet_4Vect[deltaR_mask]
+nu_4Vect_leq04=nu_4Vect[deltaR_mask]
+mu_4Vect_leq04=mu_4Vect[deltaR_mask]
+
 
 N_04=np.sum(deltaR_mask)
 plt.text(0.63,6000,f"$N_{{tot}}$   = {N_tot}\n$N_{{<0.4}}=$ {N_04} ({(N_04/N_tot):.2f})",fontsize=20)
 plt.savefig("images/deltaRmin_jet_leptB.png")
 
-bJet_4Vect_leq04=bJet_4Vect[deltaR_mask]
-nu_4Vect_leq04=nu_4Vect[deltaR_mask]
-mu_4Vect_leq04=mu_4Vect[deltaR_mask]
+
 
 # %%
 # _good =right b jet (t->b(W->lv))
