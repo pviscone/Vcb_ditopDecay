@@ -53,5 +53,4 @@ Scripts to run the skimming on crab using nanoaod tools
   
   - SingleLeptFromT case: the leptons are all $e$
   
-  
   This is true only if for the cbOnly case. In other hadronic decays we can find other leptons in the original dataset
