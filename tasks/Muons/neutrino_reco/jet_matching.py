@@ -390,3 +390,7 @@ h.add_hist(min_deltaeta_from_others, label="Others-Others",
            color=xkcd_yellow, alpha=0.7, edgecolor="goldenrod", linewidth=2.5)
 h.plot()
 plt.savefig("./images/min_deltaeta_jets.png")
+
+#%% Save the features in a numpy matrix
+
+features=np.array()
