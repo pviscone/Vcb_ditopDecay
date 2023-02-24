@@ -52,7 +52,7 @@
 |:------------:|:---------------------------------------:| ------ |:-------------------------------:|
 | Tight        | (Muon_thightId[0] && Muon_pfIsoId[0]>3) | 147781 | 0.80                            |
 | Medium       | (Muon_mediumId[0] && Muon_pfIsoId[0]>2) | 154455 | 0.83                            |
-| Loose        | (Muon_looseId[0] && Muon_pfIsoId[0]>1)  | 147781 | 0.86                            |
+| Loose        | (Muon_looseId[0] && Muon_pfIsoId[0]>1)  | 158387 | 0.86                            |
 
 From now we will consider only loose muons
 
