@@ -1,9 +1,3 @@
-
-
-
-
-
-
 # [Skimmed_background](./Skimmed_background)
 
 **This is the background dataset used in the analysis**
@@ -12,9 +6,11 @@ Skimming script in[CBOnlySemileptonicFilter/selectBackground](../tasks/CBOnlySem
 
 3 files (in results):
 
-- TTbarSemileptonic_Nocb_optimized.root
+- TTbarSemileptonic_Nocb_LeptFromTbar.root
 
-> optimized = merged optimizing the tree basket size 
+- TTbarSemileptonic_Nocb_LeptFromT.root
+
+- TTbarSemileptonic_Nocb.root (the two above merged)
 
 Dataset obtained skimming (using RDataframe) NON cb events from the files (in input_files):
 
@@ -46,7 +42,7 @@ Dataset generated skimming the signal and the background dataset with [some cuts
 
 file:
 
-- TTbarSemileptonic_Nocb_optimized_MuonSelection.root
+- TTbarSemileptonic_Nocb_MuonSelection.root
 
 - TTbarSemileptonic_cbOnly_pruned_optimized_MuonSelection.root
 

@@ -4,7 +4,7 @@
 > 
 > - Plot $R_{min}$ between the leptonic b jet ( $t \to b (W\to l \nu)$ )  and the muon
 > 
-> - Reconstruct the top mass (selecting the jet with $R_{min}<0.4$ ??)
+> - Reconstruct the top mass (selecting the jet with $R_{min}<0.4$)
 > 
 > - Reconstruct the top mass using the other jets
 > 
@@ -47,6 +47,3 @@ There are other approachs (also using flows and NN) but here was used the simple
 
 - There is a strange modulation in MET_phi (It should be uniform)
 
-## Achtung!
-
-There is a non negligible fraction of events with btagDeepJetB==-1. How should i interpret this
