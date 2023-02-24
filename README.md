@@ -25,7 +25,14 @@ In this repo there are symbolic links to root files that point to the /root_file
 
 You can download all the root files [here (cernbox link)](https://cernbox.cern.ch/s/AKpaEEENyWOYBjr). Copy it in the root_files directory. 
 
-List and info about the root files are in [root_files/README](./root_files/README.md) 
+List and info about the root files are in [root_files/README](./root_files/README.md)
+
+If you are a CERN user, the better way to download the folder is using **xrootd**:
+
+```bash
+xrdcp -r root://eosuser.cern.ch//eos/user/p/pviscone/root_files/ .
+```
+
 
 ---
 
