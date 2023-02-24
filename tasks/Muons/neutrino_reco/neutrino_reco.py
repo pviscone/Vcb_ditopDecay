@@ -21,7 +21,7 @@ plt.style.use(hep.style.CMS)
 signal = uproot.open(
     "../TTbarSemileptonic_cbOnly_pruned_optimized_MuonSelection.root")["Events"]
 background = uproot.open(
-    "../TTbarSemileptonic_Nocb_optimized_MuonSelection.root")["Events"]
+    "../TTbarSemileptonic_Nocb_MuonSelection.root")["Events"]
 
 
 def get(key, numpy=True, library="pd"):

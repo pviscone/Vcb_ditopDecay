@@ -57,7 +57,7 @@ void BtaggingCuts(std::string imageSaveFolder) {
     //Btagging
     LooseMuonsDF_signal = LooseMuonsDF_signal.Define("LeadingJetsWithoutMuon_bTagProb", "Reverse(Sort(Jet_btagDeepFlavB))");
 
-    RDataFrame BackgroundDF("Events", "../TTbarSemileptonic_Nocb_optimized.root",
+    RDataFrame BackgroundDF("Events", "../TTbarSemileptonic_Nocb.root",
                             {"LHEPart_pdgId",
                              "nMuon",
                              "Muon_pt",
