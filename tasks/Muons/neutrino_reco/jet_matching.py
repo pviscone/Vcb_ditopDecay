@@ -1,8 +1,8 @@
 
 #%% Imports
+import pandas as pd
 import sys
 sys.path.append("../../../utils")
-
 
 import histogrammer
 import importlib
@@ -33,6 +33,40 @@ events = NanoEventsFactory.from_root(
     "../TTbarSemileptonic_cbOnly_pruned_optimized_MuonSelection.root",
     schemaclass=NanoAODSchema,
 ).events()
+
+# Return the minAbs or maxAbs of delta phi or eta between all the jets in the event
+def minmax_delta_jets(jet_array, min_or_max, metric=None,level="event"):
+    if min_or_max not in ["min", "max"]:
+        raise ValueError("min_or_max must be 'min' or 'max'")
+
+    if metric == "phi":
+        delta_matrix = jet_array[:, :, None].delta_phi(jet_array[:, None, :])
+    elif metric == "eta":
+        delta_matrix = jet_array[:, :, None].eta-jet_array[:, None, :].eta
+    else:
+        raise ValueError("metric must be 'phi' or 'eta'")
+
+    delta_matrix = delta_matrix[delta_matrix != 0]
+
+    if level=="event":
+        delta_matrix = ak.flatten(delta_matrix, axis=2)
+        argaxis=1
+    elif level=="jet":
+        argaxis=2
+    else:
+        raise ValueError("level must be 'event' or 'jet'")
+    # Returns a mask of the minimum and maximum values.
+    if min_or_max == "min":
+        arg_mask = ak.argmin(np.abs(delta_matrix),
+                             axis=argaxis,
+                             keepdims=True)
+    elif min_or_max == "max":
+        arg_mask = ak.argmax(np.abs(delta_matrix),
+                            axis=argaxis,
+                            keepdims=True)
+
+    return ak.flatten(delta_matrix[arg_mask], axis=None).to_numpy(allow_missing=False)
+
 
 #%%
 
@@ -229,18 +263,12 @@ arange=np.arange(len(bJet_4Vect_leq04))
 
 b_other_min_deltaphi = bJet_4Vect_leq04.delta_phi(otherJet_4Vect_leq04)[arange,b_other_argminabs_deltaphi]
 
+other_other_min_deltaphi = minmax_delta_jets(
+    otherJet_4Vect_leq04, "min", metric="phi")
+
+
 #---
-other_other_deltaphi_abs = np.abs(
-    otherJet_4Vect_leq04[:, :, None].delta_phi(otherJet_4Vect_leq04[:, None, :]))
-other_other_deltaphi_abs = other_other_deltaphi_abs[other_other_deltaphi_abs != 0]
-other_other_deltaphi_abs=ak.flatten(other_other_deltaphi_abs,axis=2)
 
-other_other_argminabs_deltaphi=ak.argmin(other_other_deltaphi_abs,axis=1).to_numpy(allow_missing=False)
-
-other_other_min_deltaphi = otherJet_4Vect_leq04[:, :, None].delta_phi(otherJet_4Vect_leq04[:, None, :])
-other_other_min_deltaphi = other_other_min_deltaphi[other_other_min_deltaphi!=0]
-other_other_min_deltaphi=ak.flatten(other_other_min_deltaphi,axis=2)
-other_other_min_deltaphi=other_other_min_deltaphi[arange,other_other_argminabs_deltaphi]
 
 is_min_deltaphi_from_b = np.array(ak.argmin(
     [np.abs(other_other_min_deltaphi),np.abs( b_other_min_deltaphi)], axis=0), dtype=bool)
@@ -269,21 +297,12 @@ arange = np.arange(len(bJet_4Vect_leq04))
 b_other_max_deltaphi = bJet_4Vect_leq04.delta_phi(
     otherJet_4Vect_leq04)[arange, b_other_argmaxabs_deltaphi]
 
+other_other_max_deltaphi = minmax_delta_jets(
+    otherJet_4Vect_leq04, "max", metric="phi")
+
+
 # ---
-other_other_deltaphi_abs = np.abs(
-    otherJet_4Vect_leq04[:, :, None].delta_phi(otherJet_4Vect_leq04[:, None, :]))
-other_other_deltaphi_abs = other_other_deltaphi_abs[other_other_deltaphi_abs != 0]
-other_other_deltaphi_abs = ak.flatten(other_other_deltaphi_abs, axis=2)
 
-other_other_argmaxabs_deltaphi = ak.argmax(
-    other_other_deltaphi_abs, axis=1).to_numpy(allow_missing=False)
-
-other_other_max_deltaphi = otherJet_4Vect_leq04[:, :, None].delta_phi(
-    otherJet_4Vect_leq04[:, None, :])
-other_other_max_deltaphi = other_other_max_deltaphi[other_other_max_deltaphi != 0]
-other_other_max_deltaphi = ak.flatten(other_other_max_deltaphi, axis=2)
-other_other_max_deltaphi = other_other_max_deltaphi[arange,
-                                                    other_other_argmaxabs_deltaphi]
 
 is_max_deltaphi_from_b = np.array(ak.argmax(
     [np.abs(other_other_max_deltaphi), np.abs(b_other_max_deltaphi)], axis=0), dtype=bool)
@@ -313,20 +332,10 @@ arange = np.arange(len(bJet_4Vect_leq04))
 
 b_other_max_deltaeta = bJet_4Vect_leq04.eta-(otherJet_4Vect_leq04.eta)[arange, b_other_argmaxabs_deltaeta]
 
+other_other_max_deltaeta= minmax_delta_jets(otherJet_4Vect_leq04,"max",metric="eta")
+
 # ---
-other_other_deltaeta_abs = np.abs(
-    otherJet_4Vect_leq04[:, :, None].eta-(otherJet_4Vect_leq04.eta[:, None, :]))
-other_other_deltaeta_abs = other_other_deltaeta_abs[other_other_deltaeta_abs != 0]
-other_other_deltaeta_abs = ak.flatten(other_other_deltaeta_abs, axis=2)
 
-other_other_argmaxabs_deltaeta = ak.argmax(
-    other_other_deltaeta_abs, axis=1).to_numpy(allow_missing=False)
-
-other_other_max_deltaeta = otherJet_4Vect_leq04[:, :, None].eta-(otherJet_4Vect_leq04.eta[:, None, :])
-other_other_max_deltaeta = other_other_max_deltaeta[other_other_max_deltaeta != 0]
-other_other_max_deltaeta = ak.flatten(other_other_max_deltaeta, axis=2)
-other_other_max_deltaeta = other_other_max_deltaeta[arange,
-                                                    other_other_argmaxabs_deltaeta]
 
 is_max_deltaeta_from_b = np.array(ak.argmax(
     [np.abs(other_other_max_deltaeta), np.abs(b_other_max_deltaeta)], axis=0), dtype=bool)
@@ -356,22 +365,11 @@ arange = np.arange(len(bJet_4Vect_leq04))
 
 b_other_min_deltaeta = bJet_4Vect_leq04.eta - \
     (otherJet_4Vect_leq04.eta)[arange, b_other_argminabs_deltaeta]
+    
+other_other_min_deltaeta = minmax_delta_jets(otherJet_4Vect_leq04,"min",metric="eta")
 
 # ---
-other_other_deltaeta_abs = np.abs(
-    otherJet_4Vect_leq04[:, :, None].eta-(otherJet_4Vect_leq04.eta[:, None, :]))
-other_other_deltaeta_abs = other_other_deltaeta_abs[other_other_deltaeta_abs != 0]
-other_other_deltaeta_abs = ak.flatten(other_other_deltaeta_abs, axis=2)
 
-other_other_argminabs_deltaeta = ak.argmin(
-    other_other_deltaeta_abs, axis=1).to_numpy(allow_missing=False)
-
-other_other_min_deltaeta = otherJet_4Vect_leq04[:,
-                                                :, None].eta-(otherJet_4Vect_leq04.eta[:, None, :])
-other_other_min_deltaeta = other_other_min_deltaeta[other_other_min_deltaeta != 0]
-other_other_min_deltaeta = ak.flatten(other_other_min_deltaeta, axis=2)
-other_other_min_deltaeta = other_other_min_deltaeta[arange,
-                                                    other_other_argminabs_deltaeta]
 
 is_min_deltaeta_from_b = np.array(ak.argmin(
     [np.abs(other_other_min_deltaeta), np.abs(b_other_min_deltaeta)], axis=0), dtype=bool)
@@ -393,4 +391,65 @@ plt.savefig("./images/min_deltaeta_jets.png")
 
 #%% Save the features in a numpy matrix
 
-features=np.array()
+df=pd.DataFrame()
+#Save only the events in which the leptonic b jet is distant less than 0.4 from the LHE leptonic b jet
+Jet_pt=ak.flatten(events.Jet.pt[deltaR_mask]).to_numpy(allow_missing=False)
+Jet_eta=ak.flatten(events.Jet.eta[deltaR_mask]).to_numpy(allow_missing=False)
+Jet_btag=ak.flatten(events.Jet.btagDeepFlavB[deltaR_mask]).to_numpy(allow_missing=False)
+Jet_CvBtag=ak.flatten(events.Jet.btagDeepFlavCvB[deltaR_mask]).to_numpy(allow_missing=False)
+Jet_CvLtag=ak.flatten(events.Jet.btagDeepFlavCvL[deltaR_mask]).to_numpy(allow_missing=False)
+dPhi_Jet_mu=ak.flatten(events.Jet.delta_phi(events.Muon[:,0])[deltaR_mask]).to_numpy(allow_missing=False)
+dPhi_Jet_nu=ak.flatten(events.Jet.delta_phi(events.MET)[deltaR_mask]).to_numpy(allow_missing=False)
+dEta_Jet_mu=ak.flatten((events.Jet.eta-events.Muon[:,0].eta)[deltaR_mask]).to_numpy(allow_missing=False)
+dEta_Jet_nu=ak.flatten((events.Jet.eta-nu_4Vect.eta)[deltaR_mask]).to_numpy(allow_missing=False)
+
+T_mass=ak.flatten((events.Jet+events.Muon[:,0]+nu_4Vect)[deltaR_mask].mass).to_numpy(allow_missing=False)
+
+#min/max dphi deta jets
+min_dPhi_Jets=minmax_delta_jets(events.Jet[deltaR_mask], "min",metric="phi",level="jet")
+max_dPhi_Jets=minmax_delta_jets(events.Jet[deltaR_mask], "max",metric="phi",level="jet")
+
+min_dEta_Jets=minmax_delta_jets(events.Jet[deltaR_mask], "min",metric="eta",level="jet")
+max_dEta_Jets=minmax_delta_jets(events.Jet[deltaR_mask], "max",metric="eta",level="jet")
+
+
+#Event id
+nJets_per_event = ak.count(events.Jet.pt, axis=-1).to_numpy(allow_missing=False)
+event_id=np.repeat(np.arange(len(events.Jet.pt))[deltaR_mask], nJets_per_event[deltaR_mask])
+
+
+
+
+#LABEL: 1=Jet from Leptonic T, 0=Others
+
+#[1]: return the metric (min delta_r)
+#[:,[2,5]][leptonic_LHE_mask]: Select the leptonic b jet from the LHE
+#[deltaR_mask]: Select only the events in which the leptonic b jet is distant less than 0.4 from the LHE jet
+deltaR_jet_LHE=events.LHEPart.nearest(events.Jet,return_metric=True)[1][:, [2, 5]][leptonic_LHE_mask][deltaR_mask]
+
+label=ak.flatten(events.Jet.delta_r(LeptB_LHE_4Vect)[deltaR_mask]==deltaR_jet_LHE)
+
+
+
+df=pd.DataFrame(
+    {
+    "Jet_pt":Jet_pt,
+    "Jet_eta":Jet_eta,
+    "Jet_btag":Jet_btag,
+    "Jet_CvBtag":Jet_CvBtag,
+    "Jet_CvLtag":Jet_CvLtag,
+    "dPhi_Jet_mu":dPhi_Jet_mu,
+    "dPhi_Jet_nu":dPhi_Jet_nu,
+    "dEta_Jet_mu":dEta_Jet_mu,
+    "dEta_Jet_nu":dEta_Jet_nu,
+    "T_mass":T_mass,
+    "min_dPhi_Jets":min_dPhi_Jets,"max_dPhi_Jets":max_dPhi_Jets,"min_dEta_Jets":min_dEta_Jets,
+    "max_dEta_Jets":max_dEta_Jets,
+    "label":label,
+    "event_id":event_id
+    })
+
+
+df.to_pickle("../classify_bLept_jet/Jet_features.pkl",
+             compression="bz2")
+#%%
