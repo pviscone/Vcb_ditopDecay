@@ -7,14 +7,14 @@ if torch.cuda.is_available():
 else:
   dev = "cpu"
   
+dev="cpu"
 device = torch.device(dev)
   
   
 class MLP(torch.nn.Module):
     def __init__(self,hidden_arch=[10,10],x_train=None,y_train=None,x_test=None,y_test=None,learning_rate=0.001):
         super().__init__()
-        self.optimizer=torch.optim.RMSprop(self.parameters(), lr=learning_rate)
-        
+
         self.loss_fn=torch.nn.BCELoss()
         self.accuracy_fn = lambda y_pred, y_true: (
             y_pred.round() == y_true).sum()/len(y_true)
@@ -23,7 +23,7 @@ class MLP(torch.nn.Module):
         self.y_train=y_train
         self.x_test=x_test
         self.y_test=y_test
-        self.arch=hidden_arch
+        self.hidden_arch=hidden_arch
 
         
         self.test_loss=[]
@@ -34,7 +34,7 @@ class MLP(torch.nn.Module):
         self.n_inputs=x_train.shape[1]
         self.n_outputs=y_train.shape[1]
         
-        self.layers = []
+        self.layers = torch.nn.ModuleList()
         self.layers.append(torch.nn.Linear(self.n_inputs, hidden_arch[0]))
         self.layers.append(torch.nn.Sigmoid())
         for in_neurons,out_neurons in zip(self.hidden_arch[:-1],self.hidden_arch[1:]):
@@ -48,22 +48,24 @@ class MLP(torch.nn.Module):
         else:
             self.layers.append(torch.nn.Softmax())
         
+        self.optimizer = torch.optim.RMSprop(self.parameters(), lr=learning_rate)
+
         
         
     def forward(self,x):
         for layer in self.layers:
-            x=layer(x)
+            x=layer(x.to(device))
         return x
     
-    def training(self,epochs):
+    def train_loop(self,epochs):
         for epoch in range(epochs):
             self.train()
             
             y_logits=self.forward(self.x_train).squeeze()
             y_pred=y_logits.round()
             
-            train_loss_step=self.loss_fn(y_logits,self.y_train)
-            train_accuracy_step=self.accuracy_fn(y_pred,self.y_train)
+            train_loss_step=self.loss_fn(y_logits,self.y_train.squeeze())
+            train_accuracy_step=self.accuracy_fn(y_pred,self.y_train.squeeze())
             
             self.optimizer.zero_grad()
             train_loss_step.backward()
@@ -74,8 +76,8 @@ class MLP(torch.nn.Module):
                 test_logits=self.forward(self.x_test).squeeze()
                 test_pred=test_logits.round()
                 
-                test_loss_step=self.loss_fn(test_logits,self.y_test)
-                test_accuracy_step=self.accuracy_fn(test_pred,self.y_test)
+                test_loss_step=self.loss_fn(test_logits,self.y_test.squeeze())
+                test_accuracy_step=self.accuracy_fn(test_pred,self.y_test.squeeze())
                 
                 self.test_loss.append(test_loss_step.numpy())
                 self.test_accuracy.append(test_accuracy_step.numpy())
