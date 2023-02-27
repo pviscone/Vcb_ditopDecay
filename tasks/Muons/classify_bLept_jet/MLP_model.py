@@ -1,5 +1,7 @@
 import torch
 import numpy as np
+import wandb
+from typing import List
 
 #enable gpu if available
 if torch.cuda.is_available():
@@ -7,12 +9,13 @@ if torch.cuda.is_available():
 else:
   dev = "cpu"
   
-dev="cpu"
+cpu=torch.device("cpu")
 device = torch.device(dev)
-  
-  
+
+
 class MLP(torch.nn.Module):
-    def __init__(self,hidden_arch=[10,10],x_train=None,y_train=None,x_test=None,y_test=None,learning_rate=0.001):
+
+    def __init__(self,hidden_arch=[10,10],x_train=None,y_train=None,x_test=None,y_test=None,optim={}):
         super().__init__()
 
         self.loss_fn=torch.nn.BCELoss()
@@ -34,28 +37,78 @@ class MLP(torch.nn.Module):
         self.n_inputs=x_train.shape[1]
         self.n_outputs=y_train.shape[1]
         
-        self.layers = torch.nn.ModuleList()
+        
+        #self.layers = torch.jit.trace(torch.nn.ModuleList())
+        self.layers = torch.nn.Sequential()
         self.layers.append(torch.nn.Linear(self.n_inputs, hidden_arch[0]))
+        
+        torch.nn.init.xavier_uniform_(self.layers[-1].weight)
+        
         self.layers.append(torch.nn.Sigmoid())
         for in_neurons,out_neurons in zip(self.hidden_arch[:-1],self.hidden_arch[1:]):
             self.layers.append(torch.nn.Linear(in_neurons,out_neurons))
+            torch.nn.init.xavier_uniform_(self.layers[-1].weight)
             self.layers.append(torch.nn.Sigmoid())
         
         self.layers.append(torch.nn.Linear(self.hidden_arch[-1],self.n_outputs))
-        
+        torch.nn.init.xavier_uniform_(self.layers[-1].weight)
         if self.n_outputs==1:
             self.layers.append(torch.nn.Sigmoid())
         else:
             self.layers.append(torch.nn.Softmax())
         
-        self.optimizer = torch.optim.RMSprop(self.parameters(), lr=learning_rate)
+    
+        self.optim_dict=optim
+        self.optimizer = torch.optim.RMSprop(self.parameters(), **self.optim_dict)
+        
+        self.wandb=False
 
         
+        self.false_negative=[]
+        self.false_positive=[]
         
+
+    def wandb_init(self,project,config,**log_kwargs):
+        self.wandb=True
+        wandb.init(project=project, config=config)
+        self.wandb_log_kwargs=log_kwargs
+
     def forward(self,x):
         for layer in self.layers:
-            x=layer(x.to(device))
+            x=layer(x)
         return x
+    
+    def error(self,type=None,dataset=None):
+        if type not in ["I","II"]:
+            raise ValueError("type must be either train or test")
+        if dataset not in ["train","test"]:
+            raise ValueError("dataset must be either train or test")
+        
+        if type=="I":
+            true=0
+            predicted=1
+        elif type=="II":
+            true=1
+            predicted=0
+        
+        if dataset=="train":
+            x=self.x_train
+            y=(self.y_train).squeeze()
+        elif dataset=="test":
+            x=self.x_test
+            y=(self.y_test).squeeze()
+        
+        y_pred=(self(x[y==true]).round())==predicted
+        return y_pred.sum()/len(y_pred)
+        
+        
+        
+        
+        
+        
+        
+        
+        
     
     def train_loop(self,epochs):
         for epoch in range(epochs):
@@ -79,8 +132,19 @@ class MLP(torch.nn.Module):
                 test_loss_step=self.loss_fn(test_logits,self.y_test.squeeze())
                 test_accuracy_step=self.accuracy_fn(test_pred,self.y_test.squeeze())
                 
-                self.test_loss.append(test_loss_step.numpy())
-                self.test_accuracy.append(test_accuracy_step.numpy())
-                self.train_loss.append(train_loss_step.numpy())
-                self.train_accuracy.append(train_accuracy_step.numpy())
-        
+                self.test_loss.append(test_loss_step.to(cpu).numpy())
+                self.test_accuracy.append(test_accuracy_step.to(cpu).numpy())
+                self.train_loss.append(train_loss_step.to(cpu).numpy())
+                self.train_accuracy.append(train_accuracy_step.to(cpu).numpy())
+                
+                self.false_positive.append(self.error(type="I",dataset="test").to(cpu).numpy())
+                
+                self.false_negative.append(self.error(type="II", dataset="test").to(cpu).numpy())
+                
+                if self.wandb:
+                    wandb.log(
+                        {"test_loss": test_loss_step,
+                        "test_accuracy":test_accuracy_step,
+                        "train_loss": train_loss_step,
+                        "train_accuracy": train_accuracy_step}
+                    )
