@@ -1,7 +1,8 @@
 import torch
 import numpy as np
 import wandb
-from typing import List
+from tqdm import tqdm
+from torch.utils.data.dataloader import default_collate
 
 #enable gpu if available
 if torch.cuda.is_available():
@@ -29,7 +30,8 @@ class MLP(torch.nn.Module):
 
         tensor_dataset=torch.utils.data.TensorDataset(self.x_train, self.y_train)
 
-        self.data_loader=torch.utils.data.DataLoader(tensor_dataset,batch_size=batch_size)
+        self.data_loader = torch.utils.data.DataLoader(
+            tensor_dataset, batch_size=batch_size)
 
         
         
@@ -118,23 +120,19 @@ class MLP(torch.nn.Module):
     
     def train_loop(self,epochs):
         
-        for epoch in range(epochs):
+        for epoch in tqdm(range(epochs)):
             self.train()
+            
             for x_batch, y_batch in self.data_loader:
-                
-                
-                
                 y_logits=self.forward(x_batch).squeeze()
-                y_pred=y_logits.round()
-                
                 train_loss_step=self.loss_fn(y_logits,y_batch)
-
                 self.optimizer.zero_grad()
                 train_loss_step.backward()
                 self.optimizer.step()
             
             self.eval()
             with torch.inference_mode():
+                
                 test_logits=self.forward(self.x_test).squeeze()
                 test_pred=test_logits.round()
                 

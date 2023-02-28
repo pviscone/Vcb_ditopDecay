@@ -69,7 +69,7 @@ importlib.reload(MLP_model)
 MLP = MLP_model.MLP
 
 model=MLP(x_train=train_data,y_train=train_label,x_test=test_data,y_test=test_label,hidden_arch=[10,10],
-          batch_size=800000,
+          batch_size=400000,
           optim={"lr":0.01,
               }
           )
