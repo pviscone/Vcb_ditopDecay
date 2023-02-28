@@ -6,3 +6,5 @@ uproot
 coffea
 vector
 torch
+pandas
+seaborn
