@@ -35,7 +35,7 @@ events = NanoEventsFactory.from_root(
 ).events()
 
 # Return the minAbs or maxAbs of delta phi or eta between all the jets in the event
-def minmax_delta_jets(jet_array, min_or_max, metric=None,level="event"):
+def minmax_delta_jets(jet_array, min_or_max, metric=None,level="event",flatten_axis=-1,numpy=True):
     if min_or_max not in ["min", "max"]:
         raise ValueError("min_or_max must be 'min' or 'max'")
 
@@ -65,7 +65,15 @@ def minmax_delta_jets(jet_array, min_or_max, metric=None,level="event"):
                             axis=argaxis,
                             keepdims=True)
 
-    return ak.flatten(delta_matrix[arg_mask], axis=None).to_numpy(allow_missing=False)
+    res = delta_matrix[arg_mask]
+    
+    if flatten_axis==-1:
+        res = ak.flatten(res, axis=None)
+    else:
+        res=ak.flatten(res,axis=flatten_axis)
+    if numpy:
+        res=res.to_numpy(allow_missing=False)
+    return res
 
 
 #%%
@@ -393,30 +401,32 @@ plt.savefig("./images/min_deltaeta_jets.png")
 
 df=pd.DataFrame()
 #Save only the events in which the leptonic b jet is distant less than 0.4 from the LHE leptonic b jet
-Jet_pt=ak.flatten(events.Jet.pt[deltaR_mask]).to_numpy(allow_missing=False)
-Jet_eta=ak.flatten(events.Jet.eta[deltaR_mask]).to_numpy(allow_missing=False)
-Jet_btag=ak.flatten(events.Jet.btagDeepFlavB[deltaR_mask]).to_numpy(allow_missing=False)
-Jet_CvBtag=ak.flatten(events.Jet.btagDeepFlavCvB[deltaR_mask]).to_numpy(allow_missing=False)
-Jet_CvLtag=ak.flatten(events.Jet.btagDeepFlavCvL[deltaR_mask]).to_numpy(allow_missing=False)
-dPhi_Jet_mu=ak.flatten(events.Jet.delta_phi(events.Muon[:,0])[deltaR_mask]).to_numpy(allow_missing=False)
-dPhi_Jet_nu=ak.flatten(events.Jet.delta_phi(events.MET)[deltaR_mask]).to_numpy(allow_missing=False)
-dEta_Jet_mu=ak.flatten((events.Jet.eta-events.Muon[:,0].eta)[deltaR_mask]).to_numpy(allow_missing=False)
-dEta_Jet_nu=ak.flatten((events.Jet.eta-nu_4Vect.eta)[deltaR_mask]).to_numpy(allow_missing=False)
+Jet_pt=events.Jet.pt[deltaR_mask]
+Jet_eta=events.Jet.eta[deltaR_mask]
+Jet_mass = events.Jet.mass[deltaR_mask]
+Jet_btag=events.Jet.btagDeepFlavB[deltaR_mask]
+Jet_CvBtag=events.Jet.btagDeepFlavCvB[deltaR_mask]
+Jet_CvLtag=events.Jet.btagDeepFlavCvL[deltaR_mask]
+dPhi_Jet_mu=events.Jet.delta_phi(events.Muon[:,0])[deltaR_mask]
+dPhi_Jet_nu=events.Jet.delta_phi(events.MET)[deltaR_mask]
+dEta_Jet_mu=(events.Jet.eta-events.Muon[:,0].eta)[deltaR_mask]
+dEta_Jet_nu=(events.Jet.eta-nu_4Vect.eta)[deltaR_mask]
 
-T_mass=ak.flatten((events.Jet+events.Muon[:,0]+nu_4Vect)[deltaR_mask].mass).to_numpy(allow_missing=False)
+T_mass=(events.Jet+events.Muon[:,0]+nu_4Vect)[deltaR_mask].mass
 
 #min/max dphi deta jets
-min_dPhi_Jets=minmax_delta_jets(events.Jet[deltaR_mask], "min",metric="phi",level="jet")
-max_dPhi_Jets=minmax_delta_jets(events.Jet[deltaR_mask], "max",metric="phi",level="jet")
+min_dPhi_Jets=minmax_delta_jets(events.Jet[deltaR_mask], "min",metric="phi",level="jet",flatten_axis=2,numpy=False)
+max_dPhi_Jets=minmax_delta_jets(events.Jet[deltaR_mask], "max",metric="phi",level="jet",flatten_axis=2,numpy=False)
 
-min_dEta_Jets=minmax_delta_jets(events.Jet[deltaR_mask], "min",metric="eta",level="jet")
-max_dEta_Jets=minmax_delta_jets(events.Jet[deltaR_mask], "max",metric="eta",level="jet")
+min_dEta_Jets=minmax_delta_jets(events.Jet[deltaR_mask], "min",metric="eta",level="jet",flatten_axis=2,numpy=False)
+max_dEta_Jets=minmax_delta_jets(events.Jet[deltaR_mask], "max",metric="eta",level="jet",flatten_axis=2,numpy=False)
 
 
 #Event id
-nJets_per_event = ak.count(events.Jet.pt, axis=-1).to_numpy(allow_missing=False)
-event_id=np.repeat(np.arange(len(events.Jet.pt))[deltaR_mask], nJets_per_event[deltaR_mask])
+#nJets_per_event = ak.count(events.Jet.pt, axis=-1)
+#event_id=np.repeat(np.arange(len(events.Jet.pt))[deltaR_mask], nJets_per_event[deltaR_mask])
 
+event_id=ak.Array(np.arange(len(events.Jet.pt))[deltaR_mask])
 
 
 
@@ -427,29 +437,49 @@ event_id=np.repeat(np.arange(len(events.Jet.pt))[deltaR_mask], nJets_per_event[d
 #[deltaR_mask]: Select only the events in which the leptonic b jet is distant less than 0.4 from the LHE jet
 deltaR_jet_LHE=events.LHEPart.nearest(events.Jet,return_metric=True)[1][:, [2, 5]][leptonic_LHE_mask][deltaR_mask]
 
-label=ak.flatten(events.Jet.delta_r(LeptB_LHE_4Vect)[deltaR_mask]==deltaR_jet_LHE)
+label = (events.Jet.delta_r(LeptB_LHE_4Vect)[
+         deltaR_mask] == deltaR_jet_LHE)
+label = ak.values_astype(label, int)
 
-
-
-df=pd.DataFrame(
+#Se usi una graph mettici anche il phi dei jet, all'interno dell' evento può impararci qualcosa sopra
+features = ak.zip(
     {
     "Jet_pt":Jet_pt,
     "Jet_eta":Jet_eta,
-    "Jet_btag":Jet_btag,
-    "Jet_CvBtag":Jet_CvBtag,
+    "Jet_mass":Jet_mass,
+    "Jet_btag": Jet_btag,
+    "Jet_CvBtag": Jet_CvBtag,
     "Jet_CvLtag":Jet_CvLtag,
     "dPhi_Jet_mu":dPhi_Jet_mu,
     "dPhi_Jet_nu":dPhi_Jet_nu,
     "dEta_Jet_mu":dEta_Jet_mu,
     "dEta_Jet_nu":dEta_Jet_nu,
     "T_mass":T_mass,
-    "min_dPhi_Jets":min_dPhi_Jets,"max_dPhi_Jets":max_dPhi_Jets,"min_dEta_Jets":min_dEta_Jets,
+    "min_dPhi_Jets":min_dPhi_Jets,
+    "max_dPhi_Jets": max_dPhi_Jets,
+    "min_dEta_Jets":min_dEta_Jets,
     "max_dEta_Jets":max_dEta_Jets,
     "label":label,
     "event_id":event_id
     })
 
 
-df.to_pickle("../classify_bLept_jet/Jet_features.pkl",
-             compression="bz2")
+#ak.to_parquet(features, "../classify_bLept_jet/Jet_features.pq", compression="lz4")
+
+features_df = ak.to_pandas(features)
+new_index = pd.MultiIndex.from_product(features_df.index.levels)
+
+features_df = features_df.reindex(new_index)
+perm1=np.random.permutation(len(Jet_pt))
+perm2=np.random.permutation(15)
+i, j = features_df.index.levels
+idx = pd.IndexSlice
+
+features_df = features_df.loc[i[perm1]]
+features_df = features_df.loc[idx[i, j[perm2]],:]
+features_df=features_df.dropna()
+
+
+features_df.to_pickle("../classify_bLept_jet/Jet_features.pkl",compression="bz2")
 #%%
+
