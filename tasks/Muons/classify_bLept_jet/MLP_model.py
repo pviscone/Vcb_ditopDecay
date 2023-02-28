@@ -19,8 +19,7 @@ class MLP(torch.nn.Module):
         super().__init__()
 
         self.loss_fn=torch.nn.BCELoss()
-        self.accuracy_fn = lambda y_pred, y_true: (
-            y_pred.round() == y_true).sum()/len(y_true)
+
         
         self.x_train=x_train
         self.y_train=y_train
@@ -30,10 +29,9 @@ class MLP(torch.nn.Module):
 
         
         self.test_loss=[]
-        self.test_accuracy=[]
+
         self.train_loss=[]
-        self.train_accuracy=[]
-        
+
         self.n_inputs=x_train.shape[1]
         self.n_outputs=y_train.shape[1]
         
@@ -55,7 +53,7 @@ class MLP(torch.nn.Module):
         if self.n_outputs==1:
             self.layers.append(torch.nn.Sigmoid())
         else:
-            self.layers.append(torch.nn.Softmax())
+            self.layers.append(torch.nn.Softmax(dim=1))
         
     
         self.optim_dict=optim
@@ -85,20 +83,21 @@ class MLP(torch.nn.Module):
             raise ValueError("dataset must be either train or test")
         
         if type=="I":
-            true=0
-            predicted=1
+            true=torch.tensor([1,0])
+            predicted=torch.tensor([0,1])
         elif type=="II":
-            true=1
-            predicted=0
+            true=torch.tensor([0,1])
+            predicted=torch.tensor([1,0])
         
         if dataset=="train":
             x=self.x_train
-            y=(self.y_train).squeeze()
+            y=(self.y_train)
         elif dataset=="test":
             x=self.x_test
-            y=(self.y_test).squeeze()
+            y=(self.y_test)
         
-        y_pred=(self(x[y==true]).round())==predicted
+        mask = (y == true)[:,0]
+        y_pred=((self(x[mask]).round())==predicted)[:,0]
         return y_pred.sum()/len(y_pred)
         
         
@@ -118,8 +117,7 @@ class MLP(torch.nn.Module):
             y_pred=y_logits.round()
             
             train_loss_step=self.loss_fn(y_logits,self.y_train.squeeze())
-            train_accuracy_step=self.accuracy_fn(y_pred,self.y_train.squeeze())
-            
+
             self.optimizer.zero_grad()
             train_loss_step.backward()
             self.optimizer.step()
@@ -130,12 +128,12 @@ class MLP(torch.nn.Module):
                 test_pred=test_logits.round()
                 
                 test_loss_step=self.loss_fn(test_logits,self.y_test.squeeze())
-                test_accuracy_step=self.accuracy_fn(test_pred,self.y_test.squeeze())
+
                 
                 self.test_loss.append(test_loss_step.to(cpu).numpy())
-                self.test_accuracy.append(test_accuracy_step.to(cpu).numpy())
+
                 self.train_loss.append(train_loss_step.to(cpu).numpy())
-                self.train_accuracy.append(train_accuracy_step.to(cpu).numpy())
+
                 
                 self.false_positive.append(self.error(type="I",dataset="test").to(cpu).numpy())
                 
