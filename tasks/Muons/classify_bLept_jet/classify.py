@@ -64,14 +64,14 @@ test_label = torch.tensor(
 
 
 #%%
-#!FIXME: I applyed some "unsqueeze" to the labels. Fix the MLP class to accept labels with shape (n_samples,1) (check)
+
 importlib.reload(MLP_model)
 MLP = MLP_model.MLP
 
-model=MLP(x_train=train_data,y_train=train_label,x_test=test_data,y_test=test_label,hidden_arch=[20,20,20],
-          optim={"lr":0.008,
-                 "momentum":0.005,
-                 "alpha":0.97,}
+model=MLP(x_train=train_data,y_train=train_label,x_test=test_data,y_test=test_label,hidden_arch=[10,10],
+          batch_size=800000,
+          optim={"lr":0.01,
+              }
           )
 
 model=model.to(device)
@@ -80,7 +80,8 @@ model=model.to(device)
 
 #%%
 
-model.train_loop(epochs=10)
+#!FIX:the loop on the batches is crititcally slow
+model.train_loop(epochs=100)
 # %%
 plt.figure(figsize=(20,5))
 plt.subplot(131)

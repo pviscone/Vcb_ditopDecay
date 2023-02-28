@@ -15,10 +15,10 @@ device = torch.device(dev)
 
 class MLP(torch.nn.Module):
 
-    def __init__(self,hidden_arch=[10,10],x_train=None,y_train=None,x_test=None,y_test=None,optim={}):
+    def __init__(self,hidden_arch=[10,10],batch_size=1,x_train=None,y_train=None,x_test=None,y_test=None,optim={}):
         super().__init__()
 
-        self.loss_fn=torch.nn.BCELoss()
+        self.loss_fn=torch.nn.BCELoss(weight=torch.tensor([5,1],device=device))
 
         
         self.x_train=x_train
@@ -27,6 +27,13 @@ class MLP(torch.nn.Module):
         self.y_test=y_test
         self.hidden_arch=hidden_arch
 
+        tensor_dataset=torch.utils.data.TensorDataset(self.x_train, self.y_train)
+
+        self.data_loader=torch.utils.data.DataLoader(tensor_dataset,batch_size=batch_size)
+
+        
+        
+        
         
         self.test_loss=[]
 
@@ -57,7 +64,7 @@ class MLP(torch.nn.Module):
         
     
         self.optim_dict=optim
-        self.optimizer = torch.optim.RMSprop(self.parameters(), **self.optim_dict)
+        self.optimizer = torch.optim.Adam(self.parameters(), **self.optim_dict)
         
         self.wandb=False
 
@@ -83,11 +90,11 @@ class MLP(torch.nn.Module):
             raise ValueError("dataset must be either train or test")
         
         if type=="I":
-            true=torch.tensor([1,0])
-            predicted=torch.tensor([0,1])
+            true=torch.tensor([1,0],device=device)
+            predicted=torch.tensor([0,1],device=device)
         elif type=="II":
-            true=torch.tensor([0,1])
-            predicted=torch.tensor([1,0])
+            true=torch.tensor([0,1],device=device)
+            predicted=torch.tensor([1,0],device=device)
         
         if dataset=="train":
             x=self.x_train
@@ -110,17 +117,21 @@ class MLP(torch.nn.Module):
         
     
     def train_loop(self,epochs):
+        
         for epoch in range(epochs):
             self.train()
-            
-            y_logits=self.forward(self.x_train).squeeze()
-            y_pred=y_logits.round()
-            
-            train_loss_step=self.loss_fn(y_logits,self.y_train.squeeze())
+            for x_batch, y_batch in self.data_loader:
+                
+                
+                
+                y_logits=self.forward(x_batch).squeeze()
+                y_pred=y_logits.round()
+                
+                train_loss_step=self.loss_fn(y_logits,y_batch)
 
-            self.optimizer.zero_grad()
-            train_loss_step.backward()
-            self.optimizer.step()
+                self.optimizer.zero_grad()
+                train_loss_step.backward()
+                self.optimizer.step()
             
             self.eval()
             with torch.inference_mode():
@@ -142,7 +153,5 @@ class MLP(torch.nn.Module):
                 if self.wandb:
                     wandb.log(
                         {"test_loss": test_loss_step,
-                        "test_accuracy":test_accuracy_step,
-                        "train_loss": train_loss_step,
-                        "train_accuracy": train_accuracy_step}
+                        "train_loss": train_loss_step,}
                     )
