@@ -2,7 +2,8 @@ import torch
 import numpy as np
 import wandb
 from tqdm import tqdm
-from torch.utils.data.dataloader import default_collate
+#from torch.utils.data.dataloader import default_collate
+from torch.utils.data import Dataset
 
 #enable gpu if available
 if torch.cuda.is_available():
@@ -12,6 +13,12 @@ else:
   
 cpu=torch.device("cpu")
 device = torch.device(dev)
+
+
+
+def custom_collate_fn(batch):
+    batch = batch.to(device, non_blocking=True)
+    return batch
 
 
 class MLP(torch.nn.Module):
@@ -28,15 +35,18 @@ class MLP(torch.nn.Module):
         self.y_test=y_test
         self.hidden_arch=hidden_arch
 
-        tensor_dataset=torch.utils.data.TensorDataset(self.x_train, self.y_train)
+        #tensor_dataset=torch.utils.data.TensorDataset(x_train.to(cpu), y_train.to(cpu))
 
-        self.data_loader = torch.utils.data.DataLoader(
-            tensor_dataset, batch_size=batch_size)
+
+        #self.data_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size)
+        
+        #self.data_loader = torch.utils.data.DataLoader(tensor_dataset, batch_size=batch_size,pin_memory=True, num_workers=6)
 
         
+
         
-        
-        
+        self.batch_size=batch_size
+        self.n_batch=np.ceil(len(x_train)/batch_size).astype(int)
         self.test_loss=[]
 
         self.train_loss=[]
@@ -119,11 +129,20 @@ class MLP(torch.nn.Module):
         
     
     def train_loop(self,epochs):
-        
-        for epoch in tqdm(range(epochs)):
+        epoch_loop=tqdm(range(epochs),desc="epoch")
+        batch_loop=tqdm(range(self.n_batch),desc="batch")
+        for epoch in epoch_loop:
             self.train()
             
-            for x_batch, y_batch in self.data_loader:
+            
+            #for x_batch, y_batch in self.data_loader:
+            for i in batch_loop:
+                if((i+1)*self.batch_size<len(self.x_train)):
+                    x_batch=self.x_train[i*self.batch_size:(i+1)*self.batch_size]
+                    y_batch = self.y_train[i *self.batch_size:(i+1)*self.batch_size]
+                else:
+                    x_batch=self.x_train[i*self.batch_size:len(self.x_train)]
+                    y_batch = self.y_train[i*self.batch_size:len(self.y_train)]
                 y_logits=self.forward(x_batch).squeeze()
                 train_loss_step=self.loss_fn(y_logits,y_batch)
                 self.optimizer.zero_grad()

@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-import awkward as ak
+#import awkward as ak
 
 
 import MLP_model
@@ -12,7 +12,7 @@ importlib.reload(MLP_model)
 MLP=MLP_model.MLP
 
 import pandas as pd
-import wandb
+#import wandb
 import seaborn as sn
 from sklearn.preprocessing import OneHotEncoder
 #%%
@@ -42,18 +42,18 @@ label=ohe.transform(label).toarray()
 
 data_df = df.loc[:, df.columns != "label"]
 
-train_data, test_data, train_label, test_label = train_test_split(
-    data_df, label, test_size=0.2)
+train_data_df, test_data_df, train_label, test_label = train_test_split(
+    data_df, label, test_size=0.2,shuffle=False)
 
-event_id_train=train_data["event_id"]
-event_id_test=test_data["event_id"]
+event_id_train=train_data_df["event_id"]
+event_id_test=test_data_df["event_id"]
 
 
 train_data = torch.tensor(
-    train_data.loc[:, train_data.columns != "event_id"].values, device=device)
+    train_data_df.loc[:, train_data_df.columns != "event_id"].values, device=device)
 
 test_data = torch.tensor(
-    test_data.loc[:, test_data.columns != "event_id"].values, device=device)
+    test_data_df.loc[:, test_data_df.columns != "event_id"].values, device=device)
 
 
 train_label=torch.tensor(train_label,device=device,dtype=torch.float32)
@@ -68,9 +68,10 @@ test_label = torch.tensor(
 importlib.reload(MLP_model)
 MLP = MLP_model.MLP
 
-model=MLP(x_train=train_data,y_train=train_label,x_test=test_data,y_test=test_label,hidden_arch=[10,10],
-          batch_size=400000,
-          optim={"lr":0.01,
+model=MLP(x_train=train_data,y_train=train_label,x_test=test_data,y_test=test_label,hidden_arch=[1000,1000,1000],
+          batch_size=20000,
+          optim={"lr":0.001,
+                  "weight_decay":0.00001,
               }
           )
 
@@ -79,9 +80,9 @@ model=model.to(device)
 #model.wandb_init(project="leptonic_jet_classification", config={"architecture": "MLP", "loss": "BCE", "optimizer": "RMSprop"})
 
 #%%
+model.train_loop(epochs=300)
 
-#!FIX:the loop on the batches is crititcally slow
-model.train_loop(epochs=100)
+
 # %%
 plt.figure(figsize=(20,5))
 plt.subplot(131)
@@ -107,6 +108,23 @@ with torch.no_grad():
   sn.heatmap(confusion_matrix_test, annot=True, fmt="g", cmap="viridis")
 
 # %%
+
+pred = model(model.x_test)[:, 1]
+
+res=pd.DataFrame({"event_id":event_id_test,"pred":pred.detach().cpu().numpy(),
+"label":test_label[:,1].cpu().numpy()})
+
+selected_jets_idx = res.groupby(level=0)["pred"].idxmax()
+
+efficiency=res["label"][selected_jets_idx].sum()/len(selected_jets_idx)
+print(f"Efficiency: {efficiency*100:.2f}%")
+
+#%%
+fom=(df["T_mass"]-175).abs()/df["Jet_btag"]
+idxmin=fom.groupby(level=0).idxmin()
+
+fom_efficiency=df["label"][idxmin].sum()/111341
+
 
 #%%
 # wandb.finish()
