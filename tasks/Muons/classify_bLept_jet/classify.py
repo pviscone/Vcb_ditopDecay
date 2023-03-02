@@ -68,10 +68,11 @@ test_label = torch.tensor(
 importlib.reload(MLP_model)
 MLP = MLP_model.MLP
 
-model=MLP(x_train=train_data,y_train=train_label,x_test=test_data,y_test=test_label,hidden_arch=[1000,1000,1000],
-          batch_size=20000,
+model=MLP(x_train=train_data,y_train=train_label,x_test=test_data,y_test=test_label,hidden_arch=[300,300,300],
+          batch_size=100000,
+          shuffle=False,
           optim={"lr":0.001,
-                  "weight_decay":0.00001,
+                  "weight_decay":0.001,
               }
           )
 
@@ -80,7 +81,7 @@ model=model.to(device)
 #model.wandb_init(project="leptonic_jet_classification", config={"architecture": "MLP", "loss": "BCE", "optimizer": "RMSprop"})
 
 #%%
-model.train_loop(epochs=300)
+model.train_loop(epochs=120)
 
 
 # %%
