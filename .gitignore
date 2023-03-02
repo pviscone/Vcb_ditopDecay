@@ -4,6 +4,9 @@
 /**/prova.cpp
 root_files/**/*.root
 check/*
+/**/step*.py
+/**/crab_projects/*
+/**/crab.log
 tasks/generateCbEvents/genproductions/*
 tasks/generateCbEvents/genproductions
 *.tar.xz
