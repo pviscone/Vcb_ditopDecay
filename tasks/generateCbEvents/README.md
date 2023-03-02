@@ -16,9 +16,19 @@ The tutorial about event generation is [here](../../tutorials/EventGeneration.md
 
 # Job reports
 
-- [cbFromT Grafana](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230201_182456%3Apviscone_crab_TTbarSemileptonic_cbOnlyFromT_TuneCP5_13TeV-madgraphMLM-pythia8_FULLSIM&from=1675272296000&to=now)
+- [cbFromT Grafana](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230302_103719%3Apviscone_crab_TTbarSemileptonic_cbOnlyFromT_TuneCP5_13TeV-madgraphMLM-pythia8_FULLSIM&from=1677749839000&to=now)
 
 - [cbFromTbar Grafana](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230201_182559%3Apviscone_crab_TTbarSemileptonic_cbOnlyFromTbar_TuneCP5_13TeV-madgraphMLM-pythia8_FULLSIM&from=1675272360000&to=now)
+
+
+
+> ## Second run
+> 
+> - [cbFromT Grafana](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230302_104933%3Apviscone_crab_TTbarSemileptonic_cbOnlyFromT_TuneCP5_13TeV-madgraphMLM-pythia8_FULLSIM&from=1677750573000&to=now)
+> 
+> - [cbFromTbar Grafana](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230302_105148%3Apviscone_crab_TTbarSemileptonic_cbOnlyFromTbar_TuneCP5_13TeV-madgraphMLM-pythia8_FULLSIM&from=1677750708000&to=now)
+
+
 
 # How to run it
 
