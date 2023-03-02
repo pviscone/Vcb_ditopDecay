@@ -44,7 +44,10 @@ cd $CMSSW_BASE/..
 cd CMSSW_10_6_30_patch1/src
 cmsenv
 cd $here
-
+cp ./ttbar_cbFromTbar_fragment.py $CMSSW_BASE/src/Configuration/GenProduction/python
+cd $CMSSW_BASE/src
+scram b
+cd $here
 #-----------STEP 1: LHE:GEN -------------------
 
 
