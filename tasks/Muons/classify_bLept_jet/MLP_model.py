@@ -1,7 +1,9 @@
 import torch
 import numpy as np
-import wandb
+import pandas as pd
 from tqdm import tqdm
+import matplotlib.pyplot as plt
+import seaborn as sn
 #from torch.utils.data.dataloader import default_collate
 from torch.utils.data import Dataset
 
@@ -35,16 +37,6 @@ class MLP(torch.nn.Module):
         self.y_test=y_test
         self.hidden_arch=hidden_arch
 
-        #tensor_dataset=torch.utils.data.TensorDataset(x_train.to(cpu), y_train.to(cpu))
-
-
-        #self.data_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size)
-        
-        #self.data_loader = torch.utils.data.DataLoader(tensor_dataset, batch_size=batch_size,pin_memory=True, num_workers=6)
-
-        
-
-        
         self.batch_size=batch_size
         self.n_batch=np.ceil(len(x_train)/batch_size).astype(int)
         self.test_loss=[]
@@ -78,17 +70,8 @@ class MLP(torch.nn.Module):
         self.optim_dict=optim
         self.optimizer = torch.optim.Adam(self.parameters(), **self.optim_dict)
         
-        self.wandb=False
-
-        
         self.false_negative=[]
         self.false_positive=[]
-        
-
-    def wandb_init(self,project,config,**log_kwargs):
-        self.wandb=True
-        wandb.init(project=project, config=config)
-        self.wandb_log_kwargs=log_kwargs
 
     def forward(self,x):
         for layer in self.layers:
@@ -118,14 +101,6 @@ class MLP(torch.nn.Module):
         mask = (y == true)[:,0]
         y_pred=((self(x[mask]).round())==predicted)[:,0]
         return y_pred.sum()/len(y_pred)
-        
-        
-        
-        
-        
-        
-        
-        
         
     
     def train_loop(self,epochs):
@@ -166,9 +141,41 @@ class MLP(torch.nn.Module):
                 self.false_positive.append(self.error(type="I",dataset="test").to(cpu).numpy())
                 
                 self.false_negative.append(self.error(type="II", dataset="test").to(cpu).numpy())
-                
-                if self.wandb:
-                    wandb.log(
-                        {"test_loss": test_loss_step,
-                        "train_loss": train_loss_step,}
-                    )
+
+                    
+    def loss_plot(self):
+        plt.figure(figsize=(20,5))
+        plt.subplot(131)
+        plt.plot(self.train_loss,label="train")
+        plt.plot(self.test_loss,label="test")
+        plt.legend()
+        plt.xlabel("Epochs")
+        plt.ylabel("BCE loss")
+        plt.subplot(132)
+        plt.plot(self.false_negative,label="false negative")
+        plt.plot(self.false_positive,label="false positive")
+        plt.title("Type I and II error: TEST dataset")
+        plt.legend()
+        plt.xlabel("Epochs")
+        plt.subplot(133)
+        with torch.no_grad():
+            confusion_matrix_test = torch.tensor(
+                [[1-self.false_positive[-1], self.false_positive[-1]], [self.false_negative[-1], 1-self.false_negative[-1]]])
+
+            confusion_matrix_test = pd.DataFrame(confusion_matrix_test, index=[
+                                                "true negative", "true positive"], columns=["predicted negative", "predicted positive"])
+
+            sn.heatmap(confusion_matrix_test, annot=True, fmt="g", cmap="viridis")
+            
+
+    def evaluate_on_events(self):
+        pred = self(self.x_test)[:, 1]
+
+        res = pd.DataFrame({"pred": pred.detach().cpu().numpy(),
+                            "label": self.y_test[:, 1].cpu().numpy()})
+
+        selected_jets_idx = res.groupby(level=0)["pred"].idxmax()
+
+        efficiency = res["label"][selected_jets_idx].sum()/len(selected_jets_idx)
+        print(f"Efficiency: {efficiency*100:.2f}%")
+        return efficiency
