@@ -23,11 +23,30 @@ def custom_collate_fn(batch):
     return batch
 
 
+class OrderedDict(dict):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def __getitem__(self, key):
+        if type(key) == str:
+            return super().__getitem__(key)
+        else:
+            key = tuple(self.keys())[key]
+            return (key, self[key])
+
+    def sort(self):
+        return OrderedDict(dict(sorted(self.items(), key=lambda item: item[1])))
+
+
+
+
 class MLP(torch.nn.Module):
 
     def __init__(self,hidden_arch=[10,10],batch_size=1,
                  shuffle=False,
-                 x_train=None,y_train=None,x_test=None,y_test=None,optim={}):
+                 x_train=None,y_train=None,x_test=None,y_test=None,
+                 event_id_train=None,event_id_test=None,
+                 optim={}):
         super().__init__()
 
         self.loss_fn=torch.nn.BCELoss(weight=torch.tensor([6,1],device=device))
@@ -39,6 +58,9 @@ class MLP(torch.nn.Module):
         self.y_test=y_test
         self.hidden_arch=hidden_arch
 
+        self.event_id_train=event_id_train
+        self.event_id_test=event_id_test
+
         self.mean=x_train.mean(axis=0)
         self.std=x_train.std(axis=0)
 
@@ -46,9 +68,9 @@ class MLP(torch.nn.Module):
         self.shuffle_at_each_epoch=shuffle
         self.batch_size=batch_size
         self.n_batch=np.ceil(len(x_train)/batch_size).astype(int)
-        self.test_loss=[]
-
-        self.train_loss=[]
+        
+        self.test_loss=np.array([])
+        self.train_loss=np.array([])
 
         self.n_inputs=x_train.shape[1]
         self.n_outputs=y_train.shape[1]
@@ -145,15 +167,22 @@ class MLP(torch.nn.Module):
                 test_loss_step=self.loss_fn(test_logits,self.y_test.squeeze())
 
                 
-                self.test_loss.append(test_loss_step.to(cpu).numpy())
+                self.test_loss=np.append(self.test_loss,test_loss_step.to(cpu).numpy())
 
-                self.train_loss.append(train_loss_step.to(cpu).numpy())
+                self.train_loss=np.append(self.train_loss,train_loss_step.to(cpu).numpy())
 
                 
                 self.false_positive.append(self.error(type="I",dataset="test").to(cpu).numpy())
                 
                 self.false_negative.append(self.error(type="II", dataset="test").to(cpu).numpy())
 
+            if epoch>20:
+                if np.std(self.test_loss[-20:])<0.0005:
+                    print("Early stopping: test loss not changing")
+                    break
+                if np.mean(self.test_loss[-20:])>np.mean(self.test_loss[-40:-20]):
+                    print("Early stopping: test loss increasing")
+                    break
                     
     def loss_plot(self):
         plt.figure(figsize=(20,5))
@@ -181,13 +210,15 @@ class MLP(torch.nn.Module):
             
 
     def evaluate_on_events(self):
+
+
         pred = self(self.x_test)[:, 1]
 
-        res = pd.DataFrame({"pred": pred.detach().cpu().numpy(),
+        res = pd.DataFrame({"event_id": self.event_id_test, "pred": pred.detach().cpu().numpy(),
                             "label": self.y_test[:, 1].cpu().numpy()})
 
         selected_jets_idx = res.groupby(level=0)["pred"].idxmax()
 
-        efficiency = res["label"][selected_jets_idx].sum()/len(selected_jets_idx)
-        print(f"Efficiency: {efficiency*100:.2f}%")
-        return efficiency
+        eff = res["label"][selected_jets_idx].sum()/len(selected_jets_idx)
+        print(f"Efficiency: {eff*100:.2f}%")
+        return eff
