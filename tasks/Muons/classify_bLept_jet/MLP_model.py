@@ -25,10 +25,12 @@ def custom_collate_fn(batch):
 
 class MLP(torch.nn.Module):
 
-    def __init__(self,hidden_arch=[10,10],batch_size=1,x_train=None,y_train=None,x_test=None,y_test=None,optim={}):
+    def __init__(self,hidden_arch=[10,10],batch_size=1,
+                 shuffle=False,
+                 x_train=None,y_train=None,x_test=None,y_test=None,optim={}):
         super().__init__()
 
-        self.loss_fn=torch.nn.BCELoss(weight=torch.tensor([5,1],device=device))
+        self.loss_fn=torch.nn.BCELoss(weight=torch.tensor([6,1],device=device))
 
         
         self.x_train=x_train
@@ -37,6 +39,11 @@ class MLP(torch.nn.Module):
         self.y_test=y_test
         self.hidden_arch=hidden_arch
 
+        self.mean=x_train.mean(axis=0)
+        self.std=x_train.std(axis=0)
+
+
+        self.shuffle_at_each_epoch=shuffle
         self.batch_size=batch_size
         self.n_batch=np.ceil(len(x_train)/batch_size).astype(int)
         self.test_loss=[]
@@ -52,12 +59,11 @@ class MLP(torch.nn.Module):
         self.layers.append(torch.nn.Linear(self.n_inputs, hidden_arch[0]))
         
         torch.nn.init.xavier_uniform_(self.layers[-1].weight)
-        
-        self.layers.append(torch.nn.Sigmoid())
+        self.layers.append(torch.nn.ReLU())
         for in_neurons,out_neurons in zip(self.hidden_arch[:-1],self.hidden_arch[1:]):
             self.layers.append(torch.nn.Linear(in_neurons,out_neurons))
             torch.nn.init.xavier_uniform_(self.layers[-1].weight)
-            self.layers.append(torch.nn.Sigmoid())
+            self.layers.append(torch.nn.ReLU())
         
         self.layers.append(torch.nn.Linear(self.hidden_arch[-1],self.n_outputs))
         torch.nn.init.xavier_uniform_(self.layers[-1].weight)
@@ -74,6 +80,7 @@ class MLP(torch.nn.Module):
         self.false_positive=[]
 
     def forward(self,x):
+        x=(x-self.mean)/self.std
         for layer in self.layers:
             x=layer(x)
         return x
@@ -108,16 +115,21 @@ class MLP(torch.nn.Module):
         batch_loop=tqdm(range(self.n_batch),desc="batch")
         for epoch in epoch_loop:
             self.train()
-            
+            x_train=self.x_train
+            y_train=self.y_train
+            if self.shuffle_at_each_epoch:
+                perm=torch.randperm(self.x_train.size()[0])
+                x_train=x_train[perm]
+                y_train=y_train[perm]
             
             #for x_batch, y_batch in self.data_loader:
             for i in batch_loop:
-                if((i+1)*self.batch_size<len(self.x_train)):
-                    x_batch=self.x_train[i*self.batch_size:(i+1)*self.batch_size]
-                    y_batch = self.y_train[i *self.batch_size:(i+1)*self.batch_size]
+                if((i+1)*self.batch_size<len(x_train)):
+                    x_batch=x_train[i*self.batch_size:(i+1)*self.batch_size]
+                    y_batch = y_train[i *self.batch_size:(i+1)*self.batch_size]
                 else:
-                    x_batch=self.x_train[i*self.batch_size:len(self.x_train)]
-                    y_batch = self.y_train[i*self.batch_size:len(self.y_train)]
+                    x_batch=x_train[i*self.batch_size:len(x_train)]
+                    y_batch = y_train[i*self.batch_size:len(y_train)]
                 y_logits=self.forward(x_batch).squeeze()
                 train_loss_step=self.loss_fn(y_logits,y_batch)
                 self.optimizer.zero_grad()
