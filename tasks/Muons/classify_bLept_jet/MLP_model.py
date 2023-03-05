@@ -200,7 +200,7 @@ class MLP(torch.nn.Module):
         plt.xlabel("Epochs")
         plt.subplot(133)
         with torch.no_grad():
-            confusion_matrix_test = torch.tensor(
+            confusion_matrix_test = np.array(
                 [[1-self.false_positive[-1], self.false_positive[-1]], [self.false_negative[-1], 1-self.false_negative[-1]]])
 
             confusion_matrix_test = pd.DataFrame(confusion_matrix_test, index=[
