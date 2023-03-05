@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
+from tqdm.notebook import tqdm
 import matplotlib.pyplot as plt
 import seaborn as sn
 #from torch.utils.data.dataloader import default_collate
@@ -134,7 +134,7 @@ class MLP(torch.nn.Module):
     
     def train_loop(self,epochs):
         epoch_loop=tqdm(range(epochs),desc="epoch")
-        batch_loop=tqdm(range(self.n_batch),desc="batch")
+        
         for epoch in epoch_loop:
             self.train()
             x_train=self.x_train
@@ -143,9 +143,9 @@ class MLP(torch.nn.Module):
                 perm=torch.randperm(self.x_train.size()[0])
                 x_train=x_train[perm]
                 y_train=y_train[perm]
-            
+
             #for x_batch, y_batch in self.data_loader:
-            for i in batch_loop:
+            for i in range(self.n_batch):
                 if((i+1)*self.batch_size<len(x_train)):
                     x_batch=x_train[i*self.batch_size:(i+1)*self.batch_size]
                     y_batch = y_train[i *self.batch_size:(i+1)*self.batch_size]
