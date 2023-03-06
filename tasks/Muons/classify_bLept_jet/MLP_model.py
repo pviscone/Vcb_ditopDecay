@@ -16,41 +16,17 @@ else:
 cpu=torch.device("cpu")
 device = torch.device(dev)
 
-
-
-def custom_collate_fn(batch):
-    batch = batch.to(device, non_blocking=True)
-    return batch
-
-
-class OrderedDict(dict):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def __getitem__(self, key):
-        if type(key) == str:
-            return super().__getitem__(key)
-        else:
-            key = tuple(self.keys())[key]
-            return (key, self[key])
-
-    def sort(self):
-        return OrderedDict(dict(sorted(self.items(), key=lambda item: item[1])))
-
-
-
-
 class MLP(torch.nn.Module):
 
     def __init__(self,hidden_arch=[10,10],batch_size=1,
                  shuffle=False,
                  x_train=None,y_train=None,x_test=None,y_test=None,
                  event_id_train=None,event_id_test=None,
-                 optim={}):
+                 optim={},early_stopping={"RMS":0.0005,"Mean":True,"Patience":20}):
         super().__init__()
 
         self.loss_fn=torch.nn.BCELoss(weight=torch.tensor([6,1],device=device))
-
+        self.early_stopping=early_stopping
         
         self.x_train=x_train
         self.y_train=y_train
@@ -175,14 +151,20 @@ class MLP(torch.nn.Module):
                 self.false_positive.append(self.error(type="I",dataset="test").to(cpu).numpy())
                 
                 self.false_negative.append(self.error(type="II", dataset="test").to(cpu).numpy())
-
-            if epoch>20:
-                if np.std(self.test_loss[-20:])<0.0005:
-                    print("Early stopping: test loss not changing")
-                    break
-                if np.mean(self.test_loss[-20:])>np.mean(self.test_loss[-40:-20]):
-                    print("Early stopping: test loss increasing")
-                    break
+            
+            if self.early_stopping != None:
+                if not "Patience" in self.early_stopping:
+                    raise ValueError("early_stopping must be a dictionary with key 'Patience'")
+                patience=self.early_stopping["Patience"]
+                if epoch>patience:
+                    if "RMS" in self.early_stopping:
+                        if np.std(self.test_loss[-patience:])<self.early_stopping["RMS"]:
+                            print("Early stopping: test loss not changing")
+                            break
+                    if "Mean" in self.early_stopping and self.early_stopping==True:
+                        if np.mean(self.test_loss[-patience:])>np.mean(self.test_loss[-2*patience:-patience]):
+                            print("Early stopping: test loss increasing")
+                            break
                     
     def loss_plot(self):
         plt.figure(figsize=(20,5))
