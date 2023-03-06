@@ -117,7 +117,7 @@ col_list = list(data_df.keys())
 initial_features=["Jet_CvBtag", "dPhi_Jet_mu"]
 [col_list.remove(col) for col in initial_features]
 
-data_nplus1 = df.loc[:, initial_features]
+data_nplus1 = data_df.loc[:, initial_features]
 
 first_efficiency = train(data_nplus1, label,event_id_test,test_size=test_size)
 nplus1_efficiency.append(first_efficiency)
@@ -126,12 +126,12 @@ col_added.append("(starter) CvB, dphi_j_mu")
 n_col_loop = tqdm(range(len(col_list)), desc="N+1 loop")
 for n_col in n_col_loop:
     if n_col >0:
-        data_nplus1.join(df.loc[:, col_to_add])
+        data_nplus1=data_nplus1.join(data_df.loc[:, col_to_add])
 
     dict_nplus1_step = OrderedDict({})
     column_loop = tqdm(col_list, desc="Column")
     for col in column_loop:
-        data_nplus1_step = data_nplus1.join(df.loc[:, col])
+        data_nplus1_step = data_nplus1.join(data_df.loc[:, col])
         efficiency=train(data_nplus1_step,label,event_id_test,test_size=test_size)
         plt.title(f"N+{n_col+1}: {col}")
         plt.savefig(f"./images/N_plus1/loss/N+{n_col+1}_{col}.png")
