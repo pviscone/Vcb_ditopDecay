@@ -127,14 +127,14 @@ for n_col in n_col_loop:
     keys.insert(0, "All features")
     values.insert(0, all_efficiency)
     arange = np.arange(len(keys))
-    plt.figure()
+    plt.figure(figsize=(9,5))
     plt.barh(arange, values, height=0.5, tick_label=keys, xerr=err, ecolor="black", color="orange", capsize=2)
     plt.plot([all_efficiency]*2,[-0.5,len(keys)+0.5],c="r")
-    plt.fill_between([all_efficiency-err, all_efficiency+err], [-0.5,-0.5], [len(keys)+0.5,len(keys)+0.5], color="grey", alpha=0.3)
+    plt.fill_between([all_efficiency-err, all_efficiency+err], [-0.5,-0.5], [len(keys)+0.5,len(keys)+0.5], color="grey", alpha=0.5)
     plt.ylim(-0.5,len(keys))
     plt.xlim(np.min(values)/2,1)
     plt.xlabel("Efficiency")
-    plt.grid()
+    plt.grid(alpha=0.5, linestyle="--")
     if n_col > 0:
         plt.title(f"step: N-{n_col+1}. Previously removed: {col_to_remove}")
     else:
@@ -152,21 +152,21 @@ for n_col in n_col_loop:
 col_removed.insert(0, "All features")
 n_minus1_efficiency.insert(0, all_efficiency)
 
-col_removed.insert(len(col_removed), f"N-{len(train_data_df.columns)-2}: {dict_n_minus1[0][0]}")
+col_removed.insert(len(col_removed), f"N-{len(train_data_df.columns)-1}: {dict_n_minus1[0][0]}")
 n_minus1_efficiency.insert(len(n_minus1_efficiency), dict_n_minus1[0][1])
 
 arange = np.arange(len(col_removed))
-plt.figure()
+plt.figure(figsize=(12,5))
 plt.barh(arange, n_minus1_efficiency,
          height=0.5, tick_label=col_removed, xerr=err, ecolor="black", color="orange", capsize=2)
 plt.xlabel("Efficiency")
 
 plt.plot([all_efficiency]*2, [-0.5, arange[-1]+0.5], c="r")
 plt.fill_between([all_efficiency-err, all_efficiency+err], [-0.5, -0.5],
-                 [arange[-1]+0.5, arange[-1]+0.5], color="grey", alpha=0.3)
-plt.ylim(-0.5, arange[-1])
+                 [arange[-1]+0.5, arange[-1]+0.5], color="grey", alpha=0.5)
+plt.ylim(-0.5, arange[-1]+1)
 plt.xlim(np.min(n_minus1_efficiency)/2, 1)
-plt.grid()
+plt.grid(alpha=0.5, linestyle="--")
 plt.title("N-1: All steps")
 plt.savefig(f"./images/N_minus1/all_steps.png")
 
