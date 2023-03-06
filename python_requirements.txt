@@ -8,3 +8,5 @@ vector
 torch
 pandas
 seaborn
+tqdm
+scikit-learn
