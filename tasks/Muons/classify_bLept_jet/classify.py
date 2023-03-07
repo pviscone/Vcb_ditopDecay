@@ -96,8 +96,8 @@ for n_col in n_col_loop:
     nminus1_efficiency.append(dict_nminus1_step[-1][1])
 
 #!Remember that the efficiency of the last surviving feature is obtained with a training with 2 features
-col_removed.insert(len(col_removed), f"N-{len(data_df.columns)-1}: {dict_nminus1_step[0][0]}")
-nminus1_efficiency.insert(len(nminus1_efficiency), dict_nminus1_step[0][1])
+col_removed.insert(len(col_removed), f"N-{len(data_df.columns)-1}: {dict_nminus1_step[-2][0]}")
+nminus1_efficiency.insert(len(nminus1_efficiency), dict_nminus1_step[-2][1])
 
 dict_nminus1=OrderedDict(zip(col_removed, nminus1_efficiency))
 plot_efficiency(dict_nminus1, err=err)
