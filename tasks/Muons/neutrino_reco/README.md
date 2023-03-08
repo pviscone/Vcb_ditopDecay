@@ -29,8 +29,6 @@ If $\Delta>0$ choose the smallest solution
 
 If $\Delta<0$ impose it to 0 (take only the real part of the solution)
 
-
-
 This approach is not based on physical reasons.
 
 There are other approachs (also using flows and NN) but here was used the simplest method
@@ -46,4 +44,3 @@ There are other approachs (also using flows and NN) but here was used the simple
 ## Observation
 
 - There is a strange modulation in MET_phi (It should be uniform)
-
