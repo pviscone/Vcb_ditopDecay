@@ -31,7 +31,7 @@ cpu = torch.device("cpu")
 device = torch.device(dev)
 
 
-df = pd.read_pickle("./Jet_features.pkl", compression="bz2")
+df = pd.read_pickle("../Jet_features.pkl", compression="bz2")
 
 # [a,b]: a=non leptonic, b=leptonic
 label = np.expand_dims(df["label"].astype(float).to_numpy(), axis=1)
