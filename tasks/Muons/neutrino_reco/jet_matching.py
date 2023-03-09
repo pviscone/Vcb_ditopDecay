@@ -480,6 +480,74 @@ features_df = features_df.loc[idx[i, j[perm2]],:]
 features_df=features_df.dropna()
 
 
-features_df.to_pickle("../classify_bLept_jet/Jet_features.pkl",compression="bz2")
+#features_df.to_pickle("../classify_bLept_jet/Jet_features.pkl",compression="bz2")
 #%%
+n_jets = ak.max(ak.num(events.Jet.pt[deltaR_mask], axis=1))
+def padded_matrix(ak_array):
+    max_lenght = ak.max(ak.num(ak_array, axis=1))
+    masked_array = ak.pad_none(ak_array, max_lenght, clip=True).to_numpy()
+    masked_array.data[masked_array.mask]=0
+    return masked_array.data
 
+def column(ak_array, branch=[],additional_column=None):
+    return np.atleast_2d(ak_array.to_numpy(allow_missing=False)).T
+    
+col_labels=[]
+
+pt_muon=column(events.Muon[deltaR_mask][:,0].pt)
+eta_muon=column(events.Muon[deltaR_mask][:,0].eta)
+phi_muon=column(events.Muon[deltaR_mask][:,0].phi)
+mass_muon=column(events.Muon[deltaR_mask][:,0].mass)
+
+muon_matrix=np.hstack([pt_muon,eta_muon,phi_muon,mass_muon])
+col_labels.extend(["Muon_pt","Muon_eta","Muon_phi","Muon_mass"])
+
+pt_nu=column(nu_4Vect[deltaR_mask].pt)
+eta_nu=column(nu_4Vect[deltaR_mask].eta)
+phi_nu=column(nu_4Vect[deltaR_mask].phi)
+mass_nu=column(nu_4Vect[deltaR_mask].mass)
+
+nu_matrix=np.hstack([pt_nu,eta_nu,phi_nu,mass_nu])
+col_labels.extend(["Nu_pt","Nu_eta","Nu_phi","Nu_mass"])
+
+pt_jet_matrix=padded_matrix(events.Jet[deltaR_mask].pt)
+eta_jet_matrix=padded_matrix(events.Jet[deltaR_mask].eta)
+phi_jet_matrix=padded_matrix(events.Jet[deltaR_mask].phi)
+m_jet_matrix=padded_matrix(events.Jet[deltaR_mask].mass)
+btag_jet_matrix=padded_matrix(events.Jet[deltaR_mask].btagDeepFlavB)
+CvB_jet_matrix=padded_matrix(events.Jet[deltaR_mask].btagDeepFlavCvB)
+CvL_jet_matrix=padded_matrix(events.Jet[deltaR_mask].btagDeepFlavCvL)
+area_jet_matrix=padded_matrix(events.Jet[deltaR_mask].area)
+tmass_jet_matrix=padded_matrix(T_mass)
+
+
+def alternate_column(matrix_list):
+    num_particles=matrix_list[0].shape[1]
+    num_features=len(matrix_list)
+    final_matrix=np.empty((matrix_list[0].shape[0],num_particles*num_features))
+    for feature in range(num_features):
+        for obj in range(num_particles):
+            final_matrix[:,num_features*obj+feature]=matrix_list[feature][:,obj]
+    return final_matrix
+
+
+jet_matrix=alternate_column([pt_jet_matrix,eta_jet_matrix,phi_jet_matrix,m_jet_matrix,btag_jet_matrix,CvB_jet_matrix,CvL_jet_matrix,area_jet_matrix,tmass_jet_matrix])
+
+
+event_matrix=np.hstack([muon_matrix,nu_matrix,jet_matrix])
+for i in range(n_jets):
+    col_labels.extend([f"Jet{i}_pt",f"Jet{i}_eta",f"Jet{i}_phi",f"Jet{i}_mass",f"Jet{i}_btag",f"Jet{i}_CvBtag",f"Jet{i}_CvLtag",f"Jet{i}_area",f"Jet{i}_tmass"])
+
+label = (events.Jet.delta_r(LeptB_LHE_4Vect)[
+         deltaR_mask] == deltaR_jet_LHE)
+label = ak.values_astype(label, int)
+label = ak.argmax(label, axis=1).to_numpy(allow_missing=False)
+label=np.atleast_2d(label).T
+
+event_matrix=np.hstack([event_matrix,label])
+col_labels.extend(["label"])
+
+event_df=pd.DataFrame(event_matrix,columns=col_labels)
+
+
+#!Fai un taglio label<=7 o 8 e butta via tutti gli altri jet
