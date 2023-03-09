@@ -86,7 +86,7 @@ plt.subplot(121)
 h = Histogrammer(bins=50, histtype="step", linewidth=3.5, cmsText=None,ylim=(0,14000),xlabel="$\Delta\phi_{GenMET}$")
 
 
-h.add_hist(dphi_met, label="GenMET_phi", color=xkcd_yellow)
+h.add_hist(dphi_met, label="MET_phi", color=xkcd_yellow)
 h.add_hist(dphi_raw, label="RawMET_phi", color="fuchsia", alpha=0.8)
 
 h.add_hist(dphi_chs, label="ChsMET_phi", color="firebrick", alpha=0.8)
@@ -118,39 +118,39 @@ c.SetTitle("TProfile")
 c.Divide(3,2)
 c.cd(1)
 t_raw=tprofile(dphi_raw)
-t_raw.SetTitle("RawMET_phi")
+t_raw.SetTitle("$\Delta \Phi$GenMET- RawMET")
 t_raw.GetXaxis().SetTitle("GenMET_phi")
 t_raw.Draw()
 
 c.cd(2)
 t_met = tprofile(dphi_met)
-t_met.SetTitle("MET_phi")
+t_met.SetTitle("$\Delta \Phi$GenMET- MET_phi")
 t_met.GetXaxis().SetTitle("GenMET_phi")
 t_met.Draw()
 
 c.cd(3)
 t_calo = tprofile(dphi_calo)
-t_calo.SetTitle("CaloMET_phi")
+t_calo.SetTitle("$\Delta \Phi$GenMET- CaloMET")
 t_calo.GetXaxis().SetTitle("GenMET_phi")
 t_calo.Draw()
 
 c.cd(4)
 t_tk = tprofile(dphi_tk)
-t_tk.SetTitle("TkMET_phi")
+t_tk.SetTitle("$\Delta \Phi$GenMET- TkMET")
 t_tk.GetXaxis().SetTitle("GenMET_phi")
 t_tk.Draw()
 
 
 c.cd(5)
 t_chs = tprofile(dphi_chs)
-t_chs.SetTitle("ChsMET_phi")
+t_chs.SetTitle("$\Delta \Phi$GenMET- ChsMET")
 t_chs.GetXaxis().SetTitle("GenMET_phi")
 t_chs.Draw()
 
 
 c.cd(6)
 t_puppi = tprofile(dphi_puppi)
-t_puppi.SetTitle("PuppiMET_phi")
+t_puppi.SetTitle("$\Delta \Phi$GenMET- PuppiMET")
 t_puppi.GetXaxis().SetTitle("GenMET_phi")
 t_puppi.Draw()
 
