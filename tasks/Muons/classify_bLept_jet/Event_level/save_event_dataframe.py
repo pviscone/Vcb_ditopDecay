@@ -126,6 +126,5 @@ col_labels=mu_labels+nu_labels+jet_labels+["label"]
 event_matrix=np.hstack([muon_matrix,nu_matrix,jet_matrix,label])
 
 event_df=pd.DataFrame(event_matrix,columns=col_labels)
-event_df=event_df.sample(frac=1)
-#event_df.to_pickle("./event_df.pkl", compression="bz2")
+event_df.to_pickle("./event_df.pkl", compression="bz2")
 # %%
