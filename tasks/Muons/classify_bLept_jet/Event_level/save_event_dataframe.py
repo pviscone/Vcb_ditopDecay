@@ -93,12 +93,12 @@ plt.yscale("log")
 plt.xlabel("Order in pt")
 
 
-num_jet_to_select=6
-efficiency = len(bLept_pt_order[np.bitwise_and(bLept_pt_order <=
+num_jet_to_select=7
+efficiency = len(bLept_pt_order[np.bitwise_and(bLept_pt_order <
                  num_jet_to_select,deltaR<0.4)])/len(bLept_pt_order[deltaR<0.4])
-print(f"Percentage of events with the bLept jet in the first {num_jet_to_select} jets:{efficiency:.2f}")
+print(f"Percentage of events with the bLept jet in the first {num_jet_to_select} jets:{efficiency}")
 
-mask= np.bitwise_and(deltaR<0.4, bLept_pt_order <= num_jet_to_select)
+mask= np.bitwise_and(deltaR<0.4, bLept_pt_order < num_jet_to_select)
 
 #%%
 events.Jet=events.Jet[:, :num_jet_to_select]
