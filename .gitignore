@@ -1,6 +1,7 @@
 *.pyc
 *.gz
 *.ipynb
+/**/check.py
 /**/prova.cpp
 root_files/**/*.root
 check/*
