@@ -26,11 +26,13 @@ The tutorial about event generation is [here](../../tutorials/EventGeneration.md
 > 
 > - [cbFromTbar Grafana](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230302_105148%3Apviscone_crab_TTbarSemileptonic_cbOnlyFromTbar_TuneCP5_13TeV-madgraphMLM-pythia8_FULLSIM&from=1677750708000&to=now)
 
-> ### Third run (20 billion)
+> ### Third run
 > 
-> - [cbFromT Grafana](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230310_173329%3Apviscone_crab_TTbarSemileptonic_cbOnlyFromT_TuneCP5_13TeV-madgraphMLM-pythia8_FULLSIM&from=1678466009000&to=now)
+> 1250 ev/job X 10000 jobs X 0.66 (success rate) x 0.25 (hadronization)  $\sim 2000000$ ev/dataset 
 > 
-> - [cbFromTbar Grafana](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230310_173806%3Apviscone_crab_TTbarSemileptonic_cbOnlyFromTbar_TuneCP5_13TeV-madgraphMLM-pythia8_FULLSIM&from=1678466286000&to=now)
+> - [cbFromT Grafana](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230311_154702%3Apviscone_crab_TTbarSemileptonic_cbOnlyFromT_TuneCP5_13TeV-madgraphMLM-pythia8_FULLSIM&from=1678546022000&to=now)
+> 
+> - [cbFromTbar Grafana](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230311_155000%3Apviscone_crab_TTbarSemileptonic_cbOnlyFromTbar_TuneCP5_13TeV-madgraphMLM-pythia8_FULLSIM&from=1678546200000&to=now)
 
 # How to run it
 
