@@ -228,9 +228,9 @@ for correction in correction_labels:
         phi = events.PuppiMET.phi
         key="Puppi"
     elif "pfmet" in correction:
-        pt=events.ChsMET.pt
-        phi=events.ChsMET.phi
-        key="Chs"
+        pt=events.MET.pt
+        phi=events.MET.phi
+        key="MET"
     
     npv = events.PV.npvs
     runs = None
@@ -242,8 +242,8 @@ for correction in correction_labels:
 
 corrected_puppi_phi=ak.Array(corrected_phi["Puppi"])
 corrected_puppi_phi.phi=corrected_puppi_phi
-corrected_chs_phi=ak.Array(corrected_phi["Chs"])
-corrected_chs_phi.phi=corrected_chs_phi
+corrected_met_phi=ak.Array(corrected_phi["MET"])
+corrected_met_phi.phi=corrected_met_phi
 
 plt.figure(figsize=(25,12))
 h = Histogrammer(bins=40,  linewidth=3.5,xlabel="$\phi$",histtype="step")
@@ -277,23 +277,23 @@ plt.subplot(121)
 h.add_hist(events.GenMET.phi,
            label="GenMet", edgecolor=xkcd_yellow,)
 
-h.add_hist(events.ChsMET.phi,
-           label="ChsMET", edgecolor="dodgerblue", )
+h.add_hist(events.MET.phi,
+           label="MET", edgecolor="dodgerblue", )
 
-h.add_hist(corrected_chs_phi.phi,
-           label="ChsMET_corr", edgecolor="red", )
-h.add_hist(events.MET.phi,label="MET",edgecolor="black",)
+h.add_hist(corrected_met_phi.phi,
+           label="MET_corr", edgecolor="red", )
+
 
 h.plot()
 plt.ylim(2500, 4500)
 plt.subplot(122)
 
-h.add_hist(events.GenMET.delta_phi(events.ChsMET),
-           label="GenMet-ChsMET", edgecolor=xkcd_yellow,bins=50 )
-h.add_hist(events.GenMET.delta_phi(corrected_chs_phi),
-           label="GenMet-ChsMET_corr", edgecolor="red", bins=50)
-h.add_hist(events.ChsMET.delta_phi(corrected_chs_phi),
-           label="ChsMET-ChsMET_corr", edgecolor="dodgerblue",bins=50 )
+h.add_hist(events.GenMET.delta_phi(events.MET),
+           label="GenMet-MET", edgecolor=xkcd_yellow,bins=50 )
+h.add_hist(events.GenMET.delta_phi(corrected_met_phi),
+           label="GenMet-MET_corr", edgecolor="red", bins=50)
+h.add_hist(events.MET.delta_phi(corrected_met_phi),
+           label="MET-MET_corr", edgecolor="dodgerblue",bins=50 )
 h.plot()
 plt.ylim(300, 70000)
 plt.yscale("log")
