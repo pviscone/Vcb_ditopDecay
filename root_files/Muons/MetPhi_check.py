@@ -208,3 +208,93 @@ h.add_hist(events.MET.phi[events.MET.pt > 100], label="MET_pt>100 [GeV]",color="
 plt.grid()
 h.plot()
 plt.legend(bbox_to_anchor=(1.0, 0.9))
+
+
+
+#%%
+import correctionlib
+
+correction_labels = ["metphicorr_pfmet_mc","metphicorr_puppimet_mc"]
+
+
+infile="./met.json"
+corrected_pt = {}
+corrected_phi = {}
+for correction in correction_labels:
+    ceval = correctionlib.CorrectionSet.from_file(infile)
+    
+    if "puppimet" in correction:
+        pt = events.PuppiMET.pt
+        phi = events.PuppiMET.phi
+        key="Puppi"
+    elif "pfmet" in correction:
+        pt=events.ChsMET.pt
+        phi=events.ChsMET.phi
+        key="Chs"
+    
+    npv = events.PV.npvs
+    runs = None
+    
+    corrected_pt[key] = ceval[f"pt_{correction}"].evaluate(pt, phi, npv, runs)
+    
+    corrected_phi[key]=ceval[f"phi_{correction}"].evaluate(pt, phi, npv, runs)
+
+
+corrected_puppi_phi=ak.Array(corrected_phi["Puppi"])
+corrected_puppi_phi.phi=corrected_puppi_phi
+corrected_chs_phi=ak.Array(corrected_phi["Chs"])
+corrected_chs_phi.phi=corrected_chs_phi
+
+plt.figure(figsize=(25,12))
+h = Histogrammer(bins=40,  linewidth=3.5,xlabel="$\phi$",histtype="step")
+plt.subplot(121)
+h.add_hist(events.GenMET.phi,
+           label="GenMet", edgecolor=xkcd_yellow,)
+
+h.add_hist(events.PuppiMET.phi,
+           label="PuppiMET", edgecolor="dodgerblue", )
+
+h.add_hist(corrected_puppi_phi.phi,
+           label="PuppiMET_corr", edgecolor="red", )
+h.add_hist(events.MET.phi,label="MET",edgecolor="black", )
+
+h.plot()
+plt.ylim(2500, 4600)
+plt.subplot(122)
+
+h.add_hist(events.GenMET.delta_phi(events.PuppiMET),label="GenMet-PuppiMET",edgecolor=xkcd_yellow, )
+h.add_hist(events.GenMET.delta_phi(corrected_puppi_phi),label="GenMet-PuppiMET_corr",edgecolor="red", )
+h.add_hist(events.PuppiMET.delta_phi(corrected_puppi_phi),label="PuppiMET-PuppiMET_corr",edgecolor="dodgerblue", )
+h.plot()
+plt.ylim(1, 7000000)
+plt.yscale("log")
+plt.xlabel("$\Delta\phi$")
+
+
+plt.figure(figsize=(25, 12))
+h = Histogrammer(bins=40,  linewidth=3.5, xlabel="$\phi$", histtype="step")
+plt.subplot(121)
+h.add_hist(events.GenMET.phi,
+           label="GenMet", edgecolor=xkcd_yellow,)
+
+h.add_hist(events.ChsMET.phi,
+           label="ChsMET", edgecolor="dodgerblue", )
+
+h.add_hist(corrected_chs_phi.phi,
+           label="ChsMET_corr", edgecolor="red", )
+h.add_hist(events.MET.phi,label="MET",edgecolor="black",)
+
+h.plot()
+plt.ylim(2500, 4500)
+plt.subplot(122)
+
+h.add_hist(events.GenMET.delta_phi(events.ChsMET),
+           label="GenMet-ChsMET", edgecolor=xkcd_yellow,bins=50 )
+h.add_hist(events.GenMET.delta_phi(corrected_chs_phi),
+           label="GenMet-ChsMET_corr", edgecolor="red", bins=50)
+h.add_hist(events.ChsMET.delta_phi(corrected_chs_phi),
+           label="ChsMET-ChsMET_corr", edgecolor="dodgerblue",bins=50 )
+h.plot()
+plt.ylim(300, 70000)
+plt.yscale("log")
+plt.xlabel("$\Delta\phi$")
