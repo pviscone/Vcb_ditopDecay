@@ -16,10 +16,31 @@ else:
 cpu = torch.device("cpu")
 device = torch.device(dev)
 
-
 class MLP(torch.nn.Module):
+    def __init__(self, in_dim,out_dim,out_activation,hidden_arch=[10, 10]):
+        super().__init__()
+        self.layers=torch.nn.Sequential()
+        self.layers.append(torch.nn.Linear(in_dim, hidden_arch[0]))
+        torch.nn.init.xavier_uniform_(self.layers[-1].weight)
+        torch.nn.init.zeros_(self.layers[-1].bias)
+        self.layers.append(torch.nn.ReLU())
+        for in_neurons, out_neurons in zip(hidden_arch[:-1], hidden_arch[1:]):
+            self.layers.append(torch.nn.Linear(in_neurons, out_neurons))
+            torch.nn.init.xavier_uniform_(self.layers[-1].weight)
+            torch.nn.init.zeros_(self.layers[-1].bias)
+            self.layers.append(torch.nn.ReLU())
+        self.layers.append(torch.nn.Linear(hidden_arch[-1], out_dim))
+        torch.nn.init.xavier_uniform_(self.layers[-1].weight)
+        torch.nn.init.zeros_(self.layers[-1].bias)
+        if out_activation is not None:
+            self.layers.append(out_activation)
+    def forward(self,x):
+        return self.layers(x)
 
-    def __init__(self, hidden_arch=[10, 10], batch_size=1,
+
+class AttentionNetwork(torch.nn.Module):
+
+    def __init__(self, hidden_arch=[10, 10], embed_arch=[10,10,10],batch_size=1,
                  shuffle=False,
                  x_train=None, y_train=None, x_test=None, y_test=None,
                  event_id_train=None, event_id_test=None,
@@ -52,25 +73,15 @@ class MLP(torch.nn.Module):
         self.n_outputs = y_train.shape[1]
 
         n_head=1
-        self.selfattention = torch.nn.MultiheadAttention(self.n_inputs,num_heads=1)
+        
+        self.embed1=MLP(self.x_train.shape[1],embed_arch[-1],torch.nn.Sigmoid(),hidden_arch=embed_arch[:-1])
+        self.embed2=MLP(self.x_train.shape[1],embed_arch[-1],torch.nn.Sigmoid(),hidden_arch=embed_arch[:-1])
+        self.embed3=MLP(self.x_train.shape[1],embed_arch[-1],torch.nn.Sigmoid(),hidden_arch=embed_arch[:-1])
+        
+        self.selfattention = torch.nn.MultiheadAttention(embed_arch[-1],num_heads=1)
 
-
-
-        self.feedforward = torch.nn.Sequential()
-        self.feedforward.append(torch.nn.Linear(self.n_inputs, hidden_arch[0]))
-        torch.nn.init.xavier_uniform_(self.feedforward[-1].weight)
-        torch.nn.init.zeros_(self.feedforward[-1].bias)
-        self.feedforward.append(torch.nn.ReLU())
-        for in_neurons, out_neurons in zip(self.hidden_arch[:-1], self.hidden_arch[1:]):
-            self.feedforward.append(torch.nn.Linear(in_neurons, out_neurons))
-            torch.nn.init.xavier_uniform_(self.feedforward[-1].weight)
-            torch.nn.init.zeros_(self.feedforward[-1].bias)
-            self.feedforward.append(torch.nn.ReLU())
-        self.feedforward.append(torch.nn.Linear(
-            self.hidden_arch[-1], int(torch.max(self.y_train).item()+1)))
-        torch.nn.init.xavier_uniform_(self.feedforward[-1].weight)
-        torch.nn.init.zeros_(self.feedforward[-1].bias)
-        self.feedforward.append(torch.nn.LogSoftmax())
+        self.norm = torch.nn.LayerNorm(embed_arch[-1])
+        self.feedforward = MLP(embed_arch[-1],int(torch.max(self.y_train)+1),torch.nn.LogSoftmax(dim=1),hidden_arch=[10, 10])
 
         self.optim_dict = optim
         self.optimizer = torch.optim.Adam(self.parameters(), **self.optim_dict)
@@ -80,8 +91,11 @@ class MLP(torch.nn.Module):
 
     def forward(self, x):
         x = (x-self.mean)/(self.std+1e-5)
-        out,weight=self.selfattention(x,x,x)
-        out=torch.nn.LayerNorm(x.shape[1])(x+out)
+        embed1=self.embed1(x)
+        embed2=self.embed2(x)
+        embed3=self.embed3(x)
+        out,_=self.selfattention(embed1,embed2,embed3)
+        out=self.norm(out+embed1+embed2+embed3)
         out= self.feedforward(out)
         return out
     
@@ -124,16 +138,15 @@ class MLP(torch.nn.Module):
                 self.test_loss = np.append(
                     self.test_loss, test_loss_step.to(cpu).numpy())
 
-                self.train_loss = np.append(
-                    self.train_loss, train_loss_step.to(cpu).numpy())
+                self.train_loss = np.append(self.train_loss, train_loss_step.to(cpu).numpy())
                 
                 classified_test=torch.argmax(test_logits,dim=1) == self.y_test.squeeze()
                 
                 self.test_accuracy.append(classified_test.sum().item()/len(classified_test))
                 
-                classified_train=torch.argmax(self(self.x_train),dim=1) == self.y_train.squeeze()
+                #classified_train=torch.argmax(self(self.x_train),dim=1) == self.y_train.squeeze()
 
-                self.train_accuracy.append(classified_train.sum().item()/len(classified_train))
+                #self.train_accuracy.append(classified_train.sum().item()/len(classified_train))
                 
             if self.early_stopping != None:
                 if not "Patience" in self.early_stopping:
