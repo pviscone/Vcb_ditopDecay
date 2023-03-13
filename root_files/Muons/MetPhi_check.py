@@ -28,6 +28,39 @@ events = NanoEventsFactory.from_root(
     schemaclass=NanoAODSchema,
 ).events()
 
+import correctionlib
+
+correction_labels = ["metphicorr_pfmet_mc","metphicorr_puppimet_mc"]
+
+
+infile="./met.json"
+corrected_pt = {}
+corrected_phi = {}
+for correction in correction_labels:
+    ceval = correctionlib.CorrectionSet.from_file(infile)
+    
+    if "puppimet" in correction:
+        pt = events.PuppiMET.pt
+        phi = events.PuppiMET.phi
+        key="Puppi"
+    elif "pfmet" in correction:
+        pt=events.MET.pt
+        phi=events.MET.phi
+        key="MET"
+    
+    npv = events.PV.npvs
+    runs = None
+    
+    corrected_pt[key] = ceval[f"pt_{correction}"].evaluate(pt, phi, npv, runs)
+    
+    corrected_phi[key]=ceval[f"phi_{correction}"].evaluate(pt, phi, npv, runs)
+
+
+corrected_puppi_phi=ak.Array(corrected_phi["Puppi"])
+corrected_puppi_phi.phi=corrected_puppi_phi
+corrected_met_phi=ak.Array(corrected_phi["MET"])
+corrected_met_phi.phi=corrected_met_phi
+
 #%%
 
 
@@ -36,8 +69,9 @@ plt.figure(figsize=(20,20))
 plt.subplot(221)
 h = Histogrammer(bins=50, histtype="step",linewidth=3.5,ylim=(1800, 3300),cmsText=None)
 h.add_hist(events.GenMET.phi, label="GenMET_phi",histtype="stepfilled",color=xkcd_yellow)
-h.add_hist(events.RawMET.phi, label="RawMET_phi", color="fuchsia", alpha=0.8)
+
 h.add_hist(events.MET.phi,label="MET_phi",color="darkgreen",alpha=0.8)
+h.add_hist(corrected_met_phi.phi,label="MET_phi_corrected",color="fuchsia",alpha=0.8)
 
 
 mplhep.cms.text("Preliminary",loc=0)
@@ -66,6 +100,7 @@ h.add_hist(events.GenMET.phi, label="GenMET_phi",
 
 h.add_hist(events.ChsMET.phi, label="ChsMET_phi", color="firebrick", alpha=0.8)
 h.add_hist(events.PuppiMET.phi, label="PuppiMET_phi", color="dimgray")
+h.add_hist(events.RawMET.phi, label="RawMET_phi", color="fuchsia", alpha=0.8)
 h.plot()
 
 plt.xlabel("$\phi$")
@@ -80,7 +115,9 @@ dphi_chs=events.ChsMET.delta_phi(events.GenMET)
 dphi_tk=events.TkMET.delta_phi(events.GenMET)
 dphi_calo=events.CaloMET.delta_phi(events.GenMET)
 dphi_puppi=events.PuppiMET.delta_phi(events.GenMET)
-plt.figure(figsize=(20, 10))
+dphi_met_corr=events.GenMET.delta_phi(corrected_met_phi)
+dphi_met_metcorr=events.MET.delta_phi(corrected_met_phi)
+plt.figure(figsize=(22, 10))
 
 plt.subplot(121)
 h = Histogrammer(bins=50, histtype="step", linewidth=3.5, cmsText=None,ylim=(0,14000),xlabel="$\Delta\phi_{GenMET}$")
@@ -88,8 +125,9 @@ h = Histogrammer(bins=50, histtype="step", linewidth=3.5, cmsText=None,ylim=(0,1
 
 h.add_hist(dphi_met, label="MET_phi", color=xkcd_yellow)
 h.add_hist(dphi_raw, label="RawMET_phi", color="fuchsia", alpha=0.8)
+h.add_hist(dphi_met_corr, label="MET_phi_corr", color="darkgreen", alpha=0.8)
+h.add_hist(dphi_met_metcorr, label="MET-MET-corr", color="firebrick", alpha=0.8)
 
-h.add_hist(dphi_chs, label="ChsMET_phi", color="firebrick", alpha=0.8)
 mplhep.cms.text("Preliminary", loc=0)
 h.plot()
 plt.legend(bbox_to_anchor=(2.62, 1.02))
@@ -97,7 +135,7 @@ plt.legend(bbox_to_anchor=(2.62, 1.02))
 plt.subplot(122)
 
 h.add_hist(dphi_puppi, label="PuppiMET_phi", color="dimgray")
-
+h.add_hist(dphi_chs, label="ChsMET_phi", color="firebrick", alpha=0.8)
 h.add_hist(dphi_calo, label="CaloMET_phi", color="black")
 h.add_hist(dphi_tk, label="TkMET_phi", color="dodgerblue")
 h.plot()
@@ -115,7 +153,7 @@ def tprofile(dphi,phi=events.GenMET.phi,bins=50):
 
 c=ROOT.TCanvas("","",1200,900)
 c.SetTitle("TProfile")
-c.Divide(3,2)
+c.Divide(3,3)
 c.cd(1)
 t_raw=tprofile(dphi_raw)
 t_raw.SetTitle("$\Delta \Phi$GenMET- RawMET")
@@ -153,6 +191,12 @@ t_puppi = tprofile(dphi_puppi)
 t_puppi.SetTitle("$\Delta \Phi$GenMET- PuppiMET")
 t_puppi.GetXaxis().SetTitle("GenMET_phi")
 t_puppi.Draw()
+
+c.cd(7)
+t_met_corr = tprofile(corrected_met_phi)
+t_met_corr.SetTitle("$\Delta \Phi$GenMET- corrected MET")
+t_met_corr.GetXaxis().SetTitle("GenMET_phi")
+t_met_corr.Draw()
 
 
 c.Draw()
@@ -212,6 +256,7 @@ plt.legend(bbox_to_anchor=(1.0, 0.9))
 
 
 #%%
+"""
 import correctionlib
 
 correction_labels = ["metphicorr_pfmet_mc","metphicorr_puppimet_mc"]
@@ -298,3 +343,4 @@ h.plot()
 plt.ylim(300, 70000)
 plt.yscale("log")
 plt.xlabel("$\Delta\phi$")
+"""
