@@ -51,26 +51,26 @@ class MLP(torch.nn.Module):
         self.n_inputs = x_train.shape[1]
         self.n_outputs = y_train.shape[1]
 
-        #self.layers = torch.jit.trace(torch.nn.ModuleList())
-        self.layers = torch.nn.Sequential()
-        
-        self.layers.append(torch.nn.Linear(self.n_inputs, hidden_arch[0]))
+        n_head=1
+        self.selfattention = torch.nn.MultiheadAttention(self.n_inputs,num_heads=1)
 
-        torch.nn.init.xavier_uniform_(self.layers[-1].weight)
-        torch.nn.init.zeros_(self.layers[-1].bias)
-        
-        self.layers.append(torch.nn.ReLU())
+
+
+        self.feedforward = torch.nn.Sequential()
+        self.feedforward.append(torch.nn.Linear(self.n_inputs, hidden_arch[0]))
+        torch.nn.init.xavier_uniform_(self.feedforward[-1].weight)
+        torch.nn.init.zeros_(self.feedforward[-1].bias)
+        self.feedforward.append(torch.nn.ReLU())
         for in_neurons, out_neurons in zip(self.hidden_arch[:-1], self.hidden_arch[1:]):
-            self.layers.append(torch.nn.Linear(in_neurons, out_neurons))
-            torch.nn.init.xavier_uniform_(self.layers[-1].weight)
-            torch.nn.init.zeros_(self.layers[-1].bias)
-            self.layers.append(torch.nn.ReLU())
-
-        self.layers.append(torch.nn.Linear(
+            self.feedforward.append(torch.nn.Linear(in_neurons, out_neurons))
+            torch.nn.init.xavier_uniform_(self.feedforward[-1].weight)
+            torch.nn.init.zeros_(self.feedforward[-1].bias)
+            self.feedforward.append(torch.nn.ReLU())
+        self.feedforward.append(torch.nn.Linear(
             self.hidden_arch[-1], int(torch.max(self.y_train).item()+1)))
-        torch.nn.init.xavier_uniform_(self.layers[-1].weight)
-        torch.nn.init.zeros_(self.layers[-1].bias)
-        self.layers.append(torch.nn.LogSoftmax())
+        torch.nn.init.xavier_uniform_(self.feedforward[-1].weight)
+        torch.nn.init.zeros_(self.feedforward[-1].bias)
+        self.feedforward.append(torch.nn.LogSoftmax())
 
         self.optim_dict = optim
         self.optimizer = torch.optim.Adam(self.parameters(), **self.optim_dict)
@@ -80,9 +80,10 @@ class MLP(torch.nn.Module):
 
     def forward(self, x):
         x = (x-self.mean)/(self.std+1e-5)
-        for layer in self.layers:
-            x = layer(x)
-        return x
+        out,weight=self.selfattention(x,x,x)
+        out=torch.nn.LayerNorm(x.shape[1])(x+out)
+        out= self.feedforward(out)
+        return out
     
     def train_loop(self, epochs):
         epoch_loop = tqdm(range(epochs), desc="epoch")

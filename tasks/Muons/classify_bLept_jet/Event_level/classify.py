@@ -2,8 +2,6 @@
 import sys
 sys.path.append('..')
 
-
-import utils
 import importlib
 import MLP_model
 from tqdm.notebook import tqdm
@@ -19,11 +17,6 @@ import matplotlib.pyplot as plt
 
 importlib.reload(MLP_model)
 MLP = MLP_model.MLP
-
-importlib.reload(utils)
-OrderedDict = utils.OrderedDict
-train = utils.train
-plot_efficiency = utils.plot_efficiency
 
 
 if torch.cuda.is_available():
@@ -52,7 +45,7 @@ label = ohe.transform(label).toarray()
 data = torch.tensor(df.to_numpy(), dtype=torch.float32, device=device)
 label = torch.tensor(label, dtype=torch.long, device=device)
 
-train_data,test_data,train_label,test_label=train_test_split(data,label, test_size=0.2, shuffle=True)
+train_data,test_data,train_label,test_label=train_test_split(data,label, test_size=0.1, shuffle=True)
 
 #%%
 
@@ -61,13 +54,12 @@ MLP = MLP_model.MLP
 
 
 model = MLP(x_train=train_data, y_train=train_label, x_test=test_data, y_test=test_label,
-            hidden_arch=[20,20,20], batch_size=1000,
+            hidden_arch=[40,40,40], batch_size=1000,
             optim={"lr": 0.0005, "weight_decay": 0.001, },
             early_stopping=None
             )
 model = model.to(device)
 
-#! SOMETHIMG IS BROKEN
 #!---------------------Training---------------------
 
 model.train_loop(epochs=100)
