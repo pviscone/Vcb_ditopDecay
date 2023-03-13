@@ -31,8 +31,8 @@ config.section_("Data")
 
 config.Data.outputPrimaryDataset = 'TTbarSemileptonic_cbOnlyFromTbar_TuneCP5_13TeV-madgraphMLM-pythia8_FULLSIM'
 config.Data.splitting = 'EventBased'
-config.Data.unitsPerJob = 400
-NJOBS = 5000  # This is not a configuration parameter, but an auxiliary variable that we use in the next line.
+config.Data.unitsPerJob = 1250
+NJOBS = 10000  # This is not a configuration parameter, but an auxiliary variable that we use in the next line.
 config.Data.totalUnits = config.Data.unitsPerJob * NJOBS
 config.Data.outLFNDirBase = '/store/user/pviscone/'
 config.Data.publication = False

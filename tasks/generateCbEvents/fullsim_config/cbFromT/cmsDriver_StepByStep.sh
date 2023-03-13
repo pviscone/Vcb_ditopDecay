@@ -12,7 +12,7 @@ conditions="106X_upgrade2018_realistic_v11_L1v1"
 beamspot="Realistic25ns13TeVEarly2018Collision"
 geometry="DB:Extended"
 era="Run2_2018"
-n="400"
+n="1250"
 
 #Pileup and premix parameters
 pileup="dbs:/Neutrino_E-10_gun/RunIISummer20ULPrePremix-UL18_106X_upgrade2018_realistic_v11_L1v1-v2/PREMIX"
