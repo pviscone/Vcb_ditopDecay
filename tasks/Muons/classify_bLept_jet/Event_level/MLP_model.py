@@ -16,7 +16,7 @@ else:
 cpu = torch.device("cpu")
 device = torch.device(dev)
 
-class MLP(torch.nn.Module):
+class MLP_block(torch.nn.Module):
     def __init__(self, in_dim,out_dim,out_activation,hidden_arch=[10, 10]):
         super().__init__()
         self.layers=torch.nn.Sequential()
@@ -38,7 +38,7 @@ class MLP(torch.nn.Module):
         return self.layers(x)
 
 
-class AttentionNetwork(torch.nn.Module):
+class MLP(torch.nn.Module):
 
     def __init__(self, hidden_arch=[10, 10], embed_arch=[10,10,10],batch_size=1,
                  shuffle=False,
@@ -72,16 +72,7 @@ class AttentionNetwork(torch.nn.Module):
         self.n_inputs = x_train.shape[1]
         self.n_outputs = y_train.shape[1]
 
-        n_head=1
-        
-        self.embed1=MLP(self.x_train.shape[1],embed_arch[-1],torch.nn.Sigmoid(),hidden_arch=embed_arch[:-1])
-        self.embed2=MLP(self.x_train.shape[1],embed_arch[-1],torch.nn.Sigmoid(),hidden_arch=embed_arch[:-1])
-        self.embed3=MLP(self.x_train.shape[1],embed_arch[-1],torch.nn.Sigmoid(),hidden_arch=embed_arch[:-1])
-        
-        self.selfattention = torch.nn.MultiheadAttention(embed_arch[-1],num_heads=1)
-
-        self.norm = torch.nn.LayerNorm(embed_arch[-1])
-        self.feedforward = MLP(embed_arch[-1],int(torch.max(self.y_train)+1),torch.nn.LogSoftmax(dim=1),hidden_arch=[10, 10])
+        self.feedforward = MLP_block(self.x_train.shape[1],int(torch.max(self.y_train)+1),torch.nn.LogSoftmax(dim=1),hidden_arch)
 
         self.optim_dict = optim
         self.optimizer = torch.optim.Adam(self.parameters(), **self.optim_dict)
@@ -91,12 +82,8 @@ class AttentionNetwork(torch.nn.Module):
 
     def forward(self, x):
         x = (x-self.mean)/(self.std+1e-5)
-        embed1=self.embed1(x)
-        embed2=self.embed2(x)
-        embed3=self.embed3(x)
-        out,_=self.selfattention(embed1,embed2,embed3)
-        out=self.norm(out+embed1+embed2+embed3)
-        out= self.feedforward(out)
+
+        out= self.feedforward(x)
         return out
     
     def train_loop(self, epochs):
