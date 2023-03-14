@@ -78,13 +78,17 @@ del nu_pt, nu_eta, nu_phi, nu_pz
 pdgId_Wdecay= events.LHEPart.pdgId[:,[3,6]]
 #Mask for the leptonic decay of the W
 leptonic_LHE_mask=np.bitwise_or(pdgId_Wdecay==13,pdgId_Wdecay==-13)
+hadronic_LHE_mask=np.bitwise_not(leptonic_LHE_mask)
+
 
 bLept_LHE=events.LHEPart[:,[2,5]][leptonic_LHE_mask]
-bLept_Jet,deltaR = events.LHEPart.nearest(events.Jet,return_metric=True)
-bLept_Jet = bLept_Jet[:, [2, 5]][leptonic_LHE_mask]
-deltaR=deltaR[:, [2, 5]][leptonic_LHE_mask]
+near_Jet,deltaR = events.LHEPart.nearest(events.Jet,return_metric=True)
+bLept_Jet = near_Jet[:, [2, 5]][leptonic_LHE_mask]
 
-
+deltaRLept=deltaR[:, [2, 5]][leptonic_LHE_mask]
+deltaRHad=deltaR[:, [2, 5]][hadronic_LHE_mask]
+deltaRW1=deltaR[:, [3, 6]][hadronic_LHE_mask]
+deltaRW2=deltaR[:, [4, 7]][hadronic_LHE_mask]
 
 plt.title("Order in pt of the bLept jet")
 bLept_pt_order = ak.argmax(events.Jet.pt == bLept_Jet.pt, axis=1)
@@ -95,10 +99,13 @@ plt.xlabel("Order in pt")
 
 num_jet_to_select=7
 efficiency = len(bLept_pt_order[np.bitwise_and(bLept_pt_order <
-                 num_jet_to_select,deltaR<0.4)])/len(bLept_pt_order[deltaR<0.4])
+                 num_jet_to_select,deltaRLept<0.4)])/len(bLept_pt_order[deltaRLept<0.4])
 print(f"Percentage of events with the bLept jet in the first {num_jet_to_select} jets:{efficiency}")
 
-mask= np.bitwise_and(deltaR<0.4, bLept_pt_order < num_jet_to_select)
+mask=np.bitwise_and(deltaRLept<0.4, deltaRHad<0.4)
+mask=np.bitwise_and(mask, deltaRW1<0.4)
+mask=np.bitwise_and(mask, deltaRW2<0.4)
+mask= np.bitwise_and(mask, bLept_pt_order < num_jet_to_select)
 
 #%%
 events.Jet=events.Jet[:, :num_jet_to_select]
