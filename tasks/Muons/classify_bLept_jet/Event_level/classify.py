@@ -55,18 +55,22 @@ JPANet = JPA.JPANet
 
 
 model =JPANet(mu_data=mu_data,nu_data=nu_data,jet_data=jet_data,label=label,test_size=0.15,
-            mlp_arch=[50,50,50],  batch_size=20000, n_heads=2,
-            optim={"lr": 0.0005, "weight_decay": 0.00, },
-            early_stopping=None,shuffle=False,dropout=0.15,
+            mu_arch=None,nu_arch=None,jet_arch=None,
+            event_arch=[50,50],attention_arch=[50,50],final_arch=[50,50],
+              batch_size=20000, n_heads=1, dropout=0.15,
+            optim={"lr": 0.001, "weight_decay": 0.00, },
+            early_stopping=None,shuffle=False,
             )
 model = model.to(device)
 print(f"Number of parameters: {model.n_parameters()}")
 model.graph()
 #!---------------------Training---------------------
 
-model.train_loop(epochs=100)
+model.train_loop(epochs=500)
 
 #!---------------------Plot loss---------------------
 model.loss_plot()
 
 
+
+# %%

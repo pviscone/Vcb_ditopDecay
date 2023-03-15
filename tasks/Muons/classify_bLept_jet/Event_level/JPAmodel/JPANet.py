@@ -22,16 +22,18 @@ device = torch.device(dev)
 class JPANet(torch.nn.Module):
 
     def __init__(self,
+                 mu_arch=None, nu_arch=None, jet_arch=None, event_arch=None,
+                 attention_arch=None, final_arch=None,
                  mu_data=None, nu_data=None, jet_data=None, label=None,
-                 mlp_arch=None, batch_size=1, test_size=0.15, n_heads=1,
+                 batch_size=1, test_size=0.15, n_heads=1,
                  optim={}, early_stopping=None, shuffle=False, dropout=0.15):
         super().__init__()
         assert mu_data is not None
         assert nu_data is not None
         assert jet_data is not None
         assert label is not None
-        assert mlp_arch is not None
-
+        assert final_arch is not None
+        
         self.loss_fn = torch.nn.NLLLoss()
         self.early_stopping = early_stopping
 
@@ -55,26 +57,58 @@ class JPANet(torch.nn.Module):
         self.train_loss = np.array([])
 
         # Declare the layers here
-        mu_arch = [self.mu_train.shape[2]]+mlp_arch
-        self.mu_mlp = MLP(
-            arch=mu_arch, out_activation=torch.nn.LeakyReLU(0.1), dropout=dropout)
+        if mu_arch is not None:
+            mu_arch = [self.mu_train.shape[2]]+mu_arch
+            self.mu_mlp = MLP(
+                arch=mu_arch, out_activation=torch.nn.LeakyReLU(0.1), dropout=dropout)
+            after_mu = mu_arch[-1]
+        else:
+            self.mu_mlp=torch.nn.Identity()
+            after_mu = self.mu_train.shape[2]
+            
 
-        nu_arch = [self.nu_train.shape[2]]+mlp_arch
-        self.nu_mlp = MLP(
-            arch=nu_arch, out_activation=torch.nn.LeakyReLU(0.1), dropout=dropout)
+        if nu_arch is not None:
+            nu_arch = [self.nu_train.shape[2]]+nu_arch
+            self.nu_mlp = MLP(
+                arch=nu_arch, out_activation=torch.nn.LeakyReLU(0.1), dropout=dropout)
+            after_nu=nu_arch[-1]
+        else:
+            self.nu_mlp=torch.nn.Identity()
+            after_nu=self.nu_train.shape[2]
 
-        self.mu_nu_norm = torch.nn.LayerNorm(mlp_arch[-1])
-        self.ev_mlp = MLP(arch=[mlp_arch[-1]*2]+mlp_arch,
-                          out_activation=torch.nn.LeakyReLU(0.1), dropout=dropout)
+        self.mu_nu_norm = torch.nn.LayerNorm(after_nu+after_mu)
+        
+        if event_arch is not None:
+            event_arch=[after_nu+after_mu]+event_arch
+            self.ev_mlp = MLP(arch=event_arch,
+                            out_activation=torch.nn.LeakyReLU(0.1), dropout=dropout)
+        else:
+            event_arch=[after_nu+after_mu]
+            self.ev_mlp = torch.nn.Identity()
 
-        self.mlp_jet = MLP(arch=[self.jet_train.shape[2]]+mlp_arch,
+        if jet_arch is not None:
+            jet_arch = [self.jet_train.shape[2]]+jet_arch
+            self.mlp_jet = MLP(arch=[self.jet_train.shape[2]]+jet_arch,
                            out_activation=torch.nn.LeakyReLU(0.1), dropout=dropout)
+            after_jet = jet_arch[-1]
+        else:
+            self.mlp_jet = torch.nn.Identity()
+            after_jet = self.jet_train.shape[2]
+
+
+        if attention_arch is not None:
+            attention_arch = [after_jet]+attention_arch
+            after_attention = attention_arch[-1]
+        else:
+            attention_arch = None
+            after_attention = after_jet
 
         self.attention = Attention(
-            input_dim=mlp_arch[-1], mlp_arch=mlp_arch, n_heads=n_heads, dropout=dropout)
+            input_dim=after_jet, mlp_arch=attention_arch, n_heads=n_heads, dropout=dropout)
 
-        self.total_norm = torch.nn.LayerNorm(mlp_arch[-1]*2)
-        self.total_mlp = MLP(arch=[mlp_arch[-1]*2]+mlp_arch+[1],
+        final_arch = [event_arch[-1]+after_attention]+final_arch+[1]
+        self.total_norm = torch.nn.LayerNorm(final_arch[0])
+        self.total_mlp = MLP(arch=final_arch,
                              out_activation=torch.nn.LogSoftmax(dim=1), dropout=dropout)
 
         self.optim_dict = optim
@@ -201,7 +235,7 @@ class JPANet(torch.nn.Module):
 
     def graph(self):
         model_graph = draw_graph(self, input_data=[
-                                 self.mu_test[:self.batch_size], self.nu_test[:self.batch_size], self.jet_test[:self.batch_size]], expand_nested=True)
+                                 self.mu_test[:self.batch_size], self.nu_test[:self.batch_size], self.jet_test[:self.batch_size]], expand_nested=True,depth=5)
         return model_graph.visual_graph
 
     def n_parameters(self):
