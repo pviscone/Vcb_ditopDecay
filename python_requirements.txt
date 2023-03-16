@@ -10,3 +10,4 @@ pandas
 seaborn
 tqdm
 scikit-learn
+torchview
