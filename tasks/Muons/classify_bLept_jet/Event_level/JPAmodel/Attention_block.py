@@ -12,7 +12,10 @@ class Attention(torch.nn.Module):
         self.norm1 = torch.nn.LayerNorm(input_dim)
         self.attention = torch.nn.MultiheadAttention(
             embed_dim=input_dim, num_heads=n_heads,batch_first=True)
-        self.dropout = torch.nn.Dropout(dropout)
+        if dropout is not None:
+            self.dropout = torch.nn.Dropout(dropout)
+        else:
+            self.dropout = torch.nn.Identity()
         self.norm2 = torch.nn.LayerNorm(input_dim)
         if mlp_arch is not None:
             mlp_arch.insert(0, input_dim)
