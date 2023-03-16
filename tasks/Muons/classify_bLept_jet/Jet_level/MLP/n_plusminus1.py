@@ -52,7 +52,10 @@ data_df = data_df.loc[:, data_df.columns != "event_id"]
 _,event_id_test,= train_test_split(event_id,test_size=test_size,shuffle=False)
 
 
+#%%
+#! ------------------Single-------------------
 
+eff=train(data_df, label, event_id_test, test_size=test_size)
 # %%
 #!------------------N-1-------------------
 
