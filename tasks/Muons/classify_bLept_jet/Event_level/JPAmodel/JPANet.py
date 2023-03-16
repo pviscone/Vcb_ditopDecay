@@ -6,7 +6,12 @@ import matplotlib.pyplot as plt
 from Attention_block import Attention
 from MLP import MLP
 from torchview import draw_graph
-#from torch.utils.data.dataloader import default_collate
+
+from livelossplot import PlotLosses
+
+from ipywidgets import Output
+from IPython.display import display
+
 
 
 # enable gpu if available
@@ -33,6 +38,10 @@ class JPANet(torch.nn.Module):
         assert jet_data is not None
         assert label is not None
         assert final_arch is not None
+        
+        self.liveloss = PlotLosses(
+            groups={'Loss': ['train_loss', 'test_loss'], 'Acccuracy': ['test_accuracy'], })
+        self.log={}
         
         self.loss_fn = torch.nn.NLLLoss()
         self.early_stopping = early_stopping
@@ -117,6 +126,7 @@ class JPANet(torch.nn.Module):
         self.train_accuracy = []
         self.test_accuracy = []
 
+
     def forward(self, mu, nu, jet):
         mu = (mu-self.mu_mean)/(self.mu_std+1e-5)
         nu = (nu-self.nu_mean)/(self.nu_std+1e-5)
@@ -135,9 +145,11 @@ class JPANet(torch.nn.Module):
         total_out = self.total_mlp(total_out)
         return total_out
 
-    def train_loop(self, epochs):
+    def train_loop(self, epochs,show_each=False):
         epoch_loop = tqdm(range(epochs), desc="epoch")
 
+        out = Output()
+        display(out)
         for epoch in epoch_loop:
             self.train()
             mu_train = self.mu_train
@@ -184,8 +196,7 @@ class JPANet(torch.nn.Module):
 
                 test_loss_step = self.loss_fn(
                     test_logits, self.y_test.squeeze())
-                print(
-                    f"Test loss: {test_loss_step.to(cpu).numpy()}, Train loss: {train_loss_step.to(cpu).numpy()}")
+                #print(f"Test loss: {test_loss_step.to(cpu).numpy()}, Train loss: {train_loss_step.to(cpu).numpy()}")
                 self.test_loss = np.append(
                     self.test_loss, test_loss_step.to(cpu).numpy())
 
@@ -198,6 +209,21 @@ class JPANet(torch.nn.Module):
                 self.test_accuracy.append(
                     classified_test.sum().item()/len(classified_test))
 
+                    
+                    
+                    
+                if(show_each):
+
+                    self.log["train_loss"]=self.train_loss[-1]
+                    self.log["test_loss"]=self.test_loss[-1]
+                    self.log["test_accuracy"]=self.test_accuracy[-1]
+                    with out:
+                        self.liveloss.update(self.log)
+                        if(epoch%show_each==0):
+                            self.liveloss.send()
+                            self.liveloss.draw()
+                    
+                    
                 #classified_train=torch.argmax(self(self.x_train),dim=1) == self.y_train.squeeze()
 
                 # self.train_accuracy.append(classified_train.sum().item()/len(classified_train))
@@ -216,6 +242,8 @@ class JPANet(torch.nn.Module):
                         if np.mean(self.test_loss[-patience:]) > np.mean(self.test_loss[-2*patience:-patience]):
                             print("Early stopping: test loss increasing")
                             break
+
+
 
     def loss_plot(self):
         plt.figure(figsize=(10, 5))

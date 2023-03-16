@@ -11,3 +11,4 @@ seaborn
 tqdm
 scikit-learn
 torchview
+livelossplot
