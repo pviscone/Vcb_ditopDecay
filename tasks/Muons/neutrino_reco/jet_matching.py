@@ -403,6 +403,7 @@ df=pd.DataFrame()
 #Save only the events in which the leptonic b jet is distant less than 0.4 from the LHE leptonic b jet
 Jet_pt=events.Jet.pt[deltaR_mask]
 Jet_eta=events.Jet.eta[deltaR_mask]
+Jet_phi=events.Jet.phi[deltaR_mask]
 Jet_mass = events.Jet.mass[deltaR_mask]
 Jet_btag=events.Jet.btagDeepFlavB[deltaR_mask]
 Jet_CvBtag=events.Jet.btagDeepFlavCvB[deltaR_mask]
@@ -446,6 +447,7 @@ features = ak.zip(
     {
     "Jet_pt":Jet_pt,
     "Jet_eta":Jet_eta,
+    "Jet_phi":Jet_phi,
     "Jet_mass":Jet_mass,
     "Jet_btag": Jet_btag,
     "Jet_CvBtag": Jet_CvBtag,
