@@ -33,6 +33,12 @@ The tutorial about event generation is [here](../../tutorials/EventGeneration.md
 > - [cbFromT Grafana](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230311_154702%3Apviscone_crab_TTbarSemileptonic_cbOnlyFromT_TuneCP5_13TeV-madgraphMLM-pythia8_FULLSIM&from=1678546022000&to=now)
 > 
 > - [cbFromTbar Grafana](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230313_095351%3Apviscone_crab_TTbarSemileptonic_cbOnlyFromTbar_TuneCP5_13TeV-madgraphMLM-pythia8_FULLSIM&from=1678697631000&to=now)
+> 
+> ### Only muons
+> 
+> - [cbFromT Muons Grafana](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230317_143933%3Apviscone_crab_TTbarSemileptonic_cbOnlyFromT_Muon&from=1679060373000&to=now)
+> 
+> - [cbFromTbar Muon Grafana](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230317_144508%3Apviscone_crab_TTbarSemileptonic_cbOnlyFromTbar_Muon&from=1679060708000&to=now)
 
 # How to run it
 
