@@ -15,7 +15,7 @@ from sklearn import datasets
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.metrics import classification_report, roc_auc_score
-
+import sklearn as sk
 
 
 # %%
@@ -30,6 +30,11 @@ device = torch.device(dev)
 
 df = pd.read_pickle("../Jet_features.pkl", compression="bz2")
 
+#df = df.drop(columns=["Jet_mass", "max_dEta_Jets","min_dEta_Jets", "min_dPhi_Jets", "max_dPhi_Jets", "dEta_Jet_nu", "dPhi_Jet_nu", "Jet_btag"])
+
+df=df[["Jet_CvBtag","dPhi_Jet_mu","Jet_pt","dEta_Jet_mu","dPhi_Jet_nu","min_dEta_Jets","T_mass","Jet_eta","Jet_phi","label","event_id"]]
+
+
 # [a,b]: a=non leptonic, b=leptonic
 label = np.expand_dims(df["label"].astype(float).to_numpy(), axis=1)
 ohe = OneHotEncoder()
@@ -37,6 +42,7 @@ ohe.fit(label)
 label = ohe.transform(label).toarray()
 
 data_df = df.loc[:, df.columns != "label"]
+
 test_size = 0.5
 
 
@@ -57,36 +63,28 @@ y_train = train_label[:,1]
 X_test = test_data.to_numpy()
 y_test = test_label[:,1]
 
-dt = DecisionTreeClassifier(max_depth=3,
+dt = DecisionTreeClassifier(max_depth=20,
                             min_samples_leaf=2)
 bdt = AdaBoostClassifier(dt,
                          algorithm='SAMME',
-                         n_estimators=8,
+                         n_estimators=10,
                          learning_rate=0.5)
 
 bdt.fit(X_train, y_train)
 
 
-y_predicted = bdt.predict(X_test)
-print(classification_report(y_test, y_predicted,target_names=["background", "signal"]))
-print(f"Area under ROC curve: {(roc_auc_score(y_test,bdt.decision_function(X_test)))}")
-
+y_prob=bdt.predict_proba(X_test)[:,1]
 
 # %%
+res=test_data.copy()
+res["score"] = y_prob
+res["label"] = test_label[:, 1]
+idx=res.groupby(level=0)["score"].idxmax()
+efficiency = res["label"][idx].sum()/len(idx)
+print(f"Efficiency: {efficiency}")
+# %%
 
-decisions = bdt.decision_function(X_test)
-# Compute ROC curve and area under the curve
-fpr, tpr, thresholds = roc_curve(y_test, decisions)
-roc_auc = auc(fpr, tpr)
+#plt.figure(dpi=1000)
+#sk.tree.plot_tree(bdt[0])
 
-plt.plot(fpr, tpr, lw=1, label='ROC (area = %0.2f)' % (roc_auc))
-
-plt.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6), label='Luck')
-plt.xlim([-0.05, 1.05])
-plt.ylim([-0.05, 1.05])
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('Receiver operating characteristic')
-plt.legend(loc="lower right")
-plt.grid()
-plt.show()
+# %%
