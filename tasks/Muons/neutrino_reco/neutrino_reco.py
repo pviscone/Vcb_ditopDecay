@@ -1,6 +1,7 @@
 #%% Includes and function definitions
 #%load_ext autoreload
 #%autoreload 2
+from coffea.nanoevents.methods import vector
 import sys
 
 sys.path.append("../../../utils")
@@ -15,13 +16,14 @@ from histogrammer import Histogrammer
 import mplhep as hep
 import matplotlib as mpl
 import matplotlib.colors as mcolors
+import awkward as ak
+
 
 
 plt.style.use(hep.style.CMS)
 signal = uproot.open(
     "../TTbarSemileptonic_cbOnly_pruned_optimized_MuonSelection.root")["Events"]
-background = uproot.open(
-    "../TTbarSemileptonic_Nocb_MuonSelection.root")["Events"]
+#background = uproot.open("../TTbarSemileptonic_Nocb_MuonSelection.root")["Events"]
 
 
 def get(key, numpy=True, library="pd"):
@@ -118,14 +120,30 @@ np.save("nu_pz_det_mask",nu_pz[2]) """
 #%% W mass
 #You shoul vectorize this function. Maybe there is something else than ROOT.Math.PtEtaPhiMVector
 def Wmass(lept_pt, lept_eta, lept_phi, MET_pt, MET_phi, nu_pz, lept_mass=0.105):
-    Wmass_array = []
-    for i in range(len(nu_pz)):
-        mu_4V = ROOT.Math.PtEtaPhiMVector(
-            lept_pt[i], lept_eta[i], lept_phi[i], lept_mass)
-        nu_4V = ROOT.Math.PtEtaPhiMVector(MET_pt[i], np.arcsinh(
-            nu_pz[i]/MET_pt[i]), MET_phi[i], 0)
-        Wmass_array.append((mu_4V+nu_4V).M())
-    return np.array(Wmass_array)
+    nu_4V = ak.zip(
+        {
+            "pt": MET_pt,
+            "eta": np.arcsinh(nu_pz/MET_pt),
+            "phi": MET_phi,
+            "mass": np.zeros_like(MET_pt),
+        },
+        with_name="PtEtaPhiMLorentzVector",
+        behavior=vector.behavior,
+    )
+    
+    mu_4V = ak.zip(
+        {
+            "pt": lept_pt,
+            "eta": lept_eta,
+            "phi": lept_phi,
+            "mass": np.ones_like(lept_pt)*0.105,
+        },
+        with_name="PtEtaPhiMLorentzVector",
+        behavior=vector.behavior,
+    )
+    
+    Wmass=ak.to_numpy((nu_4V+mu_4V).mass)
+    return Wmass
 
 
 
