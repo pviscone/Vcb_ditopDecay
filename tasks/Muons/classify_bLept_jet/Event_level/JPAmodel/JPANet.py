@@ -31,6 +31,7 @@ class JPANet(torch.nn.Module):
                  attention_arch=None, final_arch=None, final_attention=False,
                  mu_data=None, nu_data=None, jet_data=None, label=None,
                  batch_size=1, test_size=0.15, n_heads=1,
+                 weight=None,
                  optim={}, early_stopping=None, shuffle=False, dropout=0.15):
         super().__init__()
         assert mu_data is not None
@@ -40,10 +41,10 @@ class JPANet(torch.nn.Module):
         assert final_arch is not None
         
         self.liveloss = PlotLosses(
-            groups={'Loss': ['train_loss', 'test_loss'], 'Acccuracy': ['test_accuracy'], })
+            groups={'Loss': ['train_loss', 'test_loss'], 'Acccuracy': ['train_accuracy','test_accuracy'], })
         self.log={}
         
-        self.loss_fn = torch.nn.NLLLoss()
+        self.loss_fn = torch.nn.NLLLoss(weight=weight)
         self.early_stopping = early_stopping
 
         self.mu_train, self.mu_test, self.nu_train, self.nu_test, self.jet_train, self.jet_test, self.y_train, self.y_test = train_test_split(
@@ -208,6 +209,11 @@ class JPANet(torch.nn.Module):
                 self.test_accuracy.append(
                     classified_test.sum().item()/len(classified_test))
 
+
+                idx=np.random.choice(range(self.y_train.shape[0]),self.y_test.shape[0],replace=False)
+                classified_train=torch.argmax(self(self.mu_train[idx],self.nu_train[idx],self.jet_train[idx]),dim=1) == self.y_train[idx]
+                
+                self.train_accuracy.append(classified_train.sum().item()/len(classified_train))
                     
                     
                     
@@ -216,6 +222,7 @@ class JPANet(torch.nn.Module):
                     self.log["train_loss"]=self.train_loss[-1]
                     self.log["test_loss"]=self.test_loss[-1]
                     self.log["test_accuracy"]=self.test_accuracy[-1]
+                    self.log["train_accuracy"]=self.train_accuracy[-1]
                     with out:
                         self.liveloss.update(self.log)
                         if(epoch%show_each==0):
