@@ -27,8 +27,8 @@ device = torch.device(dev)
 class JPANet(torch.nn.Module):
 
     def __init__(self,
-                 mu_arch=None, nu_arch=None, jet_arch=None, event_arch=None,
-                 attention_arch=None, final_arch=None,
+                 mu_arch=None, nu_arch=None, jet_arch=None, event_arch=None, prefinal_arch=None,
+                 attention_arch=None, final_arch=None, final_attention=False,
                  mu_data=None, nu_data=None, jet_data=None, label=None,
                  batch_size=1, test_size=0.15, n_heads=1,
                  optim={}, early_stopping=None, shuffle=False, dropout=0.15):
@@ -55,9 +55,11 @@ class JPANet(torch.nn.Module):
         self.nu_std = self.nu_train.std(axis=0)
         self.jet_mean = self.jet_train.mean(axis=0)
         self.jet_std = self.jet_train.std(axis=0)
+        
+        self.jet_test[self.jet_test==0]=-10
+        self.jet_train[self.jet_train==0]=-10
 
         self.n_events_train = self.mu_train.shape[0]
-
         self.shuffle_at_each_epoch = shuffle
         self.batch_size = batch_size
         self.n_batch = np.ceil(self.mu_train.shape[0]/batch_size).astype(int)
@@ -67,58 +69,52 @@ class JPANet(torch.nn.Module):
 
         # Declare the layers here
         if mu_arch is not None:
-            mu_arch = [self.mu_train.shape[2]]+mu_arch
-            self.mu_mlp = MLP(
-                arch=mu_arch, out_activation=torch.nn.LeakyReLU(0.1), dropout=dropout)
-            after_mu = mu_arch[-1]
+            self.mu_mlp = MLP(arch=mu_arch, out_activation=torch.nn.LeakyReLU(0.1), dropout=dropout)
         else:
             self.mu_mlp=torch.nn.Identity()
-            after_mu = self.mu_train.shape[2]
-            
 
+        
         if nu_arch is not None:
-            nu_arch = [self.nu_train.shape[2]]+nu_arch
-            self.nu_mlp = MLP(
-                arch=nu_arch, out_activation=torch.nn.LeakyReLU(0.1), dropout=dropout)
-            after_nu=nu_arch[-1]
+            self.nu_mlp = MLP(arch=nu_arch, out_activation=torch.nn.LeakyReLU(0.1), dropout=dropout)
+
         else:
             self.nu_mlp=torch.nn.Identity()
-            after_nu=self.nu_train.shape[2]
 
-        self.mu_nu_norm = torch.nn.LayerNorm(after_nu+after_mu)
+
+        self.mu_nu_norm = torch.nn.LayerNorm(event_arch[0])
         
         if event_arch is not None:
-            event_arch=[after_nu+after_mu]+event_arch
-            self.ev_mlp = MLP(arch=event_arch,
-                            out_activation=torch.nn.LeakyReLU(0.1), dropout=dropout)
+            self.ev_mlp = MLP(arch=event_arch,out_activation=torch.nn.LeakyReLU(0.1), dropout=dropout)
         else:
-            event_arch=[after_nu+after_mu]
             self.ev_mlp = torch.nn.Identity()
 
         if jet_arch is not None:
-            jet_arch = [self.jet_train.shape[2]]+jet_arch
-            self.mlp_jet = MLP(arch=[self.jet_train.shape[2]]+jet_arch,
-                           out_activation=torch.nn.LeakyReLU(0.1), dropout=dropout)
-            after_jet = jet_arch[-1]
+            self.mlp_jet = MLP(arch=jet_arch,out_activation=torch.nn.LeakyReLU(0.1), dropout=dropout)
+            attention_input_dim = jet_arch[-1]
         else:
             self.mlp_jet = torch.nn.Identity()
-            after_jet = self.jet_train.shape[2]
+            attention_input_dim = self.jet_train.shape[2]
 
-
+        
         if attention_arch is not None:
-            attention_arch = [after_jet]+attention_arch
-            after_attention = attention_arch[-1]
+            self.attention = Attention(input_dim=attention_input_dim, mlp_arch=attention_arch, n_heads=n_heads, dropout=dropout)
         else:
-            attention_arch = None
-            after_attention = after_jet
+            self.attention = torch.nn.Identity()
 
-        self.attention = Attention(
-            input_dim=after_jet, mlp_arch=attention_arch, n_heads=n_heads, dropout=dropout)
 
-        final_arch = [event_arch[-1]+after_attention]+final_arch+[1]
-        self.total_norm = torch.nn.LayerNorm(final_arch[0])
-        self.total_mlp = MLP(arch=final_arch,
-                             out_activation=torch.nn.LogSoftmax(dim=1), dropout=dropout)
+        if prefinal_arch is not None:
+            self.prefinal_mlp = MLP(arch=prefinal_arch, out_activation=torch.nn.LeakyReLU(0.1), dropout=dropout)
+        else:
+            self.prefinal_mlp = torch.nn.Identity()
+
+        if final_attention:
+            self.total_norm=torch.nn.Identity()
+            self.total = Attention(input_dim=final_arch[0], mlp_arch=final_arch, n_heads=n_heads, dropout=dropout)
+        else:
+            self.total_norm = torch.nn.LayerNorm(final_arch[0])
+            self.total = MLP(arch=final_arch, out_activation=torch.nn.LeakyReLU(0.1), dropout=dropout)
+    
+        self.output=MLP(arch=[final_arch[-1],1],out_activation=torch.nn.LogSoftmax(dim=1), dropout=None)
 
         self.optim_dict = optim
         self.optimizer = torch.optim.Adam(self.parameters(), **self.optim_dict)
@@ -142,7 +138,9 @@ class JPANet(torch.nn.Module):
         out_jet = self.attention(out_jet)
         out_ev = out_ev.repeat((1, jet.shape[1], 1))
         total_out = self.total_norm(torch.cat((out_ev, out_jet), dim=2))
-        total_out = self.total_mlp(total_out)
+        total_out = self.prefinal_mlp(total_out)
+        total_out = self.total(total_out)
+        total_out = self.output(total_out)
         return total_out
 
     def train_loop(self, epochs,show_each=False):
@@ -181,9 +179,10 @@ class JPANet(torch.nn.Module):
                     y_batch = y_train[i*self.batch_size:self.n_events_train]
 
                 y_logits = self.forward(
-                    mu_batch, nu_batch, jet_batch).squeeze()
+                    mu_batch, nu_batch, jet_batch)
+                
                 train_loss_step = self.loss_fn(
-                    y_logits.squeeze(), y_batch.squeeze())
+                    y_logits, y_batch)
                 self.optimizer.zero_grad()
                 train_loss_step.backward()
                 self.optimizer.step()
@@ -192,10 +191,10 @@ class JPANet(torch.nn.Module):
             with torch.inference_mode():
 
                 test_logits = self.forward(
-                    self.mu_test, self.nu_test, self.jet_test).squeeze()
+                    self.mu_test, self.nu_test, self.jet_test)
 
                 test_loss_step = self.loss_fn(
-                    test_logits, self.y_test.squeeze())
+                    test_logits, self.y_test)
                 #print(f"Test loss: {test_loss_step.to(cpu).numpy()}, Train loss: {train_loss_step.to(cpu).numpy()}")
                 self.test_loss = np.append(
                     self.test_loss, test_loss_step.to(cpu).numpy())
@@ -204,7 +203,7 @@ class JPANet(torch.nn.Module):
                     self.train_loss, train_loss_step.to(cpu).numpy())
 
                 classified_test = torch.argmax(
-                    test_logits, dim=1) == self.y_test.squeeze()
+                    test_logits, axis=1) == self.y_test
 
                 self.test_accuracy.append(
                     classified_test.sum().item()/len(classified_test))
