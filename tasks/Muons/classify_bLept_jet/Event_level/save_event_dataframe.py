@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import awkward as ak
 from coffea.nanoevents.methods import vector
 from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
+from matplotlib.patches import Circle
 
 events = NanoEventsFactory.from_root(
     "../../TTbarSemileptonic_cbOnly_pruned_optimized_MuonSelection.root",
@@ -89,14 +90,18 @@ hadronic_LHE_mask=np.bitwise_not(leptonic_LHE_mask)
 
 #*Define Jet objects
 
+bLept_LHE = events.LHEPart[:, [2, 5]][leptonic_LHE_mask]
+bHad_LHE = events.LHEPart[:, [2, 5]][hadronic_LHE_mask]
+Wb_LHE = events.LHEPart[:, [4, 6]][hadronic_LHE_mask]
+Wc_LHE = events.LHEPart[:, [3, 7]][hadronic_LHE_mask]
+
+
 near_Jet,deltaR = events.LHEPart.nearest(events.Jet,return_metric=True)
 bLept_Jet = near_Jet[:, [2, 5]][leptonic_LHE_mask]
 bHad_Jet = near_Jet[:, [2, 5]][hadronic_LHE_mask]
 Wb_Jet= near_Jet[:, [4, 6]][hadronic_LHE_mask]
 Wc_Jet= near_Jet[:, [3, 7]][hadronic_LHE_mask]
 
-
-#! Replace W1,W2 with the cW, bW
 
 #*Compute the deltaR between the LHE and the Jet
 deltaRLept=deltaR[:, [2, 5]][leptonic_LHE_mask]
@@ -122,26 +127,33 @@ Wc_pt_order = ak.argmin(events.Jet.delta_r(Wc_Jet), axis=1)
 
 plt.figure()
 
-same_match = np.array([ak.sum(bLept_pt_order[Rmask] == bHad_pt_order[Rmask]),
-                       ak.sum(bLept_pt_order[Rmask] == Wb_pt_order[Rmask]),
-                       ak.sum(bLept_pt_order[Rmask] == Wc_pt_order[Rmask]),
-                       ak.sum(bHad_pt_order[Rmask] == Wb_pt_order[Rmask]),
-                       ak.sum(bHad_pt_order[Rmask] == Wc_pt_order[Rmask]),
-                       ak.sum(Wb_pt_order[Rmask] == Wc_pt_order[Rmask])
+same_match = np.array([
+    ak.sum(bLept_pt_order[Rmask] == bHad_pt_order[Rmask]),
+    ak.sum(bLept_pt_order[Rmask] == Wb_pt_order[Rmask]),
+    ak.sum(bLept_pt_order[Rmask] == Wc_pt_order[Rmask]),
+    ak.sum(bHad_pt_order[Rmask] == Wb_pt_order[Rmask]),
+    ak.sum(bHad_pt_order[Rmask] == Wc_pt_order[Rmask]),
+    ak.sum(Wb_pt_order[Rmask] == Wc_pt_order[Rmask])
 ])
 same_match=same_match/n_ev
 lab=["bLept==bHad","bLept==Wb","bLept==Wc","bHad==Wb","bHad==Wc","Wb==Wc"]
 
-plt.bar(lab,width=same_match)
+plt.barh(lab,width=same_match)
 
-same_match_matrix=np.array([(bLept_pt_order[Rmask] == bHad_pt_order[Rmask]),
+same_match_matrix=np.array([
+                    (bLept_pt_order[Rmask] == bHad_pt_order[Rmask]),
                     (bLept_pt_order[Rmask] == Wb_pt_order[Rmask]),
                     (bLept_pt_order[Rmask] == Wc_pt_order[Rmask]),
                     (bHad_pt_order[Rmask] == Wb_pt_order[Rmask]),
                     (bHad_pt_order[Rmask] == Wc_pt_order[Rmask]),
                     (Wb_pt_order[Rmask] == Wc_pt_order[Rmask])]).T
 
-print(f"Fraction of event with at least 2 jet matching to the same parton: {np.bitwise_or.reduce(same_match_matrix, 1).sum()/n_ev}")
+
+same_match_array = np.bitwise_or.reduce(same_match_matrix, axis=1)
+same_match_idx = np.where(same_match_array)
+
+
+print(f"Fraction of event with at least 2 jet matching to the same parton: {len(same_match_idx[0])/n_ev}")
 
 assert ak.sum(bLept_pt_order==bHad_pt_order)==0
 assert ak.sum(bLept_pt_order==Wb_pt_order)==0
@@ -185,7 +197,8 @@ events.Neutrino = nu_4Vect[mask]
 
 bLept_Jet = bLept_Jet[mask]
 bHad_Jet = bHad_Jet[mask]
-
+Wb_Jet = Wb_Jet[mask]
+Wc_Jet = Wc_Jet[mask]
 
 #*Compute some invariant masses
 events.Muon = events.Muon[:, 0]
@@ -213,3 +226,83 @@ event_matrix=np.hstack([muon_matrix,nu_matrix,jet_matrix,bLept_label,bHad_label,
 event_df=pd.DataFrame(event_matrix,columns=col_labels)
 #event_df.to_pickle("./event_df.pkl", compression="bz2")
 # %%
+
+#!Plot all the event which have multiple parton matching to the same jet
+events.GenJet=events.GenJet[events.GenJet.pt>20]
+
+lab_list = ["bLept", "bHad", "Wc", "Wb"]
+color_list = ["green", "coral", "blue", "fuchsia"]
+
+
+def circle(ax,x,y,color,label=None,fill=False,alpha=0.4,radius=0.4):
+    ax.add_patch(Circle((x, y),radius=radius, color=color, label=label, alpha=alpha,fill=fill))
+    ax.add_patch(Circle((x, y-6.28),radius=radius, color=color, label=None, alpha=alpha,fill=fill))
+    ax.add_patch(Circle((x, y+6.28),radius=radius, color=color, label=None, alpha=alpha,fill=fill))
+
+Jet_masked=events.Jet[Rmask]
+GenJet_masked=events.GenJet[Rmask]
+for ev in same_match_idx[0]:
+    print(ev)
+
+    LHE_list = [bLept_LHE[Rmask][ev], bHad_LHE[Rmask][ev], Wc_LHE[Rmask][ev], Wb_LHE[Rmask][ev]]
+    jet_list = [bLept_Jet[Rmask][ev], bHad_Jet[Rmask][ev], Wc_Jet[Rmask][ev], Wb_Jet[Rmask][ev]]
+        
+    
+    fig, ax = plt.subplots(figsize=(10,6))
+
+    for i in range(len(Jet_masked[ev])):
+        lab="Jet" if i ==0 else None
+        circle(ax,Jet_masked.eta[ev, i],Jet_masked.phi[ev, i],"red",label=lab)
+        
+    for i in range(len(GenJet_masked[ev])):
+        lab ="GenJet" if i ==0 else None
+        circle(ax,GenJet_masked.eta[ev, i],GenJet_masked.phi[ev, i],"blue",label=lab)
+
+    for i in range(len (LHE_list)):
+        ax.plot(LHE_list[i].eta,LHE_list[i].phi,".",color=color_list[i],markersize=12, label=f"{lab_list[i]}_LHE",alpha=1)
+        circle(ax, jet_list[i].eta, jet_list[i].phi, color_list[i], label=f"{lab_list[i]}_Jet", fill=True,alpha=0.3)
+
+    plt.title(f"Jet-GenJet matching: ev {ev}")
+    plt.xlim(-6, 6)
+    plt.ylim(-3.14, 3.14)
+    plt.grid(ls="--")
+    plt.xlabel("$\eta$")
+    plt.ylabel("$\phi$")
+    plt.legend(bbox_to_anchor=(1.21, 1.))
+    plt.subplots_adjust(left=0.1, right=0.75, top=0.85, bottom=0.15)
+    plt.savefig(f"./images/same_match_ev_{ev}.png")
+    #plt.show()
+# %%
+#!Inspect why the Wc match more often with the bLept than with the bHad
+dR_bLept_Wc = bLept_LHE[Rmask].delta_r(Wc_LHE[Rmask])
+dR_bHad_Wc = bHad_LHE[Rmask].delta_r(Wc_LHE[Rmask])
+dR_bLept_Wb = bLept_LHE[Rmask].delta_r(Wb_LHE[Rmask])
+dR_bHad_Wb = bHad_LHE[Rmask].delta_r(Wb_LHE[Rmask])
+
+plt.figure(figsize=(14,6))
+plt.subplot(1,2,1)
+plt.hist((dR_bLept_Wb), 50, alpha=0.7, label="$\Delta$R bLept-$W_b$")
+plt.hist((dR_bHad_Wb), 50, alpha=0.7, label="$\Delta$R bHad-$W_b$")
+plt.legend()
+plt.xlabel("$\Delta R$")
+plt.xlim(0, 4)
+plt.subplot(1,2,2)
+plt.hist((dR_bLept_Wc), 50, alpha=0.7, label="$\Delta$R bLept-$W_c$")
+plt.hist((dR_bHad_Wc), 50, alpha=0.7, label="$\Delta$R bHad-$W_c$")
+plt.legend()
+plt.xlabel("$\Delta R$")
+plt.xlim(0, 4)
+
+print(
+    f"Fraction of event with dR bLept-Wc<bHad-Wc {ak.sum(dR_bLept_Wc<dR_bHad_Wc)/len(dR_bLept_Wc)}")
+
+print(
+    f"Fraction of event with dR bLept-Wc<0.4 {len(dR_bLept_Wc[dR_bLept_Wc<0.4])/len(dR_bLept_Wc)}")
+
+
+print(f"Fraction of event with dR bHad-Wc<0.4 {len(dR_bHad_Wc[dR_bHad_Wc<0.4])/len(dR_bHad_Wc)}")
+
+print(f"mean dR bLept-Wc {ak.mean(dR_bLept_Wc)}")
+print(f"mean dR bHad-Wc {ak.mean(dR_bHad_Wc)}")
+print(f"mean dR bLept-Wc dR<0.4 {ak.mean(dR_bLept_Wc[dR_bLept_Wc<0.4])}")
+print(f"mean dR bHad-Wc dR<0.4 {ak.mean(dR_bHad_Wc[dR_bHad_Wc<0.4])}")
