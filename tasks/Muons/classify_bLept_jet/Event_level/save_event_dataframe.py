@@ -56,7 +56,7 @@ def pad_and_alternate(obj,variable_list,pad):
 def np_and(*args):
     res=args[0]
     for arg in args[1:]:
-        res=np.bitwise_and(arg, args[0])
+        res=np.bitwise_and(arg, res)
     return res
 
 nu_pz = np.load("../../neutrino_reco/nu_pz.npy")
