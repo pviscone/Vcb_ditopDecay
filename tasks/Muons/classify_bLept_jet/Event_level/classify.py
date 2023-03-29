@@ -19,14 +19,14 @@ else:
 cpu = torch.device("cpu")
 device = torch.device(dev)
 
-jets_per_event = 7
+jets_per_event = 6
 
 df = pd.read_pickle("./event_df.pkl", compression="bz2")
 
 weights=[0.]
 
 
-label=np.expand_dims(df["label"].astype(int).to_numpy(), axis=1)
+label=np.expand_dims(df["bLept_label"].astype(int).to_numpy(), axis=1)
 
 weights = np.histogram(label.squeeze(), density=True, range=(0, jets_per_event), bins=jets_per_event)[0]
 weights=torch.tensor(weights,dtype=torch.float32, device=device)
