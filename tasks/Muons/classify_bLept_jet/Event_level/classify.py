@@ -64,15 +64,15 @@ nu_feat=nu_data.shape[2]
 jet_feat=jet_data.shape[2]
 
 model =JPANet(mu_data=mu_data,nu_data=nu_data,jet_data=jet_data,label=label,test_size=0.15,weight=None,
-            mu_arch=None,nu_arch=None,jet_arch=[jet_feat,50,50],
-            attention_arch=[50, 50],
-            event_arch=[mu_feat+nu_feat,50,50],
+            mu_arch=None,nu_arch=None,jet_arch=[jet_feat,100,50],
+            attention_arch=[100,50],
+            event_arch=[mu_feat+nu_feat,100,50],
             prefinal_arch=None,
             final_attention=True,
             final_arch=[100,50],
-            batch_size=30000, n_heads=1, dropout=0.2,
-            optim={"lr": 0.02, "weight_decay": 0.00, },
-            early_stopping=None,shuffle=True,
+            batch_size=20000, n_heads=2, dropout=0.2,
+            optim={"lr": 0.01, "weight_decay": 0.00, },
+            early_stopping=None,shuffle=False,
             )
 model = model.to(device)
 print(f"Number of parameters: {model.n_parameters()}")
