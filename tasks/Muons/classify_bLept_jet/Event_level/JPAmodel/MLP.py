@@ -11,7 +11,7 @@ class MLP(torch.nn.Module):
             l_minus1, l_plus1 =pair
             
             self.layers.append(torch.nn.Linear(l_minus1, l_plus1))
-            torch.nn.init.xavier_uniform_(self.layers[-1].weight)
+            torch.nn.init.kaiming_normal_(self.layers[-1].weight)
             torch.nn.init.zeros_(self.layers[-1].bias)
             
             if i != len(arch)-2:
