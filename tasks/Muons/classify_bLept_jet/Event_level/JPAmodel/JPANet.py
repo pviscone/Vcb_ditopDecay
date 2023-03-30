@@ -32,6 +32,7 @@ class JPANet(torch.nn.Module):
                  mu_data=None, nu_data=None, jet_data=None, label=None,
                  batch_size=1, test_size=0.15, n_heads=1,
                  weight=None,
+                 jet_mean=0, jet_std=1,
                  optim={}, early_stopping=None, shuffle=False, dropout=0.15):
         super().__init__()
         assert mu_data is not None
@@ -39,7 +40,7 @@ class JPANet(torch.nn.Module):
         assert jet_data is not None
         assert label is not None
         assert final_arch is not None
-        
+
         self.liveloss = PlotLosses(
             groups={'Loss': ['train_loss', 'test_loss'], 'Acccuracy': ['train_accuracy','test_accuracy'], })
         self.log={}
@@ -54,8 +55,8 @@ class JPANet(torch.nn.Module):
         self.mu_std = self.mu_train.std(axis=0)
         self.nu_mean = self.nu_train.mean(axis=0)
         self.nu_std = self.nu_train.std(axis=0)
-        self.jet_mean = self.jet_train.mean(axis=0)
-        self.jet_std = self.jet_train.std(axis=0)
+        self.jet_mean = jet_mean
+        self.jet_std = jet_std
         
         self.jet_test[self.jet_test==0]=-10
         self.jet_train[self.jet_train==0]=-10
@@ -101,6 +102,7 @@ class JPANet(torch.nn.Module):
             self.attention = Attention(input_dim=attention_input_dim, mlp_arch=attention_arch, n_heads=n_heads, dropout=dropout)
         else:
             self.attention = torch.nn.Identity()
+            self.attention.forward = lambda x,key_padding_mask=None: x
 
 
         if prefinal_arch is not None:
@@ -114,6 +116,7 @@ class JPANet(torch.nn.Module):
         else:
             self.total_norm = torch.nn.LayerNorm(final_arch[0])
             self.total = MLP(arch=final_arch, out_activation=torch.nn.LeakyReLU(0.1), dropout=dropout)
+            self.total.forward=lambda x,key_padding_mask=None:self.total.forward(x)
     
         self.output=MLP(arch=[final_arch[-1],1],out_activation=torch.nn.LogSoftmax(dim=1), dropout=None)
 
@@ -125,9 +128,13 @@ class JPANet(torch.nn.Module):
 
 
     def forward(self, mu, nu, jet):
+
+        pad_mask = ((jet == -10)[:, :, 0].squeeze()).to(torch.bool)
         mu = (mu-self.mu_mean)/(self.mu_std+1e-5)
         nu = (nu-self.nu_mean)/(self.nu_std+1e-5)
         jet = (jet-self.jet_mean)/(self.jet_std+1e-5)
+
+        
 
         out_mu = self.mu_mlp(mu)
         out_nu = self.nu_mlp(nu)
@@ -136,12 +143,13 @@ class JPANet(torch.nn.Module):
         del out_mu, out_nu
 
         out_jet = self.mlp_jet(jet)
-        out_jet = self.attention(out_jet)
+        out_jet = self.attention(out_jet,key_padding_mask=pad_mask)
         out_ev = out_ev.repeat((1, jet.shape[1], 1))
         total_out = self.total_norm(torch.cat((out_ev, out_jet), dim=2))
         total_out = self.prefinal_mlp(total_out)
-        total_out = self.total(total_out)
+        total_out = self.total(total_out,key_padding_mask=pad_mask)
         total_out = self.output(total_out)
+
         return total_out
 
     def train_loop(self, epochs,show_each=False):
