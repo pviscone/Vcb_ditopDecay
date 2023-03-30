@@ -24,9 +24,9 @@ class Attention(torch.nn.Module):
             self.mlp=torch.nn.Identity()
         
 
-    def forward(self, x):
+    def forward(self, x,key_padding_mask=None):
         out = self.norm1(x)
-        out, _ = self.attention(out, out, out,need_weights=False)
+        out, _ = self.attention(out, out, out,need_weights=False,key_padding_mask=key_padding_mask)
         out=self.dropout(out)
         out=self.norm2(out+x)
         out=self.mlp(out)
