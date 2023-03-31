@@ -21,8 +21,8 @@ device = torch.device(dev)
 
 jets_per_event = 6
 
-df = pd.read_pickle("./event_df.pkl", compression="bz2")
-#df=pd.read_pickle("./BigMuons_event_df.pkl")
+#df = pd.read_pickle("./event_df.pkl", compression="bz2")
+df=pd.read_pickle("./BigMuons_event_df.pkl")
 
 #%%
 weights=[0.]
@@ -71,18 +71,20 @@ mu_feat=mu_data.shape[2]
 nu_feat=nu_data.shape[2]
 jet_feat=jet_data.shape[2]
 
-model =JPANet(mu_data=mu_data,nu_data=nu_data,jet_data=jet_data,label=label,test_size=0.15,weight=None,
-            mu_arch=None,nu_arch=None,jet_arch=[jet_feat,50,50],
-            attention_arch=None,
-            event_arch=[mu_feat+nu_feat,50,50],
-            prefinal_arch=None,
-            final_attention=True,
-            final_arch=[50,50],
-            batch_size=20000, n_heads=2, dropout=0.1,
-            optim={"lr": 0.008, "weight_decay": 0.00, },
-            early_stopping=None,shuffle=False,
-            jet_mean=jet_mean,jet_std=jet_std,
-            )
+model = JPANet(mu_data=mu_data, nu_data=nu_data, jet_data=jet_data, label=label,
+               test_size=0.15, weight=None,
+               mu_arch=None, nu_arch=None, jet_arch=[jet_feat, 60, 60],
+               attention_arch=[60, 60],
+               event_arch=[mu_feat+nu_feat, 60, 60],
+               prefinal_arch=None,
+               final_attention=True,
+               final_arch=[60, 60, 60],
+               batch_size=20000, n_heads=2, dropout=0.012,
+               optim={"lr": 0.008, "weight_decay": 0.00, },
+               early_stopping=None, shuffle=True,
+               jet_mean=jet_mean, jet_std=jet_std,
+               )
+
 model = model.to(device)
 print(f"Number of parameters: {model.n_parameters()}")
 
