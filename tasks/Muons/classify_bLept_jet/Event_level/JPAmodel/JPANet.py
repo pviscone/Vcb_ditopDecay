@@ -130,11 +130,10 @@ class JPANet(torch.nn.Module):
     def forward(self, mu, nu, jet):
 
         pad_mask = ((jet == -10)[:, :, 0].squeeze()).to(torch.bool)
+        
         mu = (mu-self.mu_mean)/(self.mu_std+1e-5)
         nu = (nu-self.nu_mean)/(self.nu_std+1e-5)
         jet = (jet-self.jet_mean)/(self.jet_std+1e-5)
-
-        
 
         out_mu = self.mu_mlp(mu)
         out_nu = self.nu_mlp(nu)
@@ -144,10 +143,14 @@ class JPANet(torch.nn.Module):
 
         out_jet = self.mlp_jet(jet)
         out_jet = self.attention(out_jet,key_padding_mask=pad_mask)
-        out_ev = out_ev.repeat((1, jet.shape[1], 1))
-        total_out = self.total_norm(torch.cat((out_ev, out_jet), dim=2))
+        
+        total_out = torch.cat((out_ev, out_jet), dim=1)
+        total_out = self.total_norm(total_out)
         total_out = self.prefinal_mlp(total_out)
-        total_out = self.total(total_out,key_padding_mask=pad_mask)
+        
+        pad_mask = torch.cat((torch.tensor(np.zeros(
+            out_ev.shape[0]), device=device, dtype=torch.bool).unsqueeze(1), pad_mask), dim=1)
+        total_out = self.total(total_out,query=out_jet,key_padding_mask=pad_mask)
         total_out = self.output(total_out)
 
         return total_out
