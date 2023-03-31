@@ -25,11 +25,16 @@ jets_per_event = 6
 df=pd.read_pickle("./BigMuons_event_df.pkl")
 
 #%%
-weights=[0.]
 
 
+mu_df=df.filter(regex="Muon.*(pt|eta|phi)")
+nu_df=df.filter(regex="Neutrino.*(pt|eta|phi|Wmass)")
+jet_df=df.filter(regex="Jet.*(pt|eta|phi|btagDeepFlavCvB|Tmass)")
 label=np.expand_dims(df["bLept_label"].astype(int).to_numpy(), axis=1)
 
+
+
+weights=[0.]
 weights = np.histogram(label.squeeze(), density=True, range=(0, jets_per_event), bins=jets_per_event)[0]
 weights=torch.tensor(weights,dtype=torch.float32, device=device)
 
@@ -37,13 +42,10 @@ weights=1/weights
 weights=weights/weights.sum()
 
 
-#df=df.loc[:, df.columns != "label"]
-df=df.drop(columns=["Muon_mass", "Neutrino_mass"])
+mu_data=mu_df.to_numpy()
+nu_data=nu_df.to_numpy()
+jet_data=jet_df.to_numpy()
 
-
-mu_data=df.loc[:, df.columns.str.contains("Muon")].to_numpy()
-nu_data=df.loc[:, df.columns.str.contains("Neutrino")].to_numpy()
-jet_data=df.loc[:, df.columns.str.contains("Jet")].to_numpy()
 
 mu_data=np.reshape(mu_data, (mu_data.shape[0],1, mu_data.shape[1]))
 nu_data=np.reshape(nu_data, (nu_data.shape[0],1, nu_data.shape[1]))
@@ -54,7 +56,6 @@ mu_data = torch.tensor(mu_data, dtype=torch.float32, device=device)
 nu_data = torch.tensor(nu_data, dtype=torch.float32, device=device)
 jet_data = torch.tensor(jet_data, dtype=torch.float32, device=device)
 label = torch.tensor(label, dtype=torch.long, device=device)
-
 
 
 temp_jet_df=pd.DataFrame(torch.flatten(jet_data,end_dim=1).to(cpu).numpy())
@@ -89,7 +90,7 @@ model = model.to(device)
 print(f"Number of parameters: {model.n_parameters()}")
 
 #!---------------------Training---------------------
-torch.compile(model)
+model=torch.compile(model)
 model.train_loop(epochs=500,show_each=12)
 
 #!---------------------Plot loss---------------------
