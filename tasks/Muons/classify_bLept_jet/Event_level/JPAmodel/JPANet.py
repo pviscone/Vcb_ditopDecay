@@ -11,6 +11,7 @@ from livelossplot import PlotLosses
 
 from ipywidgets import Output
 from IPython.display import display
+import numba
 
 
 
@@ -118,7 +119,7 @@ class JPANet(torch.nn.Module):
             self.total = MLP(arch=final_arch, out_activation=torch.nn.LeakyReLU(0.1), dropout=dropout)
             self.total.forward=lambda x,key_padding_mask=None:self.total.forward(x)
     
-        self.output=MLP(arch=[final_arch[-1],1],out_activation=torch.nn.LogSoftmax(dim=1), dropout=None)
+        self.output=MLP(arch=[final_arch[-1],self.y_test.shape[-1]],out_activation=torch.nn.LogSoftmax(dim=1), dropout=None)
 
         self.optim_dict = optim
         self.optimizer = torch.optim.Adam(self.parameters(), **self.optim_dict)
@@ -285,3 +286,29 @@ class JPANet(torch.nn.Module):
 
     def n_parameters(self):
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
+    
+    
+    
+#!Remove this monster
+@numba.jit(nopython=True,fastmath=True)
+def eval_perm(out_batch):
+    res=np.zeros((1,6,6,6,6))
+    indexes=np.array([[0,0,0,0]])
+    for arr in out_batch:
+        prod=np.zeros((1,6,6,6,6))
+        min_float=np.finfo(np.float32).min
+        for i1,e1 in enumerate(arr[:,0]):
+            for i2,e2 in enumerate(arr[:,1]):
+                for i3,e3 in enumerate(arr[:,2]):
+                    for i4,e4 in enumerate(arr[:,3]):
+                        arr_check=np.unique(np.array([i1,i2,i3,i4]))
+                        if(len(arr_check)==4):
+                            #Sum because we have log probabilities
+                            summa=e1+e2+e3+e4
+                            prod[0,i1,i2,i3,i4]=(summa)
+                            if(summa>min_float):
+                                min_float=summa
+                                index=np.array([[i1,i2,i3,i4]])
+        res=np.concatenate((res,prod),axis=0)
+        indexes=np.concatenate((indexes,index),axis=0)
+    return (res[1:],indexes[1:])

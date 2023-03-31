@@ -30,8 +30,8 @@ df=pd.read_pickle("./BigMuons_event_df.pkl")
 mu_df=df.filter(regex="Muon.*(pt|eta|phi)")
 nu_df=df.filter(regex="Neutrino.*(pt|eta|phi|Wmass)")
 jet_df=df.filter(regex="Jet.*(pt|eta|phi|btagDeepFlavCvB|Tmass)")
-label=np.expand_dims(df["bLept_label"].astype(int).to_numpy(), axis=1)
-
+#label=np.expand_dims(df["bHad_label"].astype(int).to_numpy(), axis=1)
+label=df.filter(regex="(bLept|bHad|Wb|Wc).*").astype(int).to_numpy()
 
 
 weights=[0.]
@@ -80,7 +80,7 @@ model = JPANet(mu_data=mu_data, nu_data=nu_data, jet_data=jet_data, label=label,
                prefinal_arch=None,
                final_attention=True,
                final_arch=[60, 60, 60],
-               batch_size=20000, n_heads=2, dropout=0.012,
+               batch_size=20000, n_heads=4, dropout=0.012,
                optim={"lr": 0.008, "weight_decay": 0.00, },
                early_stopping=None, shuffle=True,
                jet_mean=jet_mean, jet_std=jet_std,
