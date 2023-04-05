@@ -99,7 +99,7 @@ def plot_events(LHE_list, jet_list, Jets, GenJets,label_list,index_list,save=Non
         plt.grid(ls="--")
         plt.xlabel("$\eta$")
         plt.ylabel("$\phi$")
-        plt.legend(bbox_to_anchor=(1.21, 1.))
+        plt.legend(bbox_to_anchor=(1.41, 1.05))
         plt.subplots_adjust(left=0.1, right=0.75, top=0.85, bottom=0.15)
 
         if save is str:

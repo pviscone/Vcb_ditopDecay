@@ -12,7 +12,9 @@ from utils import np_and, padded_matrix, column, build_matrix, alternate_column,
 import sys
 sys.path.append("../../../../utils/")
 from histogrammer import Histogrammer,xkcd_yellow
+import mplhep
 
+mplhep.set_style("CMS")
 
 
 
@@ -146,6 +148,10 @@ dR_bHad_Wc = bHad_LHE.delta_r(Wc_LHE)[Rmask]
 dR_bLept_Wb = bLept_LHE.delta_r(Wb_LHE)[Rmask]
 dR_bHad_Wb = bHad_LHE.delta_r(Wb_LHE)[Rmask]
 
+dR_bLept_Lept=bLept_LHE.delta_r(events.Muon[:,0])[Rmask]
+dR_bLept_Neutrino=bLept_LHE.delta_r(nu_4Vect)[Rmask]
+dR_bHad_Lept=bHad_LHE.delta_r(events.Muon[:,0])[Rmask]
+dR_bHad_Neutrino=bHad_LHE.delta_r(nu_4Vect)[Rmask]
 
 plt.figure(figsize=(16,10))
 h = Histogrammer(bins=50, histrange=(0, 4),alpha=0.7,xlabel="$\Delta$R",ylabel="")
@@ -169,6 +175,20 @@ print(f"mean dR bHad-Wc {ak.mean(dR_bHad_Wc)}")
 print(f"mean dR bLept-Wc dR<0.4 {ak.mean(dR_bLept_Wc[dR_bLept_Wc<0.4])}")
 print(f"mean dR bHad-Wc dR<0.4 {ak.mean(dR_bHad_Wc[dR_bHad_Wc<0.4])}")
 
+
+plt.figure()
+plt.figure(figsize=(16,10))
+h = Histogrammer(bins=50, histrange=(0, 4),alpha=0.7,xlabel="$\Delta$R",ylabel="")
+plt.subplot(1, 2, 1)
+h.add_hist(dR_bLept_Lept, label="$\Delta$R bLept-$\mu$",color=xkcd_yellow,edgecolor="black")
+h.add_hist(dR_bHad_Lept, label=r"$\Delta$R bHad-$\mu$",color="dodgerblue",edgecolor="blue")
+h.plot()
+plt.subplot(1, 2, 2)
+h.add_hist(dR_bLept_Neutrino, label="$\Delta$R bLept-$\\nu$",
+           color=xkcd_yellow, edgecolor="black")
+h.add_hist(dR_bHad_Neutrino, label="$\Delta$R bHad-$\\nu$",
+           color="dodgerblue", edgecolor="blue")
+h.plot()
 
 # %%
 #!-------------------Masking-------------------!
@@ -230,6 +250,6 @@ event_matrix = np.hstack(
     [muon_matrix, nu_matrix, jet_matrix, bLept_label, bHad_label, Wb_label, Wc_label])
 
 event_df = pd.DataFrame(event_matrix, columns=col_labels)
-event_df.to_pickle("./event_df.pkl", compression="bz2")
+#event_df.to_pickle("./event_df.pkl", compression="bz2")
 
 # %%
