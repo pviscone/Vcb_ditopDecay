@@ -39,6 +39,12 @@ The tutorial about event generation is [here](../../tutorials/EventGeneration.md
 > - [cbFromT Muons Grafana](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230317_143933%3Apviscone_crab_TTbarSemileptonic_cbOnlyFromT_Muon&from=1679060373000&to=now)
 > 
 > - [cbFromTbar Muon Grafana](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230317_144508%3Apviscone_crab_TTbarSemileptonic_cbOnlyFromTbar_Muon&from=1679060708000&to=now)
+> 
+> ### Only electrons
+> 
+> - [cbFromT_Electron](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230411_125115%3Apviscone_crab_TTbarSemileptonic_cbOnlyFromT_Electron&from=1681213875000&to=now)
+> 
+> - [cbFromTbar_Electron](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230411_125553%3Apviscone_crab_TTbarSemileptonic_cbOnlyFromTbar_Electron&from=1681214153000&to=now)
 
 # How to run it
 
