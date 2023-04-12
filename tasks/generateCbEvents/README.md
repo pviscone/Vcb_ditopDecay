@@ -45,6 +45,10 @@ The tutorial about event generation is [here](../../tutorials/EventGeneration.md
 > - [cbFromT_Electron](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230411_125115%3Apviscone_crab_TTbarSemileptonic_cbOnlyFromT_Electron&from=1681213875000&to=now)
 > 
 > - [cbFromTbar_Electron](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230411_125553%3Apviscone_crab_TTbarSemileptonic_cbOnlyFromTbar_Electron&from=1681214153000&to=now)
+> 
+> - [jjFromT_Electron](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230412_141149%3Apviscone_crab_TTbarSemileptonic_jjFromT_Electron&from=1681305109000&to=now)
+> 
+> - [jjFromTbar_Electron](https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=pviscone&var-task=230412_141748%3Apviscone_crab_TTbarSemileptonic_jjFromTbar_Electron&from=1681305469000&to=now)
 
 # How to run it
 
