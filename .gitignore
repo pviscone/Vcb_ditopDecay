@@ -12,3 +12,4 @@ tasks/generateCbEvents/genproductions/*
 tasks/generateCbEvents/genproductions
 *.tar.xz
 .envs/*
+root_files/*/
