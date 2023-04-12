@@ -16,14 +16,18 @@ import mplhep
 
 mplhep.set_style("CMS")
 
+#filepath="../../TTbarSemileptonic_cbOnly_pruned_optimized_MuonSelection.root"
+#nupath="../../neutrino_reco/nu_pz.npy"
+filepath="../../BigMuon_MuonSelection.root"
+nupath="../../BigMuons_nu_pz.npy"
 
 
 events = NanoEventsFactory.from_root(
-    "../../TTbarSemileptonic_cbOnly_pruned_optimized_MuonSelection.root",
+    filepath,
     schemaclass=NanoAODSchema,
 ).events()
 
-nu_pz = np.load("../../neutrino_reco/nu_pz.npy")
+nu_pz = np.load(nupath)
 nu_pt = events.MET.pt.to_numpy()
 nu_phi = events.MET.phi.to_numpy()
 nu_eta = np.arcsinh(nu_pz/nu_pt)
@@ -192,7 +196,7 @@ h.plot()
 
 # %%
 #!-------------------Masking-------------------!
-num_jet_to_select = 6
+num_jet_to_select = 7
 
 R_multiple_match_mask = np.bitwise_and(Rmask, np.bitwise_not(same_match_event_mask))
 
