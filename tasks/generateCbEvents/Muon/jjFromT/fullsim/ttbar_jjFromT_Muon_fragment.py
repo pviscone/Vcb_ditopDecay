@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-gridpackPath="root://eosuser.cern.ch//eos/user/p/pviscone/root_files/gridpack/cbFromT_Muon_slc7_amd64_gcc10_CMSSW_12_4_8_tarball.tar.xz"
+gridpackPath="root://eosuser.cern.ch//eos/user/p/pviscone/root_files/gridpack/jjFromT_Muon_slc7_amd64_gcc10_CMSSW_12_4_8_tarball.tar.xz"
 
 externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
     args = cms.vstring(gridpackPath),
