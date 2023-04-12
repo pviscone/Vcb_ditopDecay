@@ -21,8 +21,8 @@ import awkward as ak
 
 
 plt.style.use(hep.style.CMS)
-signal = uproot.open(
-    "../TTbarSemileptonic_cbOnly_pruned_optimized_MuonSelection.root")["Events"]
+signal = uproot.open("../TTbarSemileptonic_cbOnly_pruned_optimized_MuonSelection.root")["Events"]
+#signal=uproot.open("../BigMuon_MuonSelection.root")["Events"]
 #background = uproot.open("../TTbarSemileptonic_Nocb_MuonSelection.root")["Events"]
 
 
