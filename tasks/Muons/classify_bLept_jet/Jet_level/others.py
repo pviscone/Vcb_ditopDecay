@@ -63,15 +63,16 @@ algos={"Fisher":LinearDiscriminantAnalysis(),
 
 
 
-algos={}
+#algos={}
 
 res = test_data.copy()
 res["label"] = test_label[:, 1]
 efficiency={}
+
 for algo in algos:
     algos[algo].fit(X_train,y_train)
     #! WARNING: class_weight don't exist in official sklearn. You have to implement it yourself
-    y_prob=algos[algo].predict_proba(X_test,class_weight=np.array([0.18,0.82]))[:,1]
+    y_prob=algos[algo].predict_proba(X_test)[:,1]
     y_pred=algos[algo].predict(X_test)
     print(algo)
     
