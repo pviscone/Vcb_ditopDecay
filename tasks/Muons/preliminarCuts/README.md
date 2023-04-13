@@ -24,6 +24,8 @@
 
 # Muons
 
+Using TTbarSemileptonic_cbOnly.root and TTbarSemileptonic_Nocb.root
+
 ## Main cuts
 
 #### Muon from W cut
