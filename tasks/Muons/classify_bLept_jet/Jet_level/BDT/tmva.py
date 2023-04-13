@@ -17,8 +17,9 @@ df = pd.read_pickle("../Jet_features.pkl", compression="bz2")
 
 #df = df.drop(columns=["Jet_mass", "max_dEta_Jets","min_dEta_Jets", "min_dPhi_Jets", "max_dPhi_Jets", "dEta_Jet_nu", "dPhi_Jet_nu", "Jet_btag"])
 
-columns = ["Jet_CvBtag", "dPhi_Jet_mu", "Jet_pt", "dEta_Jet_mu",
-           "dPhi_Jet_nu", "min_dEta_Jets", "T_mass", "Jet_eta", "label"]
+columns=["Jet_CvBtag", "dPhi_Jet_mu", "Jet_pt", "dEta_Jet_mu", "dPhi_Jet_nu",
+         "min_dEta_Jets", "T_mass", "dEta_Jet_nu", "label"]
+
 df = df[columns]
 
 
@@ -185,3 +186,5 @@ test_data["label"] = test_label[:, 1]
 idx_pred = test_data.groupby(level=0)["score"].idxmax()
 
 efficiency = test_data.loc[idx_pred]["label"].sum()/test_data["label"].sum()
+
+# %%
