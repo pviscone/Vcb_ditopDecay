@@ -16,10 +16,10 @@ import mplhep
 
 mplhep.set_style("CMS")
 
-#filepath="../../TTbarSemileptonic_cbOnly_pruned_optimized_MuonSelection.root"
-#nupath="../../neutrino_reco/nu_pz.npy"
-filepath="../../BigMuon_MuonSelection.root"
-nupath="../../BigMuons_nu_pz.npy"
+filepath="../../TTbarSemileptonic_cbOnly_pruned_optimized_MuonSelection.root"
+nupath="../../nu_pz.npy"
+#filepath="../../BigMuon_MuonSelection.root"
+#nupath="../../BigMuons_nu_pz.npy"
 
 
 events = NanoEventsFactory.from_root(
@@ -96,6 +96,8 @@ Rmask = np_and(deltaRLept < 0.4,
               deltaRWc < 0.4,
               )
 
+
+print(f"dR<0.4 efficiency: {np.sum(Rmask)/len(Rmask):.2f}")
 #%%
 #!-------------------Multiple matching-------------------!
 
@@ -121,7 +123,7 @@ plt.barh(lab,width=np.sum(same_match_matrix[Rmask],axis=0)/np.sum(Rmask))
 same_match_event_mask = np.bitwise_or.reduce(same_match_matrix, axis=1)
 
 
-print(f"Fraction of event with at least 2 jet matching to the same parton: {np.sum(same_match_event_mask[Rmask])/np.sum(Rmask):.2%}")
+print(f"Fraction of event with at least 2 jet matching to the same parton (After RMask): {np.sum(same_match_event_mask[Rmask])/np.sum(Rmask):.2%}")
 
 # %%
 
@@ -200,6 +202,9 @@ num_jet_to_select = 7
 
 R_multiple_match_mask = np.bitwise_and(Rmask, np.bitwise_not(same_match_event_mask))
 
+RMatch_mask=np_and(Rmask,
+              np.bitwise_not(same_match_event_mask))
+
 mask = np_and(Rmask,
               np.bitwise_not(same_match_event_mask),
               bLept_pt_order < num_jet_to_select,
@@ -207,6 +212,7 @@ mask = np_and(Rmask,
               Wb_pt_order < num_jet_to_select,
               Wc_pt_order < num_jet_to_select,)
 
+print("Fraction of events with selected jets in the first 7 jets (After Rmask+multiple match):", ak.sum(mask)/ak.sum(RMatch_mask))
 
 
 efficiency = ak.sum(mask)/ak.sum(R_multiple_match_mask)
