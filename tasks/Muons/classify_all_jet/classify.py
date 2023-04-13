@@ -19,17 +19,17 @@ else:
 cpu = torch.device("cpu")
 device = torch.device(dev)
 
-jets_per_event = 6
+jets_per_event = 7
 
 #df = pd.read_pickle("./event_df.pkl", compression="bz2")
-df=pd.read_pickle("./BigMuons_event_df.pkl")
+df=pd.read_pickle("./BigMuons_event_df.pkl",compression="bz2")
 
 #%%
 
 
 mu_df=df.filter(regex="Muon.*(pt|eta|phi)")
 nu_df=df.filter(regex="Neutrino.*(pt|eta|phi|Wmass)")
-jet_df=df.filter(regex="Jet.*(pt|eta|phi|btagDeepFlavCvB|Tmass)")
+jet_df=df.filter(regex="Jet.*(pt|eta|phi|btagDeepFlavCvB|Tmass|btagDeepFlavCvL)")
 #label=np.expand_dims(df["bHad_label"].astype(int).to_numpy(), axis=1)
 label=df.filter(regex="(bLept|bHad|Wb|Wc).*").astype(int).to_numpy()
 
