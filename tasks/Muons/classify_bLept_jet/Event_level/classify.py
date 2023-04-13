@@ -19,10 +19,10 @@ else:
 cpu = torch.device("cpu")
 device = torch.device(dev)
 
-jets_per_event = 6
+jets_per_event = 7
 
 #df = pd.read_pickle("./event_df.pkl", compression="bz2")
-df=pd.read_pickle("./BigMuons_event_df.pkl")
+df=pd.read_pickle("./BigMuons_event_df.pkl",compression="bz2")
 
 #%%
 
