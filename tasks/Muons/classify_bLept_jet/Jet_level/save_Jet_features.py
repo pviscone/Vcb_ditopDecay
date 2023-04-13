@@ -242,14 +242,14 @@ new_index = pd.MultiIndex.from_product(features_df.index.levels)
 
 features_df = features_df.reindex(new_index)
 
-
+"""
 perm1=np.random.permutation(len(Jet_pt))
 perm2=np.random.permutation(num_jet_to_select)
 i, j = features_df.index.levels
 idx = pd.IndexSlice
 
 features_df = features_df.loc[i[perm1]]
-features_df = features_df.loc[idx[i, j[perm2]],:]
+features_df = features_df.loc[idx[i, j[perm2]],:] """
 features_df=features_df.dropna()
 
 
