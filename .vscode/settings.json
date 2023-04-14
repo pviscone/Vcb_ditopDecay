@@ -96,5 +96,6 @@
     ],
     "docify.commentService.programmingLanguage": "python",
     "docify.commentService.docstringFormat": "Google",
-    "docify.commentService.sidePanelReviewMode": true
+    "docify.commentService.sidePanelReviewMode": true,
+    "python.linting.enabled": false
 }
