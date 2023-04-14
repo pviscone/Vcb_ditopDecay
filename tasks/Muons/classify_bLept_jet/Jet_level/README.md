@@ -30,7 +30,7 @@ A simple multilayer perceptron of size [input_dim, 40, 40, 40, 2]
 | ttbar_cbOnly | $\sim$ 67%           |
 | BigMuons     | $\sim 70$%           |
 
-TRY ON LXPLUS-GPU WITH A BIGGER NETWORK for BIGMUONS
+(For Big Muons it remains 70% also with [input_dim,120,120,120,120,2])
 
 ### N-1, N+1
 
@@ -42,7 +42,7 @@ Then we see what is the most "useless" feature and we discard it.
 
 Then we repeat the procedure with the remaining feature.
 
-<img title="" src=".img/d1c0a67365899e72fe56f90a18847d7486768f98.png" alt="all_steps.png" width="477">
+<img title="" src=".img/d1c0a67365899e72fe56f90a18847d7486768f98.png" alt="all_steps.png" width="477" data-align="center">
 
 The first 8 feature are selected
 
