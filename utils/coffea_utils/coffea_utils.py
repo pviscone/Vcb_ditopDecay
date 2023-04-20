@@ -16,13 +16,16 @@ def np_or(*args):
         res = np.bitwise_or(arg, res)
     return res
 
-def print_cuts(selection):
+def print_cuts(selection,weight_signs=None):
     cut_set = set()
-    n_events=selection.all(*cut_set).sum()
-    for cut in selection.names:
-        num_before_cut = selection.all(*cut_set).sum()
+    n_events=ak.sum(weight_signs)
+    cut_list=[]
+    for idx,cut in enumerate(selection.names):
+        selection_before_cut = selection.all(*cut_set)
+        num_before_cut =ak.sum(weight_signs[selection_before_cut])
         cut_set.add(cut)
-        num_after_cut = selection.all(*cut_set).sum()
+        selection_after_cut = selection.all(*cut_set)
+        num_after_cut = ak.sum(weight_signs[selection_after_cut])
         print(
             f"Cut: {cut}\n\n"
                 +" "*15+f"Relative efficiency: {(num_after_cut/num_before_cut):.3f} "
@@ -30,8 +33,11 @@ def print_cuts(selection):
                 +" "*15+f"Cumulative efficiency: {(num_after_cut/n_events):.3f} "
                 +f"+- {(np.sqrt(num_after_cut)/n_events):.3f}\n"
         )
+        cut_list.append({"cut":cut,
+                        "relative":(num_after_cut/num_before_cut),
+                        "cumulative":(num_after_cut/n_events)})
         print("-----------------------------------------------------------------")
-    return cut_set
+    return cut_list
 
 
 def MET_eta(lepton,MET):
@@ -143,7 +149,7 @@ class Electron_cuts(processor.ProcessorABC):
     def postprocess(self, accumulator):
         pass
 
-    def process(self, events, LHELepton=None):
+    def process(self, events, LHELepton=None,out=None):
         if LHELepton is not None:
             assert LHELepton in [11,13,15]
             lepton_LHEMask = np.bitwise_or(
@@ -152,7 +158,8 @@ class Electron_cuts(processor.ProcessorABC):
             )
             events = events[lepton_LHEMask]
 
-        events["Electron"] = ak.pad_none(events.Electron, 1)
+        events["Electron"] = ak.pad_none(events.Electron[
+                                events.Electron.mvaFall17V2Iso_WP90], 1)
         events["Jet"] = events.Jet[
             np_and(
                 events.Jet.electronIdx1 != 0,
@@ -166,24 +173,24 @@ class Electron_cuts(processor.ProcessorABC):
 
         selection = PackedSelection()
         selection.add(
-            "nElectrons>=1",
+            "nElectrons(mvaFall17V2Iso_WP90)>=1",
             ak.count(events.Electron.pt,axis=1) >= 1)
         selection.add(
-            "Electron trigger(pt[0]>30 && |eta|[0]<2.4)",
+            "Electron trigger(pt[0]>30, |eta|[0]<2.4)",
             np_and(events.Electron.pt[:, 0] > 30,
                    np.abs(events.Electron.eta[:, 0]) < 2.4))
         selection.add(
-            "mvaFall17V2Iso_WP90",
-            events.Electron.mvaFall17V2Iso_WP90[:, 0])
-        selection.add(
-            "nJet(electronIdx1!=0 & jetId>0 & puId>0 & pt>20 & |eta|<4.8)>=4",
+            "nJet(electronIdx1!=0, jetId>0, puId>0, pt>20, |eta|<4.8)>=4",
             ak.count(events.Jet.pt,axis=1) >= 4)
         selection.add(
             "max(DeepFlavB) medium 0.2793",
             ak.max(events.Jet.btagDeepFlavB, axis=1) > 0.2793)
 
-        cut_set=print_cuts(selection)
-        return events[selection.all(*cut_set)]
+        cut_list=print_cuts(selection,np.sign(events.genWeight))
+        if out=="events":
+            return events[selection.all(*selection.names)]
+        elif out=="cuts":
+            return cut_list
 
 
 class Muon_cuts(processor.ProcessorABC):
@@ -193,7 +200,7 @@ class Muon_cuts(processor.ProcessorABC):
     def postprocess(self, accumulator):
         pass
 
-    def process(self, events,LHELepton=None):
+    def process(self, events,LHELepton=None,out=None):
         if LHELepton is not None:
             assert LHELepton in [11,13,15]
             lepton_LHEMask = np.bitwise_or(
@@ -202,7 +209,9 @@ class Muon_cuts(processor.ProcessorABC):
             )
             events = events[lepton_LHEMask]
         
-        events["Muon"] = ak.pad_none(events.Muon,1)
+        events["Muon"] = ak.pad_none(events.Muon[
+                            np_and(events.Muon.looseId,
+                            events.Muon.pfIsoId > 1)],1)
         events["Jet"] = events.Jet[
             np_and(
                 events.Jet.muonIdx1 != 0,
@@ -216,22 +225,21 @@ class Muon_cuts(processor.ProcessorABC):
         selection = PackedSelection()
 
         selection.add(
-            "nMuons>=1",
+            "nMuons(looseId, pfIsoId loose (>1))>=1",
             ak.count(events.Muon.pt,axis=1) >= 1)
         selection.add(
-            "Muon trigger(pt[0]>26 && |eta|[0]<2.4)",
+            "Muon trigger(pt[0]>26, |eta|[0]<2.4)",
             np_and(events.Muon.pt[:, 0] > 26,
                    np.abs(events.Muon.eta[:, 0]) < 2.4))
         selection.add(
-            "looseId && pfIsoId loose (>1)",
-            np_and(events.Muon.looseId[:, 0],
-                   events.Muon.pfIsoId[:, 0] > 1))
-        selection.add(
-            "nJet(muonIdx1!=0 & jetId>0 & puId>0 & pt>20 & |eta|<4.8)>=4",
+            "nJet(muonIdx1!=0, jetId>0, puId>0, pt>20, |eta|<4.8)>=4",
             ak.count(events.Jet.pt,axis=1) >= 4)
         selection.add(
             "max(DeepFlavB) medium 0.2793",
             ak.max(events.Jet.btagDeepFlavB, axis=1) > 0.2793)
 
-        cut_set = print_cuts(selection)
-        return events[selection.all(*cut_set)]
+        cut_list=print_cuts(selection,np.sign(events.genWeight))
+        if out=="events":
+            return events[selection.all(*selection.names)]
+        elif out=="cuts":
+            return cut_list
