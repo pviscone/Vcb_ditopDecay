@@ -2,10 +2,14 @@
 from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
 import sys
 import numpy as np
-from coffea import processor
+import pandas as pd
+
+import matplotlib.pyplot as plt
+import mplhep
+
 sys.path.append("../../../utils/coffea_utils")
 from coffea_utils import Electron_cuts, Muon_cuts, Jet_parton_matching,np_and,np_or
-import pandas as pd
+
 
 #%%
 #! REMEMBER TO VOMS-PROXY-INIT BEFORE RUNNING THIS SCRIPT
@@ -65,17 +69,37 @@ TT_Jets_LNuQQ_NoCKM=NanoEventsFactory.from_root(
     schemaclass=NanoAODSchema
 ).events()
 
+TT_Jets_LNuQQ_NoCKM_Electron=TT_Jets_LNuQQ_NoCKM[
+    np_or(np.abs(TT_Jets_LNuQQ_NoCKM.LHEPart.pdgId[:,3]==11),
+          np.abs(TT_Jets_LNuQQ_NoCKM.LHEPart.pdgId[:,6]==11))
+    ]
+TT_Jets_LNuQQ_NoCKM_Muon=TT_Jets_LNuQQ_NoCKM[
+    np_or(np.abs(TT_Jets_LNuQQ_NoCKM.LHEPart.pdgId[:,3]==13),
+          np.abs(TT_Jets_LNuQQ_NoCKM.LHEPart.pdgId[:,6]==13))
+    ]
+TT_Jets_LNuQQ_NoCKM_Tau=TT_Jets_LNuQQ_NoCKM[
+    np_or(np.abs(TT_Jets_LNuQQ_NoCKM.LHEPart.pdgId[:,3]==15),
+          np.abs(TT_Jets_LNuQQ_NoCKM.LHEPart.pdgId[:,6]==15))
+    ]
+
+del TT_Jets_LNuQQ_NoCKM
+
 
 datasets = {
-    "TTJets_cbMuNu": TT_semilept_cb_Muon,
     "TTJets_cbENu": TT_semilept_cb_Electron,
+    "TTJets_cbMuNu": TT_semilept_cb_Muon,
     "TTJets_cbTauNu": TT_semilept_cb_Tau,
-    "TTJets_LNuQQ_NoCKM": TT_Jets_LNuQQ_NoCKM,
+    "TTJets_LNuQQ_NoCKM_E": TT_Jets_LNuQQ_NoCKM_Electron,
+    "TTJets_LNuQQ_NoCKM_Mu": TT_Jets_LNuQQ_NoCKM_Muon,
+    "TTJets_LNuQQ_NoCKM_Tau": TT_Jets_LNuQQ_NoCKM_Tau,
     "TTJets_diLept": TTJets_diLept,
     "TTJets_diHad": TTJets_diHad,
     "WJets_toLNu": WJets_toLNu,
     "WWJets_LNuQQ":WWJets_LNuQQ
 }
+
+
+
 #%%
 """
 %%HTML
@@ -134,6 +158,90 @@ def fill_dataframe(cuts_dict,datasets):
 muon_df=fill_dataframe(Muon_cuts_dict,datasets)
 electron_df=fill_dataframe(Electron_cuts_dict,datasets)
 
+muon_report=muon_df.groupby(
+    "type").apply(lambda x: x).style.background_gradient()
+electron_report=electron_df.groupby(
+    "type").apply(lambda x: x).style.background_gradient()
+i=0
 
-# %%
-#df.groupby("type").apply(lambda x: x)
+#.groupby("type").apply(lambda x: x)
+#.style.background_gradient()
+#.xs("cumulative",level=1)
+
+#%%
+#BF
+#tt fully had = 0.478864
+#tt semilept=   0.007058
+#tt dilept=     0.010404
+#W leptonic=    0.102
+
+#cross
+#tt fully had = 832
+#W leptonic=    59100
+#WW leptonic=   119
+
+#|vcb|=0.041
+lumi=138*1e3
+num_events={
+    "TTJets": 832,
+    "WJets_leptonic":19700*3,
+    "WWJets":119#(multiply for sempilemptonic bf)
+}
+
+
+
+num_events={"TTJets_cbENu":lumi*832*0.478864*8.4e-4/3,
+            "TTJets_cbMuNu":lumi*832*0.478864*8.4e-4/3,
+            "TTJets_cbTauNu":lumi*832*0.478864*8.4e-4/3,
+            "TTJets_LNuQQ_NoCKM_E":lumi*832*0.478864*(1-8.4e-4)/3,
+            "TTJets_LNuQQ_NoCKM_Mu":lumi*832*0.478864*(1-8.4e-4)/3,
+            "TTJets_LNuQQ_NoCKM_Tau":lumi*832*0.478864*(1-8.4e-4)/3,
+            "TTJets_diLept":lumi*832*0.010404,
+            "TTJets_diHad":lumi*832*0.478864,
+            "WJets_toLNu":lumi*59100*0.102,
+            "WWJets_LNuQQ":lumi*119*0.007058
+}
+
+muon_cuts_events=muon_df.xs("cumulative",level=1)
+muon_cuts_events.insert(0,"Total Run2",0)
+electron_cuts_events=electron_df.xs("cumulative",level=1)
+electron_cuts_events.insert(0,"Total Run2",0)
+
+
+for key in num_events:
+    muon_cuts_events.loc[key,"Total Run2"]=num_events[key]
+    electron_cuts_events.loc[key,"Total Run2"]=num_events[key]
+    muon_cuts_events.loc[key]=muon_cuts_events.loc[key]*num_events[key]
+    electron_cuts_events.loc[key]=electron_cuts_events.loc[key]*num_events[key]
+    
+    
+plt.figure(figsize=(12,5))
+plt.subplot(121)
+muon_cuts_events["Total Run2"].plot(
+    kind="barh",label="Total",color="dodgerblue")
+muon_cuts_events[muon_cuts_events.columns[-1]].plot(
+    kind="barh",label="After cuts",color="gold")
+plt.title("Muon cuts")
+plt.xscale("log")
+plt.grid(linestyle=":",alpha=0.8)
+plt.xlabel("Events")
+plt.legend()
+mplhep.cms.text("Private Work")
+
+
+plt.subplot(122)
+
+electron_cuts_events["Total Run2"].plot(
+    kind="barh",label="Total",color="dodgerblue")
+electron_cuts_events[electron_cuts_events.columns[-1]].plot(
+    kind="barh",label="After cuts",color="gold")
+
+plt.tick_params(axis='y', labelleft=False, labelright=False)
+plt.title("Electron cuts")
+plt.xscale("log")
+plt.grid(linestyle=":",alpha=0.8)
+plt.xlabel("Events")
+plt.legend()
+plt.tight_layout()
+mplhep.cms.lumitext("$138$ $fb^{-1}$")
+#%%
