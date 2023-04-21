@@ -6,6 +6,7 @@ import pandas as pd
 import awkward as ak
 import matplotlib.pyplot as plt
 import mplhep
+import dataframe_image as dfi
 
 sys.path.append("../../../utils/coffea_utils")
 from coffea_utils import Electron_cuts, Muon_cuts, Jet_parton_matching,np_and,np_or
@@ -158,9 +159,11 @@ muon_df=fill_dataframe(Muon_cuts_dict,datasets)
 electron_df=fill_dataframe(Electron_cuts_dict,datasets)
 
 muon_report=muon_df.groupby(
-    "type").apply(lambda x: x).style.background_gradient()
+    "type").apply(lambda x: x).style.background_gradient().format(
+        precision=4, thousands=".", decimal=",")
 electron_report=electron_df.groupby(
-    "type").apply(lambda x: x).style.background_gradient()
+    "type").apply(lambda x: x).style.background_gradient().format(
+        precision=4, thousands=".", decimal=",")
 i=0
 
 #.groupby("type").apply(lambda x: x)
@@ -181,13 +184,6 @@ i=0
 
 #|vcb|=0.041
 lumi=138*1e3
-num_events={
-    "TTJets": 832,
-    "WJets_leptonic":19700*3,
-    "WWJets":119#(multiply for sempilemptonic bf)
-}
-
-
 
 num_events={"TTJets_cbENu":lumi*832*0.478864*8.4e-4/3,
             "TTJets_cbMuNu":lumi*832*0.478864*8.4e-4/3,
@@ -214,6 +210,17 @@ for key in num_events:
     electron_cuts_events.loc[key]=electron_cuts_events.loc[key]*num_events[key]
     
     
+muon_cuts_report=muon_cuts_events.style.format(
+    precision=0, thousands=".", decimal=",").background_gradient()
+electron_cuts_report=electron_cuts_events.style.format(
+    precision=0, thousands=".", decimal=",").background_gradient()
+
+dfi.export(muon_report,"./images/muon_report.png")
+dfi.export(electron_report,"./images/electron_report.png")
+dfi.export(muon_cuts_report,"./images/muon_cuts_report.png")
+dfi.export(electron_cuts_report,"./images/electron_cuts_report.png")
+
+
 plt.figure(figsize=(12,5))
 plt.subplot(121)
 muon_cuts_events["Total Run2"].plot(
@@ -245,6 +252,7 @@ plt.legend()
 plt.xlim(1,1e19)
 plt.tight_layout()
 mplhep.cms.lumitext("$138$ $fb^{-1}$ $(13\; TeV)$")
+plt.savefig("images/cuts.png")
 #%%
 
 #! Additional b/c jets in NoCKM ttbar semileptonic samples
@@ -280,3 +288,4 @@ sec_y=ax.secondary_yaxis(
     functions=(lambda x: x/len(TT_Jets_LNuQQ_NoCKM),lambda x:x*len(TT_Jets_LNuQQ_NoCKM))
     )
 sec_y.set_ylabel("Fraction on total events")
+plt.savefig("images/additional_b_c.png")
