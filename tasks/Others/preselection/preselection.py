@@ -264,12 +264,19 @@ additional_dict={
 }
 
 
-
-plt.bar(additional_dict.keys(),np.array(list(additional_dict.values()))/len(TT_Jets_LNuQQ_NoCKM),color="dodgerblue",edgecolor="black")
+fig,ax=plt.subplots()
 plt.rc('axes', axisbelow=True)
+ax.bar(*zip(*additional_dict.items()),color="dodgerblue",edgecolor="black")
+
 plt.yscale("log")
 mplhep.cms.text("Private Work\nTTbar_LNuQQ_NoCKM",loc=2)
+mplhep.cms.lumitext(f"{len(TT_Jets_LNuQQ_NoCKM)} events")
 plt.grid(linestyle=":",alpha=0.85)
-plt.ylim(1e-6,1e-1)
-plt.ylabel("Fraction on total events")
+plt.ylim(1e-1,1e5)
+plt.ylabel("Events")
 plt.title("Additional b/c Jets")
+sec_y=ax.secondary_yaxis(
+    'right',
+    functions=(lambda x: x/len(TT_Jets_LNuQQ_NoCKM),lambda x:x*len(TT_Jets_LNuQQ_NoCKM))
+    )
+sec_y.set_ylabel("Fraction on total events")
