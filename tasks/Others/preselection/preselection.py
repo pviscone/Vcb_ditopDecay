@@ -3,7 +3,7 @@ from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
 import sys
 import numpy as np
 import pandas as pd
-
+import awkward as ak
 import matplotlib.pyplot as plt
 import mplhep
 
@@ -82,7 +82,6 @@ TT_Jets_LNuQQ_NoCKM_Tau=TT_Jets_LNuQQ_NoCKM[
           np.abs(TT_Jets_LNuQQ_NoCKM.LHEPart.pdgId[:,6]==15))
     ]
 
-del TT_Jets_LNuQQ_NoCKM
 
 
 datasets = {
@@ -226,6 +225,7 @@ plt.xscale("log")
 plt.grid(linestyle=":",alpha=0.8)
 plt.xlabel("Events")
 plt.legend()
+plt.xlim(1,1e19)
 mplhep.cms.text("Private Work")
 
 
@@ -242,6 +242,34 @@ plt.xscale("log")
 plt.grid(linestyle=":",alpha=0.8)
 plt.xlabel("Events")
 plt.legend()
+plt.xlim(1,1e19)
 plt.tight_layout()
-mplhep.cms.lumitext("$138$ $fb^{-1}$")
+mplhep.cms.lumitext("$138$ $fb^{-1}$ $(13\; TeV)$")
 #%%
+
+#! Additional b/c jets in NoCKM ttbar semileptonic samples
+#a["LHEPart"]=ak.pad_none(a.LHEPart,11,axis=1)
+additional_b=ak.sum(np.abs(TT_Jets_LNuQQ_NoCKM.LHEPart.pdgId[:,8:])==5,axis=1)
+additional_c=ak.sum(np.abs(TT_Jets_LNuQQ_NoCKM.LHEPart.pdgId[:,8:])==4,axis=1)
+additional_dict={
+    "b":ak.sum(additional_b[additional_c==0]==1),
+    "c":ak.sum(additional_c[additional_b==0]==1),
+    "bb":ak.sum(additional_b[additional_c==0]==2),
+    "cb":ak.sum(additional_b[additional_c==1]==1),
+    "cc":ak.sum(additional_c[additional_b==0]==2),
+    "bbb":ak.sum(additional_b==3),
+    "cbb":ak.sum(additional_b[additional_c==1]==2),
+    "ccb":ak.sum(additional_b[additional_c==2]==1),
+    "ccc":ak.sum(additional_c==3)
+}
+
+
+
+plt.bar(additional_dict.keys(),np.array(list(additional_dict.values()))/len(TT_Jets_LNuQQ_NoCKM),color="dodgerblue",edgecolor="black")
+plt.rc('axes', axisbelow=True)
+plt.yscale("log")
+mplhep.cms.text("Private Work\nTTbar_LNuQQ_NoCKM",loc=2)
+plt.grid(linestyle=":",alpha=0.85)
+plt.ylim(1e-6,1e-1)
+plt.ylabel("Fraction on total events")
+plt.title("Additional b/c Jets")
