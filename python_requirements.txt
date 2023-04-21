@@ -13,3 +13,4 @@ scikit-learn
 torchview
 livelossplot
 xrootd
+dataframe_image
