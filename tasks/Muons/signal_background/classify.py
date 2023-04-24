@@ -43,7 +43,10 @@ jet_data=jet_df.to_numpy()
 
 mu_data=np.reshape(mu_data, (mu_data.shape[0],1, mu_data.shape[1]))
 nu_data=np.reshape(nu_data, (nu_data.shape[0],1, nu_data.shape[1]))
-jet_data=np.reshape(jet_data, (jet_data.shape[0],jets_per_event, jet_data.shape[1]//jets_per_event))
+jet_data=np.reshape(jet_data,
+                    (jet_data.shape[0],
+                     jets_per_event,
+                     jet_data.shape[1]//jets_per_event))
 
 
 mu_data = torch.tensor(mu_data, dtype=torch.float32, device=device)
@@ -103,26 +106,36 @@ bkg_score=bkg_score.detach().to(cpu).numpy()
 mplhep.style.use("CMS")
 plt.rc('axes', axisbelow=True)
 
+bins=40
 
-binned_signal_score=plt.hist(signal_score,bins=50,range=(0,1),
+
+
+semileptonic_weight=(138e3    #Lumi
+                    *832      #Cross section
+                    *0.44 #Semileptonic BR
+                    *0.33     #Muon fraction
+                    )
+binned_signal_score=plt.hist(signal_score,bins=bins,range=(0,1),
                              color="dodgerblue",edgecolor="blue",
                              histtype="stepfilled",alpha=0.8,linewidth=2,
-                             #weights=np.ones_like(signal_score)*138e3*832*8.4e-4/(len(signal_score)/3),
+                             weights=np.ones_like(signal_score)*semileptonic_weight*0.518*8.4e-4/(len(signal_score)),
                              label="Signal")[0]
-binned_bkg_score=plt.hist(bkg_score,bins=50,range=(0,1),
+binned_bkg_score=plt.hist(bkg_score,bins=bins,range=(0,1),
                           color="red",edgecolor="red",histtype="step",
                           linewidth=2,label="Background",hatch="//",
-                          #weights=np.ones_like(bkg_score)*138e3*832*(1-8.4e-4)/(len(bkg_score)/3),
+                          weights=np.ones_like(bkg_score)*semileptonic_weight*0.5*(1-8.4e-4)/(len(bkg_score)),
          )[0]
-#plt.yscale("log")
+plt.yscale("log")
 plt.legend()
 plt.grid(linestyle=":")
 plt.ylabel("Normalized events")
 plt.xlabel("NN score")
-plt.ylim(1e1,1200)
+plt.ylim(1e1,1e7)
 mplhep.cms.text("Private Work")
 mplhep.cms.lumitext("$138 fb^{-1}$ $(13 TeV)$")
 #%%
 fom=binned_signal_score**2/(binned_bkg_score)
 Q=(np.sum(fom[~np.isnan(fom)]))
 print("Q=",Q)
+print(f"Error: {1/np.sqrt(Q)}")
+# %%

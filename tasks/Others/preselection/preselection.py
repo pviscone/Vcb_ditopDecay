@@ -172,29 +172,44 @@ i=0
 
 #%%
 #BF
-#tt fully had = 0.478864
-#tt semilept=   0.007058
-#tt dilept=     0.010404
-#W leptonic=    0.102
+#tt semilept = 0.45
+#tt dihad    = 0.44
+##tt dilept= = 0.010404
+
+#W lepronic   = 0.108
+#W hadronic  = 0.673
+
 
 #cross
-#tt fully had = 832
+#tt = 832
 #W leptonic=    59100
 #WW leptonic=   119
 
 #|vcb|=0.041
 lumi=138*1e3
+cb_BR=(0.041**2)/2
+NoCb_BR=1-cb_BR
+W_Lept_BR=0.108 #Only e/mu/tau not sum all over 3
+W_Had_BR=0.673
+tt_cross=832
 
-num_events={"TTJets_cbENu":lumi*832*0.478864*8.4e-4/3,
-            "TTJets_cbMuNu":lumi*832*0.478864*8.4e-4/3,
-            "TTJets_cbTauNu":lumi*832*0.478864*8.4e-4/3,
-            "TTJets_LNuQQ_NoCKM_E":lumi*832*0.478864*(1-8.4e-4)/3,
-            "TTJets_LNuQQ_NoCKM_Mu":lumi*832*0.478864*(1-8.4e-4)/3,
-            "TTJets_LNuQQ_NoCKM_Tau":lumi*832*0.478864*(1-8.4e-4)/3,
-            "TTJets_diLept":lumi*832*0.010404,
-            "TTJets_diHad":lumi*832*0.478864,
-            "WJets_toLNu":lumi*59100*0.102,
-            "WWJets_LNuQQ":lumi*119*0.007058
+WJets_cross=59100
+WWJets_cross=119
+
+tt_semilept_br=2*W_Had_BR*W_Lept_BR #Only e/mu/tau not sum all over 3
+tt_diHad_br=W_Had_BR**2
+tt_diLept_br=(3*W_Lept_BR)**2 #3 leptons
+
+num_events={"TTJets_cbENu":lumi*tt_cross*tt_semilept_br*cb_BR,
+            "TTJets_cbMuNu":lumi*tt_cross*tt_semilept_br*cb_BR,
+            "TTJets_cbTauNu":lumi*tt_cross*tt_semilept_br*cb_BR,
+            "TTJets_LNuQQ_NoCKM_E":lumi*tt_cross*tt_semilept_br*NoCb_BR,
+            "TTJets_LNuQQ_NoCKM_Mu":lumi*tt_cross*tt_semilept_br*NoCb_BR,
+            "TTJets_LNuQQ_NoCKM_Tau":lumi*tt_cross*tt_semilept_br*NoCb_BR,
+            "TTJets_diLept":lumi*tt_cross*tt_diLept_br,
+            "TTJets_diHad":lumi*tt_cross*tt_diHad_br,
+            "WJets_toLNu":lumi*WJets_cross*W_Lept_BR*3, #sum over 3 leptons
+            "WWJets_LNuQQ":lumi*119*2*W_Lept_BR*3*W_Had_BR #sum over 3 leptons
 }
 
 muon_cuts_events=muon_df.xs("cumulative",level=1)
