@@ -8,7 +8,7 @@ from MLP import MLP
 from torchview import draw_graph
 
 from livelossplot import PlotLosses
-
+from dataset import loader
 from ipywidgets import Output
 from IPython.display import display
 
@@ -121,7 +121,8 @@ class JPANet(torch.nn.Module):
     def forward(self, mu, nu, jet):
 
         pad_mask = ((jet == -10)[:, :, 0].squeeze()).to(torch.bool)
-        
+        if pad_mask.dim()==1:
+            pad_mask=torch.reshape(pad_mask,(1,pad_mask.shape[0]))
 
         out_mu = self.mu_mlp(mu)
         out_nu = self.nu_mlp(nu)
@@ -145,52 +146,59 @@ class JPANet(torch.nn.Module):
 
         return total_out
 
-    def train_loop(self, train_loader,test,epochs,show_each=False):
+    def train_loop(self, train,test,epochs,train_bunch=1,test_bunch=1,batch_size=1,show_each=False):
         epoch_loop = tqdm(range(epochs), desc="epoch")
         torch.backends.cudnn.benchmark = True
         out = Output()
         display(out)
-        
+        bunch_size = int(np.ceil(len(train)/train_bunch))
+        assert bunch_size>batch_size
         for epoch in epoch_loop:
+
             self.train()
             temp_train_loss=[]
             temp_train_accuracy=[]
-            for mu_batch,nu_batch,jet_batch,y_batch in train_loader:
 
-                mu_batch = mu_batch.to(device,non_blocking=True)
-                nu_batch = nu_batch.to(device,non_blocking=True)
-                jet_batch = jet_batch.to(device,non_blocking=True)
-                y_batch =y_batch.to(device,non_blocking=True)
+            
+            for bunch in loader(train,batch_size=bunch_size):
 
-
-                y_logits = self.forward(
-                    mu_batch, nu_batch, jet_batch)
-                
-                train_loss_step = self.loss_fn(
-                    y_logits, y_batch.squeeze())
-                
-                self.optimizer.zero_grad()
-                loss=train_loss_step
-                loss.backward()
-                #train_loss_step.backward()
-                self.optimizer.step()
-                
-                temp_train_loss.append(train_loss_step.detach().to(cpu,non_blocking=True).numpy())
-                temp_train_accuracy.append(((torch.argmax(
-                    y_logits, axis=1) == y_batch.squeeze()
-                ).sum()/y_batch.shape[0]).detach().to(cpu,non_blocking=True).numpy())
-                del loss,train_loss_step
+                mu_bunch,nu_bunch,jet_bunch,y_bunch = bunch
+                mu_bunch = mu_bunch.to(device,non_blocking=True)
+                nu_bunch = nu_bunch.to(device,non_blocking=True)
+                jet_bunch = jet_bunch.to(device,non_blocking=True)
+                y_bunch =y_bunch.to(device,non_blocking=True)
+        
+                n_batch=int(np.ceil(y_bunch.shape[0]/batch_size))
+                for n in range(n_batch):
+                    mu_batch = mu_bunch[n*batch_size:(n+1)*batch_size]
+                    nu_batch = nu_bunch[n*batch_size:(n+1)*batch_size]
+                    jet_batch = jet_bunch[n*batch_size:(n+1)*batch_size]
+                    y_batch = y_bunch[n*batch_size:(n+1)*batch_size]
+                    y_logits = self.forward(
+                        mu_batch, nu_batch, jet_batch)
+                    
+                    train_loss_step = self.loss_fn(
+                        y_logits, y_batch.squeeze())
+                    
+                    self.optimizer.zero_grad()
+                    loss=train_loss_step
+                    loss.backward()
+                    #train_loss_step.backward()
+                    self.optimizer.step()
+                    
+                    temp_train_loss.append(train_loss_step.detach().to(cpu,non_blocking=True).numpy())
+                    temp_train_accuracy.append(((torch.argmax(
+                        y_logits, axis=1) == y_batch.squeeze()
+                    ).sum()/y_batch.shape[0]).detach().to(cpu,non_blocking=True).numpy())
+                    del loss,train_loss_step
                 
                     
 
             self.eval()
             with torch.inference_mode():
-                mu_test=test.mu_data.to(device)
-                nu_test=test.nu_data.to(device)
-                jet_test=test.jet_data.to(device)
-                y_test=test.label.to(device)
-                test_logits = self.forward(
-                    mu_test, nu_test, jet_test)
+                y_test=test.label.to(device,non_blocking=True)
+                test_logits = self.predict(
+                    test,bunch=test_bunch)
 
                 test_loss_step = self.loss_fn(
                     test_logits, y_test.squeeze())
@@ -290,3 +298,20 @@ class JPANet(torch.nn.Module):
     def n_parameters(self):
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
     
+    def predict(self,dataset,bunch=1):
+        self.eval()
+        with torch.inference_mode():
+            bunch_size=dataset.label.shape[0]//bunch
+            res=torch.zeros((1,2),device=device,dtype=torch.float32)
+            for bunch in loader(dataset,batch_size=bunch_size):
+                mu_bunch,nu_bunch,jet_bunch,y_bunch=bunch
+                mu_bunch = mu_bunch.to(device,non_blocking=True)
+                nu_bunch = nu_bunch.to(device,non_blocking=True)
+                jet_bunch = jet_bunch.to(device,non_blocking=True)
+                y_bunch =y_bunch.to(device,non_blocking=True)
+                temp_res=self.forward(mu_bunch,nu_bunch,jet_bunch)
+                res=torch.cat((res,temp_res),dim=0)
+        return res[1:]
+            
+
+        
