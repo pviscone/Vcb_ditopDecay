@@ -1,6 +1,7 @@
 import torch
 from torch.utils.data import Dataset
 import pandas as pd
+import numpy as np
 
 class EventsDataset(Dataset):
     def __init__(self, mu_data, nu_data, jet_data, label):
@@ -34,3 +35,10 @@ class EventsDataset(Dataset):
         self.nu_data=self.nu_data.to(device)
         self.jet_data=self.jet_data.to(device)
         self.label=self.label.to(device)
+        
+        
+def loader(dataset,batch_size):
+    n_batch=int(np.ceil(len(dataset)/batch_size))
+    for i in range(n_batch):
+        yield dataset[i*batch_size:(i+1)*batch_size]
+
