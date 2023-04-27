@@ -12,6 +12,8 @@ from livelossplot import PlotLosses
 from ipywidgets import Output
 from IPython.display import display
 
+import os
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
 
 
 
@@ -30,9 +32,9 @@ class JPANet(torch.nn.Module):
     def __init__(self,
                  mu_arch=None, nu_arch=None, jet_arch=None, event_arch=None, prefinal_arch=None,
                  attention_arch=None, final_arch=None, final_attention=False,
-                 batch_size=1, test_size=0.15, n_heads=1,
+                 n_heads=1,
                  weight=None,
-                 optim={}, early_stopping=None, shuffle=False, dropout=0.15):
+                 optim={}, early_stopping=None, dropout=0.15):
         super().__init__()
         assert final_arch is not None
 
@@ -44,8 +46,6 @@ class JPANet(torch.nn.Module):
         self.loss_fn = torch.nn.NLLLoss(weight=weight)
         self.early_stopping = early_stopping
 
-
-        self.shuffle_at_each_epoch = shuffle
 
         self.test_loss = np.array([])
         self.train_loss = np.array([])
@@ -145,55 +145,43 @@ class JPANet(torch.nn.Module):
 
         return total_out
 
-    def train_loop(self, train_loader,test,epochs,show_each=False,batch_size=1):
+    def train_loop(self, train_loader,test,epochs,show_each=False):
         epoch_loop = tqdm(range(epochs), desc="epoch")
-
+        torch.backends.cudnn.benchmark = True
         out = Output()
         display(out)
         
         for epoch in epoch_loop:
             self.train()
-            for mu_train,nu_train,jet_train,y_train in train_loader:
-                mu_train = mu_train.to(device)
-                nu_train = nu_train.to(device)
-                jet_train = jet_train.to(device)
-                y_train =y_train.to(device)
-                if self.shuffle_at_each_epoch:
-                    perm = torch.randperm(self.mu_train.size()[0])
-                    mu_train = mu_train[perm]
-                    nu_train = nu_train[perm]
-                    jet_train = jet_train[perm]
-                    y_train = y_train[perm]
+            temp_train_loss=[]
+            temp_train_accuracy=[]
+            for mu_batch,nu_batch,jet_batch,y_batch in train_loader:
 
-                n_batch=np.ceil(y_train.shape[0]/batch_size).astype(int)
-                n_events_bunch =y_train.shape[0]
+                mu_batch = mu_batch.to(device,non_blocking=True)
+                nu_batch = nu_batch.to(device,non_blocking=True)
+                jet_batch = jet_batch.to(device,non_blocking=True)
+                y_batch =y_batch.to(device,non_blocking=True)
+
+
+                y_logits = self.forward(
+                    mu_batch, nu_batch, jet_batch)
                 
-                # for x_batch, y_batch in self.data_loader:
-                #!N batch e batch size e n_events_train
-                for i in range(n_batch):
-                    if ((i+1)*batch_size < n_events_bunch):
-                        mu_batch = mu_train[i *
-                                            batch_size:(i+1)*batch_size]
-                        nu_batch = nu_train[i *
-                                            batch_size:(i+1)*batch_size]
-                        jet_batch = jet_train[i *
-                                            batch_size:(i+1)*batch_size]
-                        y_batch = y_train[i*batch_size:(i+1)*batch_size]
-                    else:
-                        mu_batch = mu_train[i*batch_size:n_events_bunch]
-                        nu_batch = nu_train[i*batch_size:n_events_bunch]
-                        jet_batch = jet_train[i *
-                                            batch_size:n_events_bunch]
-                        y_batch = y_train[i*batch_size:n_events_bunch]
-
-                    y_logits = self.forward(
-                        mu_batch, nu_batch, jet_batch)
+                train_loss_step = self.loss_fn(
+                    y_logits, y_batch.squeeze())
+                
+                self.optimizer.zero_grad()
+                loss=train_loss_step
+                loss.backward()
+                #train_loss_step.backward()
+                self.optimizer.step()
+                
+                temp_train_loss.append(train_loss_step.detach().to(cpu,non_blocking=True).numpy())
+                temp_train_accuracy.append(((torch.argmax(
+                    y_logits, axis=1) == y_batch.squeeze()
+                ).sum()/y_batch.shape[0]).detach().to(cpu,non_blocking=True).numpy())
+                del loss,train_loss_step
+                
                     
-                    train_loss_step = self.loss_fn(
-                        y_logits, y_batch.squeeze())
-                    self.optimizer.zero_grad()
-                    train_loss_step.backward()
-                    self.optimizer.step()
 
             self.eval()
             with torch.inference_mode():
@@ -212,7 +200,7 @@ class JPANet(torch.nn.Module):
                     self.test_loss, test_loss_step.to(cpu).numpy())
 
                 self.train_loss = np.append(
-                    self.train_loss, train_loss_step.to(cpu).numpy())
+                    self.train_loss,np.mean(np.array(temp_train_loss)))
 
                 
                 classified_test=(torch.argmax(
@@ -225,7 +213,7 @@ class JPANet(torch.nn.Module):
                     )
                 
                 
-
+                """
                 #idx=np.random.choice(range(y_train.shape[0]),y_test.shape[0],replace=False)
 
                 classified_train=(torch.argmax(
@@ -233,9 +221,10 @@ class JPANet(torch.nn.Module):
                              nu_train,
                              jet_train), axis=1)== y_train.squeeze()
                             ).sum()/y_train.shape[0]
+                """
 
                 self.train_accuracy.append(
-                    classified_train.to(cpu).numpy())
+                    np.mean(np.array(temp_train_accuracy)))
                     
                     
                     

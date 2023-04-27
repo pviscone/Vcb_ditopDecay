@@ -12,11 +12,14 @@ from sklearn.model_selection import train_test_split
 sys.path.append("./JPAmodel/")
 from JPAmodel.dataset import EventsDataset
 import JPAmodel.JPANet as JPA
+import os
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
+
 
 JPANet = JPA.JPANet
 
-
-
+torch.backends.cudnn.benchmark = True
+#%%
 if torch.cuda.is_available():
     dev = "cuda:0"
 else:
@@ -27,7 +30,8 @@ device = torch.device(dev)
 jets_per_event = 7
 
 #df = pd.read_pickle("./event_df.pkl", compression="bz2")
-df=pd.read_pickle("./event_df.pkl")
+#df=pd.read_pickle("./event_df.pkl")
+df=pd.read_pickle("../../../root_files/Muons/BigMuons_SB_df.pkl")
 
 #%%
 
@@ -35,7 +39,6 @@ df=pd.read_pickle("./event_df.pkl")
 mu_data=df.filter(regex="Muon.*(pt|eta|phi)").to_numpy()
 nu_data=df.filter(regex="MET.*(pt|eta|phi)").to_numpy()
 jet_data=df.filter(regex="Jet.*(pt|eta|phi|btagDeepFlavCvB|btagDeepFlavCvL|Tmass)").to_numpy()
-#label=np.expand_dims(df["bHad_label"].astype(int).to_numpy(), axis=1)
 label=df.filter(regex="(label).*").astype(int).to_numpy()
 
 
@@ -61,12 +64,15 @@ train_dataset=EventsDataset(mu_train,nu_train,jet_train,y_train)
 test_dataset=EventsDataset(mu_test,nu_test,jet_test,y_test)
 test_dataset.to(device)
 
-bunch=1
-train_loader = DataLoader(train_dataset,
-                          batch_size=len(train_dataset)//bunch,shuffle=True)
+
 
 
 # %%
+n_batch=100
+train_loader = DataLoader(train_dataset,
+                          batch_size=len(train_dataset)//n_batch,shuffle=True,
+                          num_workers=0,pin_memory=True,
+                          pin_memory_device="cuda:0")
 importlib.reload(JPA)
 JPANet = JPA.JPANet
 
@@ -75,23 +81,23 @@ nu_feat=nu_data.shape[2]
 jet_feat=jet_data.shape[2]
 
 model = JPANet(weight=None,
-               mu_arch=None, nu_arch=None, jet_arch=[jet_feat, 30, 30],
-               attention_arch=[30, 30],
-               event_arch=[mu_feat+nu_feat, 30, 30],
+               mu_arch=None, nu_arch=None, jet_arch=[jet_feat, 64, 64],
+               attention_arch=[64, 64],
+               event_arch=[mu_feat+nu_feat, 64, 64],
                prefinal_arch=None,
                final_attention=True,
-               final_arch=[30,30*(jets_per_event+1),128,64,32],
-               batch_size=5000, n_heads=2, dropout=0.1,
+               final_arch=[64,64*(jets_per_event+1),256,128,64,32],
+               n_heads=2, dropout=0.1,
                optim={"lr": 0.0002, "weight_decay": 0.00, },
-               early_stopping=None, shuffle=False,
+               early_stopping=None,
                )
-
+#model=torch.compile(model)
 model = model.to(device)
 print(f"Number of parameters: {model.n_parameters()}")
 
 #!---------------------Training---------------------
 #model=torch.compile(model)
-model.train_loop(train_loader,test_dataset,epochs=50,show_each=12,batch_size=10000)
+model.train_loop(train_loader,test_dataset,epochs=50,show_each=5)
 
 
 #!---------------------Plot loss---------------------
