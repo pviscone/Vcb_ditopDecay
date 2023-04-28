@@ -80,13 +80,14 @@ jet_feat=jet_data.shape[2]
 
 model = JPANet(weight=None,
                mu_arch=None, nu_arch=None, jet_arch=[jet_feat, 128, 128],
-               attention_arch=[128, 128],
-               event_arch=[mu_feat+nu_feat, 128, 128],
-               prefinal_arch=None,
+               jet_attention_arch=[128,128,128],
+               event_arch=[mu_feat+nu_feat, 128, 128,128],
+               pre_attention_arch=None,
                final_attention=True,
-               final_arch=[128,128*(jets_per_event+1),512,256,128,64,32],
-               n_heads=2, dropout=0.1,
-               optim={"lr": 0.0005, "weight_decay": 0.00, },
+               post_attention_arch=[128,128],
+               post_pooling_arch=[128,128,64],
+               n_heads=2, dropout=0.02,
+               optim={"lr": 0.001, "weight_decay": 0.00, },
                early_stopping=None,
                )
 #model=torch.compile(model)
@@ -95,7 +96,7 @@ print(f"Number of parameters: {model.n_parameters()}")
 
 #!---------------------Training---------------------
 #model=torch.compile(model)
-model.train_loop(train_dataset,test_dataset,epochs=50,show_each=5,train_bunch=120,test_bunch=9,batch_size=20000)
+model.train_loop(train_dataset,test_dataset,epochs=50,show_each=5,train_bunch=25,test_bunch=3,batch_size=20000)
 
 
 #!---------------------Plot loss---------------------
@@ -115,7 +116,7 @@ mplhep.style.use("CMS")
 plt.rc('axes', axisbelow=True)
 
 
-bins=40
+bins=15
 semileptonic_weight=(138e3    #Lumi
                     *832      #Cross section
                     *0.44 #Semileptonic BR
@@ -155,7 +156,7 @@ plt.xlabel("NN score")
 plt.ylim(1e-1,1e7)
 mplhep.cms.text("Private Work")
 mplhep.cms.lumitext("$138 fb^{-1}$ $(13 TeV)$")
-#%%
+
 bkg_not_zero=binned_bkg_score!=0
 fom=binned_signal_score[bkg_not_zero]**2/(binned_bkg_score[bkg_not_zero])
 Q=(np.sum(fom[~np.isnan(fom)]))
