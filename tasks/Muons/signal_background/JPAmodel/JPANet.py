@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from Attention_block import Attention
 from MLP import MLP
 from torchview import draw_graph
-
+from SelfAttentionPooling import SelfAttentionPooling
 from livelossplot import PlotLosses
 from dataset import loader
 from ipywidgets import Output
@@ -30,13 +30,14 @@ device = torch.device(dev)
 class JPANet(torch.nn.Module):
 
     def __init__(self,
-                 mu_arch=None, nu_arch=None, jet_arch=None, event_arch=None, prefinal_arch=None,
-                 attention_arch=None, final_arch=None, final_attention=False,
+                 mu_arch=None, nu_arch=None, jet_arch=None, event_arch=None, pre_attention_arch=None,
+                 jet_attention_arch=None, post_attention_arch=None, final_attention=False,post_pooling_arch=None,
                  n_heads=1,
                  weight=None,
                  optim={}, early_stopping=None, dropout=0.15):
         super().__init__()
-        assert final_arch is not None
+        assert post_attention_arch is not None
+        assert post_pooling_arch is not None
 
         self.liveloss = PlotLosses(
             groups={'Loss': ['train_loss', 'test_loss'],
@@ -75,40 +76,46 @@ class JPANet(torch.nn.Module):
             self.ev_mlp = torch.nn.Identity()
 
         if jet_arch is not None:
-            self.mlp_jet = MLP(arch=jet_arch,out_activation=torch.nn.LeakyReLU(0.1),
+            self.jet_mlp = MLP(arch=jet_arch,out_activation=torch.nn.LeakyReLU(0.1),
                                dropout=dropout)
             attention_input_dim = jet_arch[-1]
         else:
-            self.mlp_jet = torch.nn.Identity()
+            self.jet_mlp = torch.nn.Identity()
             attention_input_dim = self.jet_train.shape[2]
 
         
-        if attention_arch is not None:
-            self.attention = Attention(input_dim=attention_input_dim,
-                mlp_arch=attention_arch,n_heads=n_heads, dropout=dropout)
+        if jet_attention_arch is not None:
+            self.jet_attention = Attention(input_dim=attention_input_dim,
+                mlp_arch=jet_attention_arch,n_heads=n_heads, dropout=dropout)
         else:
-            self.attention = torch.nn.Identity()
-            self.attention.forward = lambda x,key_padding_mask=None: x
+            self.jet_attention = torch.nn.Identity()
+            self.jet_attention.forward = lambda x,key_padding_mask=None: x
 
 
-        if prefinal_arch is not None:
-            self.prefinal_mlp = MLP(arch=prefinal_arch,
+        if pre_attention_arch is not None:
+            self.all_preattention_mlp = MLP(arch=pre_attention_arch,
                                     out_activation=torch.nn.LeakyReLU(0.1),
                                     dropout=dropout)
         else:
-            self.prefinal_mlp = torch.nn.Identity()
+            self.all_preattention_mlp = torch.nn.Identity()
 
         if final_attention:
-            self.total_norm=torch.nn.Identity()
-            self.total = Attention(input_dim=final_arch[0], mlp_arch=final_arch[1:],
+            self.all_norm=torch.nn.Identity()
+            self.all_attention = Attention(input_dim=post_attention_arch[0], mlp_arch=post_attention_arch[1:],
                                    n_heads=n_heads, dropout=dropout)
         else:
-            self.total_norm = torch.nn.LayerNorm(final_arch[0])
-            self.total = MLP(arch=final_arch, out_activation=torch.nn.LeakyReLU(0.1),
+            self.all_norm = torch.nn.LayerNorm(post_attention_arch[0])
+            self.all_attention = MLP(arch=post_attention_arch, out_activation=torch.nn.LeakyReLU(0.1),
                              dropout=dropout)
-            self.total.forward=lambda x,key_padding_mask=None:self.total.forward(x)
+            self.all_attention.forward=lambda x,key_padding_mask=None:self.all_attention.forward(x)
     
-        self.output=MLP(arch=[final_arch[-1],2],out_activation=torch.nn.LogSoftmax(dim=1),
+
+    
+        self.pooling=SelfAttentionPooling(input_dim=post_attention_arch[-1])
+        
+        self.post_pooling_mlp=MLP(arch=post_pooling_arch,out_activation=torch.nn.LeakyReLU(0.1),dropout=None)
+
+        self.output=MLP(arch=[post_pooling_arch[-1],2],out_activation=torch.nn.LogSoftmax(dim=1),
                         dropout=None)
 
         self.optim_dict = optim
@@ -130,18 +137,21 @@ class JPANet(torch.nn.Module):
 
         del out_mu, out_nu
 
-        out_jet = self.mlp_jet(jet)
-        out_jet = self.attention(out_jet,key_padding_mask=pad_mask)
+        out_jet = self.jet_mlp(jet)
+        out_jet = self.jet_attention(out_jet,key_padding_mask=pad_mask)
         
         total_out = torch.cat((out_ev, out_jet), dim=1)
-        total_out = self.total_norm(total_out)
-        total_out = self.prefinal_mlp(total_out)
+        total_out = self.all_norm(total_out)
+        total_out = self.all_preattention_mlp(total_out)
         
         pad_mask = torch.cat((torch.tensor(np.zeros(
                                             out_ev.shape[0]),
                                     device=device, dtype=torch.bool)
                             .unsqueeze(1), pad_mask), dim=1)
-        total_out = self.total(total_out,key_padding_mask=pad_mask,flatten=True)
+        total_out = self.all_attention(total_out,key_padding_mask=pad_mask)
+        
+        total_out = self.pooling(total_out)
+        total_out = self.post_pooling_mlp(total_out)
         total_out = self.output(total_out)
 
         return total_out
