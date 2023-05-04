@@ -3,7 +3,7 @@ import awkward as ak
 import sys
 from coffea.nanoevents.methods import vector
 
-sys.path.append("../../../utils/coffea_utils")
+sys.path.append("../../utils/coffea_utils")
 from coffea_utils import Muon_cuts, np_and,np_or,MET_eta
 
 
@@ -18,11 +18,13 @@ def column(ak_array):
     return np.atleast_2d(ak_array.to_numpy(allow_missing=False)).T
 
 
-def build_matrix(events,obj, variable_list):
+def build_matrix(events,obj, variable_list,index=None):
     column_list = []
     col_labels = []
     for var in variable_list:
         col_labels.append(f"{obj}_{var}")
+        if index is not None:
+            var+=f"[:,{index}]"
         exec(f"column_list.append(column(events.{obj}.{var}))")
     return np.hstack(column_list), col_labels
 
@@ -55,7 +57,7 @@ def pad_and_alternate(events,obj, variable_list, pad):
 
 def select_muon_events(events,num_jet_to_select):
     muon_selector=Muon_cuts()
-    events=muon_selector.process(events,LHELepton=13,out="events")
+    events=muon_selector.process(events,out="events")
     
     events["Muon"] = events.Muon[:,0]
     events["MET"]=ak.zip(
@@ -69,6 +71,6 @@ def select_muon_events(events,num_jet_to_select):
         behavior=vector.behavior,
     )
     events["Jet"]=events.Jet[:,:num_jet_to_select]
-    events["MET","Wmass"]=(events.MET+events.Muon).mass
-    events["Jet","Tmass"]=(events.Jet+events.Muon+events.MET).mass
+    events["MET","WMass"]=(events.MET+events.Muon).mass
+    events["Jet","TMass"]=(events.Jet+events.Muon+events.MET).mass
     return events
