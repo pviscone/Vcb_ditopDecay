@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 
-def build_datasets(df,jets_per_event,test_size=0.15):
+def build_datasets(df,jets_per_event,test_size=0.15,normalize=True):
             
         mu_data=df.filter(regex="Muon.*(pt|eta|phi)").to_numpy()
         nu_data=df.filter(regex="MET.*(pt|eta|phi)").to_numpy()
@@ -28,24 +28,29 @@ def build_datasets(df,jets_per_event,test_size=0.15):
         if test_size is not None:
             mu_train, mu_test, nu_train, nu_test,\
             jet_train,jet_test,y_train,y_test=train_test_split(mu_data,nu_data,jet_data,label,test_size=test_size,shuffle=True)
-            return EventsDataset(mu_train,nu_train,jet_train,y_train),EventsDataset(mu_test,nu_test,jet_test,y_test)
+            return EventsDataset(mu_train,nu_train,jet_train,y_train,normalize=normalize),EventsDataset(mu_test,nu_test,jet_test,y_test,normalize=normalize)
         else:
-            return EventsDataset(mu_data,nu_data,jet_data,label)
+            return EventsDataset(mu_data,nu_data,jet_data,label,normalize=normalize)
         
 class EventsDataset(Dataset):
-    def __init__(self, mu_data, nu_data, jet_data, label):
-        temp_jet_df=pd.DataFrame(torch.flatten(jet_data,end_dim=1).numpy())
-        jet_mean=torch.tensor(temp_jet_df[temp_jet_df!=0].mean().to_numpy(),dtype=torch.float32)
-        jet_std=torch.tensor(temp_jet_df[temp_jet_df!=0].std().to_numpy(),dtype=torch.float32)
+    def __init__(self, mu_data, nu_data, jet_data, label,normalize=True):
+        if normalize:
+            temp_jet_df=pd.DataFrame(torch.flatten(jet_data,end_dim=1).numpy())
+            jet_mean=torch.tensor(temp_jet_df[temp_jet_df!=0].mean().to_numpy(),dtype=torch.float32)
+            jet_std=torch.tensor(temp_jet_df[temp_jet_df!=0].std().to_numpy(),dtype=torch.float32)
 
-        del temp_jet_df
+            del temp_jet_df
 
-                
-        
-        
-        self.mu_data = (mu_data-torch.mean(mu_data))/(torch.std(mu_data)+1e-5)
-        self.nu_data = (nu_data-torch.mean(nu_data))/(torch.std(nu_data)+1e-5)
-        self.jet_data = (jet_data-jet_mean)/(jet_std+1e-5)
+                    
+            
+            
+            self.mu_data = (mu_data-torch.mean(mu_data))/(torch.std(mu_data)+1e-5)
+            self.nu_data = (nu_data-torch.mean(nu_data))/(torch.std(nu_data)+1e-5)
+            self.jet_data = (jet_data-jet_mean)/(jet_std+1e-5)
+        else:
+            self.mu_data = mu_data
+            self.nu_data = nu_data
+            self.jet_data = jet_data
         self.label = label
 
     def __len__(self):

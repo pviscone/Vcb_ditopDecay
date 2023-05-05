@@ -32,7 +32,7 @@ jets_per_event = 7
 #df = pd.read_pickle("./event_df.pkl", compression="bz2")
 #df=pd.read_pickle("./event_df.pkl")
 df=pd.read_pickle("../../../root_files/signal_background/BigMuons_SB_df.pkl")
-powheg_df=pd.read_pickle("../../../root_files/signal_background/BigMuons_SB_df.pkl")
+powheg_df=pd.read_pickle("../../../root_files/signal_background/TTBarSemileptonic_MuonCuts_powheg.pkl")
 
 
 #%%
@@ -73,11 +73,12 @@ print(f"Number of parameters: {model.n_parameters()}")
 
 #!---------------------Training---------------------
 #model=torch.compile(model)
-model.train_loop(train_dataset,test_dataset,epochs=50,show_each=5,train_bunch=25,test_bunch=3,batch_size=20000)
+model.state_dict=torch.load("./state_dict.pt")
+#model.train_loop(train_dataset,test_dataset,epochs=50,show_each=5,train_bunch=25,test_bunch=3,batch_size=20000)
 
 
 #!---------------------Plot loss---------------------
-model.loss_plot()
+#model.loss_plot()
 # model.graph(test_dataset)
 
 
@@ -88,7 +89,7 @@ signal_mask=test_dataset.label.squeeze()==1
 bkg_mask=test_dataset.label.squeeze()==0
 score=torch.exp(model.predict(test_dataset,bunch=10)[:,-1])
 signal_score=score[signal_mask]
-bkg_score=torch.exp(model.predict(powheg_dataset,bunch=40)[:,-1])
+bkg_score=torch.exp(model.predict(powheg_dataset,bunch=150)[:,-1])
 #bkg_score=score[bkg_mask]
 
 signal_score=signal_score.detach().to(cpu).numpy()
