@@ -39,7 +39,7 @@ importlib.reload(JPA)
 JPANet = JPA.JPANet
 
 mu_feat=3
-nu_feat=3
+nu_feat=4
 jet_feat=8
 
 model = JPANet(weight=None,

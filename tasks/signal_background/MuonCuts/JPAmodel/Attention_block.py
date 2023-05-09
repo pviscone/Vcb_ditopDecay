@@ -18,7 +18,7 @@ class Attention(torch.nn.Module):
             self.dropout = torch.nn.Identity()
         self.norm2 = torch.nn.LayerNorm(input_dim)
         if mlp_arch is not None:
-            self.mlp=MLP(arch=mlp_arch, out_activation=torch.nn.LeakyReLU(0.1),dropout=dropout)
+            self.mlp=MLP(arch=mlp_arch, out_activation=torch.nn.SiLU(),dropout=dropout)
         else:
             self.mlp=torch.nn.Identity()
         

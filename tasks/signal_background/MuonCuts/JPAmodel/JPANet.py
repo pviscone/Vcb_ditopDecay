@@ -54,14 +54,14 @@ class JPANet(torch.nn.Module):
         # Declare the layers here
         if mu_arch is not None:
             self.mu_mlp = MLP(arch=mu_arch,
-                              out_activation=torch.nn.LeakyReLU(0.1), dropout=dropout)
+                              out_activation=torch.nn.SiLU(), dropout=dropout)
         else:
             self.mu_mlp=torch.nn.Identity()
 
         
         if nu_arch is not None:
             self.nu_mlp = MLP(arch=nu_arch,
-                              out_activation=torch.nn.LeakyReLU(0.1), dropout=dropout)
+                              out_activation=torch.nn.SiLU(), dropout=dropout)
 
         else:
             self.nu_mlp=torch.nn.Identity()
@@ -70,13 +70,13 @@ class JPANet(torch.nn.Module):
         self.mu_nu_norm = torch.nn.LayerNorm(event_arch[0])
         
         if event_arch is not None:
-            self.ev_mlp = MLP(arch=event_arch,out_activation=torch.nn.LeakyReLU(0.1),
+            self.ev_mlp = MLP(arch=event_arch,out_activation=torch.nn.SiLU(),
                               dropout=dropout)
         else:
             self.ev_mlp = torch.nn.Identity()
 
         if jet_arch is not None:
-            self.jet_mlp = MLP(arch=jet_arch,out_activation=torch.nn.LeakyReLU(0.1),
+            self.jet_mlp = MLP(arch=jet_arch,out_activation=torch.nn.SiLU(),
                                dropout=dropout)
             attention_input_dim = jet_arch[-1]
         else:
@@ -94,7 +94,7 @@ class JPANet(torch.nn.Module):
 
         if pre_attention_arch is not None:
             self.all_preattention_mlp = MLP(arch=pre_attention_arch,
-                                    out_activation=torch.nn.LeakyReLU(0.1),
+                                    out_activation=torch.nn.SiLU(),
                                     dropout=dropout)
         else:
             self.all_preattention_mlp = torch.nn.Identity()
@@ -105,7 +105,7 @@ class JPANet(torch.nn.Module):
                                    n_heads=n_heads, dropout=dropout)
         else:
             self.all_norm = torch.nn.LayerNorm(post_attention_arch[0])
-            self.all_attention = MLP(arch=post_attention_arch, out_activation=torch.nn.LeakyReLU(0.1),
+            self.all_attention = MLP(arch=post_attention_arch, out_activation=torch.nn.SiLU(),
                              dropout=dropout)
             self.all_attention.forward=lambda x,key_padding_mask=None:self.all_attention.forward(x)
     
@@ -113,7 +113,7 @@ class JPANet(torch.nn.Module):
     
         self.pooling=SelfAttentionPooling(input_dim=post_attention_arch[-1])
         
-        self.post_pooling_mlp=MLP(arch=post_pooling_arch,out_activation=torch.nn.LeakyReLU(0.1),dropout=None)
+        self.post_pooling_mlp=MLP(arch=post_pooling_arch,out_activation=torch.nn.SiLU(),dropout=None)
 
         self.output=MLP(arch=[post_pooling_arch[-1],2],out_activation=torch.nn.LogSoftmax(dim=1),
                         dropout=None)

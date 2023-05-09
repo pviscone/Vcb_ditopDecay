@@ -15,7 +15,7 @@ class MLP(torch.nn.Module):
             torch.nn.init.zeros_(self.layers[-1].bias)
             
             if i != len(arch)-2:
-                self.layers.append(torch.nn.LeakyReLU(0.1))
+                self.layers.append(torch.nn.SiLU())
             else:
                 self.layers.append(out_activation)
             
