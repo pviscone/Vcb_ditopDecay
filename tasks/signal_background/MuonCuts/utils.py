@@ -3,10 +3,41 @@ import awkward as ak
 import sys
 from coffea.nanoevents.methods import vector
 
-sys.path.append("../../utils/coffea_utils")
+sys.path.append("../../../utils/coffea_utils")
 from coffea_utils import Muon_cuts, np_and,np_or,MET_eta
 
-
+def build(coffea_obj,label=None,LHELept=None,num_jet_to_select=None):
+    assert label is not None
+    assert num_jet_to_select is not None
+    if LHELept is not None:
+        Lepton_mask=ak.sum(np.abs(coffea_obj.LHEPart.pdgId)==LHELept,axis=1)>0
+        coffea_obj=coffea_obj[Lepton_mask]
+    Muon_label=ak.sum(np.abs(coffea_obj.LHEPart.pdgId)==13,axis=1)>0
+    Electron_label=ak.sum(np.abs(coffea_obj.LHEPart.pdgId)==11,axis=1)>0
+    Tau_label=ak.sum(np.abs(coffea_obj.LHEPart.pdgId)==15,axis=1)>0
+    
+    Lept_label=np.zeros_like(Muon_label.to_numpy(),dtype=int)
+    Lept_label[Muon_label.to_numpy()]=13
+    Lept_label[Electron_label.to_numpy()]=11
+    Lept_label[Tau_label.to_numpy()]=15
+    
+    Mu_feature=["pt", "eta", "phi"]
+    Nu_feature=["pt", "eta", "phi","WLeptMass"]
+    Jet_feature=["pt", "eta", "phi", "btagDeepFlavB",
+                "btagDeepFlavCvB", "btagDeepFlavCvL", "TLeptMass","THadMass","WHadMass"]
+    muon_matrix, mu_labels = build_matrix(coffea_obj,"Muon", Mu_feature,index=0)
+    nu_matrix, nu_labels = build_matrix(coffea_obj,"MET", Nu_feature)
+    jet_matrix, jet_labels = pad_and_alternate(coffea_obj,"Jet",
+                                                        Jet_feature,
+                                                        num_jet_to_select)
+    matrix=np.hstack([
+        muon_matrix,
+        nu_matrix,
+        jet_matrix,
+        label*np.ones((muon_matrix.shape[0],1)),
+        np.atleast_2d(Lept_label).T])
+    col_labels=mu_labels+nu_labels+jet_labels+["label"]+["Lept_label"]
+    return matrix,col_labels
 
 def padded_matrix(ak_array, pad):
     masked_array = ak.pad_none(ak_array, pad, clip=True).to_numpy()
