@@ -7,17 +7,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 import mplhep
-from torch.utils.data import DataLoader
-from sklearn.model_selection import train_test_split
 sys.path.append("./JPAmodel/")
-from JPAmodel.dataset import EventsDataset,build_datasets
+from JPAmodel.dataset import build_datasets
 import JPAmodel.JPANet as JPA
 import os
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
-
-
 JPANet = JPA.JPANet
-
 torch.backends.cudnn.benchmark = True
 #%%
 if torch.cuda.is_available():
@@ -27,33 +22,25 @@ else:
 cpu = torch.device("cpu")
 device = torch.device(dev)
 
-jets_per_event = 7
-
-#df = pd.read_pickle("./event_df.pkl", compression="bz2")
-#df=pd.read_pickle("./event_df.pkl")
-df=pd.read_pickle("../../../root_files/signal_background/BigMuons_SB_df.pkl")
-powheg_df=pd.read_pickle("../../../root_files/signal_background/TTBarSemileptonic_MuonCuts_powheg.pkl")
-
 
 #%%
+train_dataset=torch.load("../../../root_files/signal_background/train_dataset.pt")
+test_dataset=torch.load("../../../root_files/signal_background/test_dataset.pt")
+powheg_dataset=torch.load("../../../root_files/signal_background/powheg_dataset.pt")
 
-train_dataset,test_dataset=build_datasets(df,jets_per_event=7,test_size=0.15)
 #test_dataset.to(device)
 #train_dataset.to(device)
-
-powheg_dataset=build_datasets(powheg_df,jets_per_event=7,test_size=None)
-
+#powheg_dataset.to(device)
 
 
 # %%
-
 
 importlib.reload(JPA)
 JPANet = JPA.JPANet
 
 mu_feat=3
 nu_feat=3
-jet_feat=5
+jet_feat=8
 
 model = JPANet(weight=None,
                mu_arch=None, nu_arch=None, jet_arch=[jet_feat, 128, 128],
@@ -73,17 +60,18 @@ print(f"Number of parameters: {model.n_parameters()}")
 
 #!---------------------Training---------------------
 #model=torch.compile(model)
-model.state_dict=torch.load("./state_dict.pt")
-#model.train_loop(train_dataset,test_dataset,epochs=50,show_each=5,train_bunch=25,test_bunch=3,batch_size=20000)
+#torch.save(model.state_dict(), "./state_dict.pt")
+#model.state_dict=torch.load("./state_dict.pt")
+model.train_loop(train_dataset,test_dataset,epochs=50,show_each=5,train_bunch=25,test_bunch=3,batch_size=20000)
 
 
 #!---------------------Plot loss---------------------
-#model.loss_plot()
+model.loss_plot()
 # model.graph(test_dataset)
 
 
 # %%
-
+#!Put in other file
 
 signal_mask=test_dataset.label.squeeze()==1
 bkg_mask=test_dataset.label.squeeze()==0
