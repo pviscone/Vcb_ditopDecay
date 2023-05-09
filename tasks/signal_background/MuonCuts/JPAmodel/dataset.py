@@ -21,7 +21,7 @@ class DatasetBuilder():
             mu_data=df.filter(regex="Muon.*(pt|eta|phi)").to_numpy()
             nu_data=df.filter(regex="MET.*(pt|eta|phi)").to_numpy()
             jet_data=df.filter(regex="Jet.*(pt|eta|phi|btagDeepFlavCvB|btagDeepFlavCvL|TLeptMass|THadMass|WHadMass)").to_numpy()
-            label=df.filter(regex="(label).*").astype(int).to_numpy()
+            label=df["label"].astype(int).to_numpy()
             Lept_label=df.filter(regex="(Lept_label).*").astype(int).to_numpy()
 
             mu_data=np.reshape(mu_data, (mu_data.shape[0],1, mu_data.shape[1]))
