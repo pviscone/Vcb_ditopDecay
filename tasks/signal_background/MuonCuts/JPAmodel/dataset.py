@@ -46,15 +46,15 @@ class DatasetBuilder():
                 mu_std=torch.std(mu_data)
                 nu_mean=torch.mean(nu_data)
                 nu_std=torch.std(nu_data)
-                mu_data=(mu_data-mu_mean)/(mu_std+1e-6)
-                nu_data=(nu_data-nu_mean)/(nu_std+1e-6)
-                jet_data=(jet_data-jet_mean)/(jet_std+1e-6)
+                mu_data=torch.tanh(0.01*((mu_data-mu_mean)/(mu_std+1e-6)))
+                nu_data=torch.tanh(0.01*((nu_data-nu_mean)/(nu_std+1e-6)))
+                jet_data=torch.tanh(0.01*((jet_data-jet_mean)/(jet_std+1e-6)))
                 stats_dict={"mu_mean":mu_mean,"mu_std":mu_std,"nu_mean":nu_mean,"nu_std":nu_std,"jet_mean":jet_mean,"jet_std":jet_std}
                 return EventsDataset(mu_data,nu_data,jet_data,label,Lept_label),stats_dict
             else:
-                mu_data=(mu_data-self.mu_mean)/(self.mu_std+1e-6)
-                nu_data=(nu_data-self.nu_mean)/(self.nu_std+1e-6)
-                jet_data=(jet_data-self.jet_mean)/(self.jet_std+1e-6)
+                mu_data=torch.tanh(0.01*((mu_data-self.mu_mean)/(self.mu_std+1e-6)))
+                nu_data=torch.tanh(0.01*((nu_data-self.nu_mean)/(self.nu_std+1e-6)))
+                jet_data=torch.tanh(0.01*((jet_data-self.jet_mean)/(self.jet_std+1e-6)))
                 return EventsDataset(mu_data,nu_data,jet_data,label,Lept_label)
             
         
