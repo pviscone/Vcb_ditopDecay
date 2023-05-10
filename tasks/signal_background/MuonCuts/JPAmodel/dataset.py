@@ -34,27 +34,30 @@ class DatasetBuilder():
             mu_data = torch.tensor(mu_data, dtype=torch.float32)
             nu_data = torch.tensor(nu_data, dtype=torch.float32)
             jet_data = torch.tensor(jet_data, dtype=torch.float32)
+            missing_mask=jet_data==-10
             label = torch.tensor(label, dtype=torch.long)
             
             if stats is True:
                 temp_jet_df=pd.DataFrame(torch.flatten(jet_data,end_dim=1).numpy())
-                jet_mean=torch.tensor(temp_jet_df[temp_jet_df!=0].mean().to_numpy(),dtype=torch.float32)
-                jet_std=torch.tensor(temp_jet_df[temp_jet_df!=0].std().to_numpy(),dtype=torch.float32)
+                jet_mean=torch.tensor(temp_jet_df[temp_jet_df!=-10].mean().to_numpy(),dtype=torch.float32)
+                jet_std=torch.tensor(temp_jet_df[temp_jet_df!=-10].std().to_numpy(),dtype=torch.float32)
 
                 del temp_jet_df
-                mu_mean=torch.mean(mu_data)
-                mu_std=torch.std(mu_data)
-                nu_mean=torch.mean(nu_data)
-                nu_std=torch.std(nu_data)
+                mu_mean=torch.mean(mu_data,axis=0)
+                mu_std=torch.std(mu_data,axis=0)
+                nu_mean=torch.mean(nu_data,axis=0)
+                nu_std=torch.std(nu_data,axis=0)
                 mu_data=torch.tanh(0.01*((mu_data-mu_mean)/(mu_std+1e-6)))
                 nu_data=torch.tanh(0.01*((nu_data-nu_mean)/(nu_std+1e-6)))
                 jet_data=torch.tanh(0.01*((jet_data-jet_mean)/(jet_std+1e-6)))
+                jet_data[missing_mask]=-1.01
                 stats_dict={"mu_mean":mu_mean,"mu_std":mu_std,"nu_mean":nu_mean,"nu_std":nu_std,"jet_mean":jet_mean,"jet_std":jet_std}
                 return EventsDataset(mu_data,nu_data,jet_data,label,Lept_label),stats_dict
             else:
                 mu_data=torch.tanh(0.01*((mu_data-self.mu_mean)/(self.mu_std+1e-6)))
                 nu_data=torch.tanh(0.01*((nu_data-self.nu_mean)/(self.nu_std+1e-6)))
                 jet_data=torch.tanh(0.01*((jet_data-self.jet_mean)/(self.jet_std+1e-6)))
+                jet_data[missing_mask]=-1.01
                 return EventsDataset(mu_data,nu_data,jet_data,label,Lept_label)
             
         

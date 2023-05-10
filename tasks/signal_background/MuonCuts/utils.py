@@ -41,7 +41,7 @@ def build(coffea_obj,label=None,LHELept=None,num_jet_to_select=None):
 
 def padded_matrix(ak_array, pad):
     masked_array = ak.pad_none(ak_array, pad, clip=True).to_numpy()
-    masked_array.data[masked_array.mask] = 0
+    masked_array.data[masked_array.mask] = -10
     return masked_array.data
 
 

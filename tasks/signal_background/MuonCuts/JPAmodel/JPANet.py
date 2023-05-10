@@ -127,7 +127,7 @@ class JPANet(torch.nn.Module):
 
     def forward(self, mu, nu, jet):
 
-        pad_mask = ((jet == -10)[:, :, 0].squeeze()).to(torch.bool)
+        pad_mask = ((jet == -1.01)[:, :, 0].squeeze()).to(torch.bool)
         if pad_mask.dim()==1:
             pad_mask=torch.reshape(pad_mask,(1,pad_mask.shape[0]))
 
