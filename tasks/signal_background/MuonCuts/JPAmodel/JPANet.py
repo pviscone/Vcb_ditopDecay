@@ -7,6 +7,7 @@ from Attention_block import Attention
 from MLP import MLP
 from torchview import draw_graph
 from SelfAttentionPooling import SelfAttentionPooling
+from losses import SBLoss, AsimovLoss, SB_Gauss_Loss
 from livelossplot import PlotLosses
 from dataset import loader
 from ipywidgets import Output
@@ -33,18 +34,17 @@ class JPANet(torch.nn.Module):
                  mu_arch=None, nu_arch=None, jet_arch=None, event_arch=None, pre_attention_arch=None,
                  jet_attention_arch=None, post_attention_arch=None, final_attention=False,post_pooling_arch=None,
                  n_heads=1,
-                 weight=None,
-                 optim={}, early_stopping=None, dropout=0.15):
+                 early_stopping=None, dropout=0.15):
         super().__init__()
         assert post_attention_arch is not None
         assert post_pooling_arch is not None
 
         self.liveloss = PlotLosses(
-            groups={'Loss': ['train_loss', 'test_loss'],
-                    'Acccuracy': ['train_accuracy','test_accuracy'], })
+            groups={'Loss': ['train_loss', 'test_loss'], })
         self.log={}
-        
-        self.loss_fn = torch.nn.NLLLoss(weight=weight)
+        self.loss_fn = torch.nn.NLLLoss()
+        self.SBLoss_fn = SBLoss()
+        self.AsimovLoss_fn = AsimovLoss()
         self.early_stopping = early_stopping
 
 
@@ -118,12 +118,10 @@ class JPANet(torch.nn.Module):
         self.output=MLP(arch=[post_pooling_arch[-1],2],out_activation=torch.nn.LogSoftmax(dim=1),
                         dropout=None)
 
-        self.optim_dict = optim
-        self.optimizer = torch.optim.Adam(self.parameters(), **self.optim_dict)
 
-        self.train_accuracy = []
-        self.test_accuracy = []
 
+
+        self.epoch=0
 
     def forward(self, mu, nu, jet):
 
@@ -150,13 +148,17 @@ class JPANet(torch.nn.Module):
                             .unsqueeze(1), pad_mask), dim=1)
         total_out = self.all_attention(total_out,key_padding_mask=pad_mask)
         
-        total_out = self.pooling(total_out)
+        total_out = self.pooling(total_out,pad_mask=pad_mask)
         total_out = self.post_pooling_mlp(total_out)
         total_out = self.output(total_out)
 
         return total_out
 
-    def train_loop(self, train,test,epochs,train_bunch=1,test_bunch=1,batch_size=1,show_each=False):
+    def train_loop(self, train,test,epochs,train_bunch=1,test_bunch=1,batch_size=1,show_each=False,change_loss_epoch=5,optim={}):
+        self.optim_dict = optim
+        self.optimizer = torch.optim.Adam(self.parameters(), **self.optim_dict)
+        
+        
         epoch_loop = tqdm(range(epochs), desc="epoch")
         torch.backends.cudnn.benchmark = True
         out = Output()
@@ -164,10 +166,16 @@ class JPANet(torch.nn.Module):
         bunch_size = int(np.ceil(len(train)/train_bunch))
         assert bunch_size>batch_size
         for epoch in epoch_loop:
-
+            """
+            if epoch<=change_loss_epoch:
+                self.loss_fn=self.SBLoss_fn
+            else:
+                self.loss_fn=self.AsimovLoss_fn
+            """
+            
+            self.epoch+=1
             self.train()
             temp_train_loss=[]
-            temp_train_accuracy=[]
 
             
             for bunch in loader(train,batch_size=bunch_size):
@@ -191,16 +199,10 @@ class JPANet(torch.nn.Module):
                         y_logits, y_batch.squeeze())
                     
                     self.optimizer.zero_grad()
-                    loss=train_loss_step
-                    loss.backward()
-                    #train_loss_step.backward()
+                    train_loss_step.backward()
                     self.optimizer.step()
-                    
-                    temp_train_loss.append(train_loss_step.detach().to(cpu,non_blocking=True).numpy())
-                    temp_train_accuracy.append(((torch.argmax(
-                        y_logits, axis=1) == y_batch.squeeze()
-                    ).sum()/y_batch.shape[0]).detach().to(cpu,non_blocking=True).numpy())
-                    del loss,train_loss_step
+                    temp_train_loss.append(train_loss_step.to(cpu).detach().item())
+
                 
                     
 
@@ -220,29 +222,7 @@ class JPANet(torch.nn.Module):
                 self.train_loss = np.append(
                     self.train_loss,np.mean(np.array(temp_train_loss)))
 
-                
-                classified_test=(torch.argmax(
-                        test_logits, axis=1
-                        ) == y_test.squeeze()
-                    ).sum()/y_test.shape[0]
-                
-                self.test_accuracy.append(
-                    classified_test.to(cpu).numpy()
-                    )
-                
-                
-                """
-                #idx=np.random.choice(range(y_train.shape[0]),y_test.shape[0],replace=False)
 
-                classified_train=(torch.argmax(
-                        self(mu_train,
-                             nu_train,
-                             jet_train), axis=1)== y_train.squeeze()
-                            ).sum()/y_train.shape[0]
-                """
-
-                self.train_accuracy.append(
-                    np.mean(np.array(temp_train_accuracy)))
                     
                     
                     
@@ -250,8 +230,6 @@ class JPANet(torch.nn.Module):
 
                     self.log["train_loss"]=self.train_loss[-1]
                     self.log["test_loss"]=self.test_loss[-1]
-                    self.log["test_accuracy"]=self.test_accuracy[-1]
-                    self.log["train_accuracy"]=self.train_accuracy[-1]
                     with out:
                         self.liveloss.update(self.log)
                         if(epoch%show_each==0):
@@ -279,20 +257,14 @@ class JPANet(torch.nn.Module):
 
 
     def loss_plot(self):
-        plt.figure(figsize=(10, 5))
-        plt.subplot(1, 2, 1)
+        plt.figure()
         plt.plot(self.train_loss, label="train")
         plt.plot(self.test_loss, label="test")
         plt.legend()
         plt.xlabel("Epochs")
         plt.ylabel("loss")
 
-        plt.subplot(1, 2, 2)
-        plt.plot(self.train_accuracy, label="train")
-        plt.plot(self.test_accuracy, label="test")
-        plt.xlabel("Epochs")
-        plt.ylabel("Accuracy")
-        plt.legend()
+
 
     def graph(self,test_dataset,batch_size=10000):
         mu_test=test_dataset.mu_data.to(device)
