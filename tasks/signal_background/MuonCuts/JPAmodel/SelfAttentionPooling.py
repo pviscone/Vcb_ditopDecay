@@ -11,8 +11,9 @@ class SelfAttentionPooling(nn.Module):
     def __init__(self, input_dim):
         super(SelfAttentionPooling, self).__init__()
         self.W = nn.Linear(input_dim, 1)
+        self.norm=nn.LayerNorm(input_dim)
         
-    def forward(self, batch_rep):
+    def forward(self, batch_rep,pad_mask=None):
         """
         input:
             batch_rep : size (N, T, H), N: batch size, T: sequence length, H: Hidden dimension
@@ -23,8 +24,16 @@ class SelfAttentionPooling(nn.Module):
         return:
             utter_rep: size (N, H)
         """
+        if pad_mask is not None:
+            mask=pad_mask.float()
+            mask[mask!=0]=-torch.inf
+        else:
+            mask=0
+        
         softmax = nn.functional.softmax
-        att_w = softmax(self.W(batch_rep).squeeze(-1),dim=1).unsqueeze(-1)
-        utter_rep = torch.sum(batch_rep * att_w, dim=1)
+        
+        att_w = softmax(self.W(batch_rep).squeeze(-1)+mask,dim=1).unsqueeze(-1)
+        res = torch.sum(batch_rep * att_w, dim=1)
+        res=self.norm(res)
 
-        return utter_rep
+        return res
