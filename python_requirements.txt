@@ -1,7 +1,7 @@
-numpy
+numpy==1.23.5
 matplotlib
 mplhep
-awkward
+awkward==1.10.3
 uproot
 coffea
 vector
