@@ -8,13 +8,12 @@ import matplotlib.pyplot as plt
 import sys
 import mplhep
 sys.path.append("./JPAmodel/")
-from JPAmodel.dataset import build_datasets
 import JPAmodel.JPANet as JPA
 import os
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
 JPANet = JPA.JPANet
 torch.backends.cudnn.benchmark = True
-#%%
+
 if torch.cuda.is_available():
     dev = "cuda:0"
 else:
@@ -23,10 +22,20 @@ cpu = torch.device("cpu")
 device = torch.device(dev)
 
 
-#%%
+
 train_dataset=torch.load("../../../root_files/signal_background/train_dataset.pt")
 test_dataset=torch.load("../../../root_files/signal_background/test_dataset.pt")
-powheg_dataset=torch.load("../../../root_files/signal_background/powheg_dataset.pt")
+train_dataset.mu_data=train_dataset.mu_data[:1000000]
+train_dataset.nu_data=train_dataset.nu_data[:1000000]
+train_dataset.jet_data=train_dataset.jet_data[:1000000]
+train_dataset.label=train_dataset.label[:1000000]
+test_dataset.mu_data=test_dataset.mu_data[:100000]
+test_dataset.nu_data=test_dataset.nu_data[:100000]
+test_dataset.jet_data=test_dataset.jet_data[:100000]
+test_dataset.label=test_dataset.label[:100000]
+
+#powheg_dataset=torch.load("../../../root_files/signal_background/powheg_dataset.pt")
+
 
 #test_dataset.to(device)
 #train_dataset.to(device)
@@ -42,8 +51,7 @@ mu_feat=3
 nu_feat=4
 jet_feat=8
 
-model = JPANet(weight=None,
-               mu_arch=None, nu_arch=None, jet_arch=[jet_feat, 128, 128],
+model = JPANet(mu_arch=None, nu_arch=None, jet_arch=[jet_feat, 128, 128],
                jet_attention_arch=[128,128,128],
                event_arch=[mu_feat+nu_feat, 128, 128,128],
                pre_attention_arch=None,
@@ -51,7 +59,6 @@ model = JPANet(weight=None,
                post_attention_arch=[128,128],
                post_pooling_arch=[128,128,64],
                n_heads=2, dropout=0.02,
-               optim={"lr": 0.001, "weight_decay": 0.00, },
                early_stopping=None,
                )
 #model=torch.compile(model)
@@ -61,8 +68,18 @@ print(f"Number of parameters: {model.n_parameters()}")
 #!---------------------Training---------------------
 #model=torch.compile(model)
 #torch.save(model.state_dict(), "./state_dict.pt")
+#torch.save({"train_loss":model.train_loss,
+#            "test_loss":model.test_loss,
+#            "epoch":model.epoch}, "./loss.pt")
 #model.state_dict=torch.load("./state_dict.pt")
-model.train_loop(train_dataset,test_dataset,epochs=50,show_each=5,train_bunch=25,test_bunch=3,batch_size=20000)
+model.train_loop(train_dataset,test_dataset,
+                 epochs=50,
+                 show_each=5,
+                 train_bunch=1,
+                 test_bunch=1,
+                 batch_size=5000,
+                 change_loss_epoch=5,
+                 optim={"lr": 1e-5, "weight_decay": 0.00, })
 
 
 #!---------------------Plot loss---------------------
@@ -77,8 +94,8 @@ signal_mask=test_dataset.label.squeeze()==1
 bkg_mask=test_dataset.label.squeeze()==0
 score=torch.exp(model.predict(test_dataset,bunch=10)[:,-1])
 signal_score=score[signal_mask]
-bkg_score=torch.exp(model.predict(powheg_dataset,bunch=150)[:,-1])
-#bkg_score=score[bkg_mask]
+#bkg_score=torch.exp(model.predict(powheg_dataset,bunch=150)[:,-1])
+bkg_score=score[bkg_mask]
 
 signal_score=signal_score.detach().to(cpu).numpy()
 bkg_score=bkg_score.detach().to(cpu).numpy()
@@ -87,7 +104,7 @@ plt.rc('axes', axisbelow=True)
 
 #%%
 bins=20
-score_range=(0,5.5)
+score_range=(0,3)
 semileptonic_weight=(138e3    #Lumi
                     *832      #Cross section
                     *0.44 #Semileptonic BR
@@ -98,20 +115,20 @@ bkg_weight=np.ones_like(bkg_score)*semileptonic_weight*0.5*(1-8.4e-4)/(len(bkg_s
 
 
 
-binned_signal_score=plt.hist(np.arctanh(signal_score),bins=bins,range=score_range,
+binned_signal_score=plt.hist((np.arctanh(signal_score)),bins=bins,range=score_range,
                              color="dodgerblue",edgecolor="blue",
                              histtype="stepfilled",alpha=0.8,linewidth=2,
                              weights=signal_weight,
                              label="Signal")[0]
-binned_bkg_score=plt.hist(np.arctanh(bkg_score),bins=bins,range=score_range,
+binned_bkg_score=plt.hist((np.arctanh(bkg_score)),bins=bins,range=score_range,
                           color="red",edgecolor="red",histtype="step",
                           linewidth=2,label="Background",hatch="//",
                           weights=bkg_weight,
          )[0]
 
 
-signal_hist,bin_edges=np.histogram(np.arctanh(signal_score),bins=bins,range=score_range)
-bkg_hist,_=np.histogram(np.arctanh(bkg_score),bins=bins,range=score_range)
+signal_hist,bin_edges=np.histogram((np.arctanh(signal_score)),bins=bins,range=score_range)
+bkg_hist,_=np.histogram((np.arctanh(bkg_score)),bins=bins,range=score_range)
 
 bin_centers=(bin_edges[1:]+bin_edges[:-1])/2
 plt.errorbar(bin_centers,
