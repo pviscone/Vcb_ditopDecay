@@ -85,6 +85,13 @@ class EventsDataset(Dataset):
         self.nu_data=self.nu_data.to(device)
         self.jet_data=self.jet_data.to(device)
         self.label=self.label.to(device)
+    
+    def slice(self,start,end):
+        self.mu_data=self.mu_data[start:end]
+        self.nu_data=self.nu_data[start:end]
+        self.jet_data=self.jet_data[start:end]
+        self.label=self.label[start:end]
+        self.Lept_label=self.Lept_label[start:end]
         
         
 def loader(dataset,batch_size):
