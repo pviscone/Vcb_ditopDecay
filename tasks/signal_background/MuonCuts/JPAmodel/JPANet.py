@@ -7,7 +7,7 @@ from Attention_block import Attention
 from MLP import MLP
 from torchview import draw_graph
 from SelfAttentionPooling import SelfAttentionPooling
-from losses import SBLoss, AsimovLoss, SB_Gauss_Loss
+from losses import SBLoss, AsimovLoss, SB_Gauss_Loss, Score_Ratio_Loss, Brier_Score
 from livelossplot import PlotLosses
 from dataset import loader
 from ipywidgets import Output
@@ -45,6 +45,9 @@ class JPANet(torch.nn.Module):
         self.loss_fn = torch.nn.NLLLoss()
         self.SBLoss_fn = SBLoss()
         self.AsimovLoss_fn = AsimovLoss()
+        self.Brier_Score_fn = Brier_Score()
+        self.SB_Gauss_Loss_fn = SB_Gauss_Loss()
+        self.NLoss_fn = torch.nn.NLLLoss()
         self.early_stopping = early_stopping
 
 
@@ -154,7 +157,7 @@ class JPANet(torch.nn.Module):
 
         return total_out
 
-    def train_loop(self, train,test,epochs,train_bunch=1,test_bunch=1,batch_size=1,show_each=False,change_loss_epoch=5,optim={}):
+    def train_loop(self, train,test,epochs,train_bunch=1,test_bunch=1,batch_size=1,show_each=False,optim={},loss=None):
         self.optim_dict = optim
         self.optimizer = torch.optim.Adam(self.parameters(), **self.optim_dict)
         
@@ -165,13 +168,9 @@ class JPANet(torch.nn.Module):
         display(out)
         bunch_size = int(np.ceil(len(train)/train_bunch))
         assert bunch_size>batch_size
+        if loss is not None:
+            self.loss_fn=loss
         for epoch in epoch_loop:
-            """
-            if epoch<=change_loss_epoch:
-                self.loss_fn=self.SBLoss_fn
-            else:
-                self.loss_fn=self.AsimovLoss_fn
-            """
             
             self.epoch+=1
             self.train()

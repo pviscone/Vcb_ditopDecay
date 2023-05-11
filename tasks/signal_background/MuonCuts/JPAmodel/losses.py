@@ -46,3 +46,20 @@ class SB_Gauss_Loss(torch.nn.Module):
         gauss_sig=signal_weight*torch.sum(gaus(x[:,None],out[target==1][None,:],self.sigma),axis=1)
         ratio=gauss_sig**2/(gauss_bkg)
         return -torch.sum(ratio,axis=0)/x.shape[0]
+    
+    
+class Brier_Score(torch.nn.Module):
+    def __init__(self):
+        super(Brier_Score, self).__init__()
+        
+    def forward(self,output,target):
+        out=torch.exp(output[:,1])
+        return torch.mean((out-target)**2)
+    
+class Score_Ratio_Loss(torch.nn.Module):
+    def __init__(self):
+        super(Score_Ratio_Loss, self).__init__()
+    
+    def forward(self,output,target):
+        out=torch.exp(output[:,1])
+        return -torch.sum(out[target==1]**2)/(torch.sum(out[target==0]**2)+1e-8)
