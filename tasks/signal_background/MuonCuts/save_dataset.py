@@ -20,11 +20,11 @@ signal=NanoEventsFactory.from_root(
 
 
 #background_path="../TTbarSemileptonic_Nocb_pruned_optimized.root"
-background_path="../../../root_files/signal_background/BigMuons_jj_MuonCuts.root"
+""" background_path="../../../root_files/signal_background/BigMuons_jj_MuonCuts.root"
 background=NanoEventsFactory.from_root(
     background_path,
     schemaclass=NanoAODSchema
-).events()
+).events() """
 
 
 powheg_path="../../../root_files/signal_background/TTbarSemilept_MuonCuts_powheg.root"
@@ -35,14 +35,14 @@ powheg=NanoEventsFactory.from_root(
 
 
 #%%
-background_matrix,col_labels=build(background,0,num_jet_to_select=n_jet,LHELept=13)
-signal_matrix,_=build(signal,1,num_jet_to_select=n_jet,LHELept=13)
 
-n_powheg_train=5500000
+signal_matrix,col_labels=build(signal,1,num_jet_to_select=n_jet,LHELept=13)
+
+n_powheg_train=20000000
 powheg_train_matrix,_=build(powheg[:n_powheg_train],0,num_jet_to_select=n_jet,LHELept=13)
 powheg_matrix,_=build(powheg[n_powheg_train:],0,num_jet_to_select=n_jet)
 
-event_matrix=np.vstack([signal_matrix,background_matrix,powheg_train_matrix])
+event_matrix=np.vstack([signal_matrix,powheg_train_matrix])
 
 train_df,test_df = train_test_split(pd.DataFrame(event_matrix, columns=col_labels),test_size=0.15,shuffle=True)
 powheg_df = pd.DataFrame(powheg_matrix, columns=col_labels).sample(frac=1)
