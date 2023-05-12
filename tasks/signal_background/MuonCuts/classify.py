@@ -1,19 +1,21 @@
 
 #%%
+import sys
+sys.path.append("./JPAmodel/")
 import importlib
 import pandas as pd
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-import sys
 import mplhep
-sys.path.append("./JPAmodel/")
 import JPAmodel.JPANet as JPA
-from JPAmodel.significance import significance_plot
+import JPAmodel.losses as losses
+import JPAmodel.significance as significance
+JPANet = JPA.JPANet
 import os
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
-JPANet = JPA.JPANet
 torch.backends.cudnn.benchmark = True
+
 
 if torch.cuda.is_available():
     dev = "cuda:0"
@@ -22,8 +24,8 @@ else:
 cpu = torch.device("cpu")
 device = torch.device(dev)
 
-
-
+#!-----------------Load datasets-----------------!#
+#powheg_dataset=torch.load("../../../root_files/signal_background/powheg_dataset.pt")
 train_dataset=torch.load("../../../root_files/signal_background/train_dataset.pt")
 test_dataset=torch.load("../../../root_files/signal_background/test_dataset.pt")
 """ train_dataset.mu_data=train_dataset.mu_data[:1000000]
@@ -35,17 +37,40 @@ test_dataset.nu_data=test_dataset.nu_data[:100000]
 test_dataset.jet_data=test_dataset.jet_data[:100000]
 test_dataset.label=test_dataset.label[:100000] """
 
-#powheg_dataset=torch.load("../../../root_files/signal_background/powheg_dataset.pt")
-
-
 #test_dataset.to(device)
 #train_dataset.to(device)
 #powheg_dataset.to(device)
 
 
-# %%
+signal_mask=test_dataset.label.squeeze()==1
+bkg_mask=test_dataset.label.squeeze()==0
 
+importlib.reload(significance)
+def show_significance(mod,
+                      func=lambda x: x,
+                      bins=np.linspace(0,1,100),
+                      normalize="lumi",
+                      ratio_log=True,
+                      log=True,
+                      bunch=10,
+                      **kwargs):
+    score=torch.exp(mod.predict(test_dataset,bunch=bunch)[:,-1])
+    signal_score=score[signal_mask].detach().to(cpu).numpy()
+    bkg_score=score[bkg_mask].detach().to(cpu).numpy()
+    #bkg_score=torch.exp(model.predict(powheg_dataset,bunch=150)[:,-1])
+
+    significance.significance_plot(func(signal_score),
+                                func(bkg_score),
+                                bins=bins,
+                                normalize=normalize,
+                                ratio_log=ratio_log,
+                                log=log,
+                                **kwargs)
+    plt.show()
+# %%
+#!---------------------Model---------------------
 importlib.reload(JPA)
+importlib.reload(losses)
 JPANet = JPA.JPANet
 
 mu_feat=3
@@ -75,12 +100,14 @@ print(f"Number of parameters: {model.n_parameters()}")
 #model.state_dict=torch.load("./state_dict.pt")
 model.train_loop(train_dataset,test_dataset,
                  epochs=20,
-                 show_each=5,
-                 train_bunch=18,
+                 show_each=1,
+                 train_bunch=15,
                  test_bunch=8,
                  batch_size=20000,
-                 loss=model.NLoss_fn,
-                 optim={"lr": 1e-4, "weight_decay": 0.00, })
+                 loss=torch.nn.NLLLoss(weight=torch.tensor([0.25,1.]).to(device)),
+                 optim={"lr": 1e-3, "weight_decay": 0.00, },
+                 callback=show_significance,
+                 )
 
 
 #!---------------------Plot loss---------------------
@@ -88,24 +115,15 @@ model.loss_plot()
 # model.graph(test_dataset)
 
 
+
 # %%
-
-signal_mask=test_dataset.label.squeeze()==1
-bkg_mask=test_dataset.label.squeeze()==0
-score=torch.exp(model.predict(test_dataset,bunch=10)[:,-1])
-signal_score=score[signal_mask].detach().to(cpu).numpy()
-#bkg_score=torch.exp(model.predict(powheg_dataset,bunch=150)[:,-1])
-bkg_score=score[bkg_mask].detach().to(cpu).numpy()
-
-
-func= lambda x: (x)
-significance_plot(func(signal_score),
-                  func(bkg_score),
-                  bins=20,
-                  score_range=(0,1),
-                  normalize="lumi",
-                  log=True)
-
-
-
+#!---------------------Plot significance---------------------
+show_significance(model,
+                func=lambda x: np.arctanh(x),
+                normalize="lumi",
+                bins=np.linspace(0,7,35),
+                ylim=(1e-4,1e8),
+                ratio_log=True,
+                log=True,
+                bunch=8)
 # %%
