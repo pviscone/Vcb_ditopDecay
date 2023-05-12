@@ -4,7 +4,7 @@ import mplhep
 
 
 def significance_plot(signal_score,bkg_score,bins=20,score_range=(0,3),
-                      ylim=None,log=True,xlabel="NN Score",normalize="lumi",):
+                      ylim=None,log=True,xlabel="NN Score",normalize="lumi",ratio_log=False):
     fig, ax = plt.subplots(nrows=2, ncols=1, height_ratios=[3, 1], sharex=True)
     plt.subplots_adjust(hspace=0)
     mplhep.style.use("CMS")
@@ -42,12 +42,12 @@ def significance_plot(signal_score,bkg_score,bins=20,score_range=(0,3),
                             weights=bkg_weight,
             )[0]
 
-    sig_err=np.sqrt(signal_hist)*binned_signal_score/signal_hist
+    sig_err=np.sqrt(signal_hist)*binned_signal_score/(signal_hist+1e-10)
     ax[0].errorbar(bin_centers,
                 binned_signal_score,
                 sig_err,
                 fmt=",",color="black")
-    bkg_err=np.sqrt(bkg_hist)*binned_bkg_score/bkg_hist
+    bkg_err=np.sqrt(bkg_hist)*binned_bkg_score/(bkg_hist+1e-10)
     ax[0].errorbar(bin_centers,
                 binned_bkg_score,
                 bkg_err,fmt=",",color="black")
@@ -60,27 +60,41 @@ def significance_plot(signal_score,bkg_score,bins=20,score_range=(0,3),
     
     if ylim!=None:
         ax[0].set_ylim(ylim[0],ylim[1])
+    else:
+        if log == True:
+            ax[0].set_ylim(0.101,
+                           100*np.max([binned_signal_score,binned_bkg_score]))
+        else:
+            ax[0].set_ylim(0,1.5*np.max([binned_signal_score,binned_bkg_score]))
 
-    mplhep.cms.text("Private Work",ax=ax[0])
-    mplhep.cms.lumitext("$138 fb^{-1}$ $(13 TeV)$",ax=ax[0])
 
 
 
 
 
 
-    fom=binned_signal_score**2/(binned_bkg_score+binned_signal_score)
+    fom=binned_signal_score**2/(binned_bkg_score+binned_signal_score+1e-10)
     Q=(np.sum(fom[~np.isnan(fom)]))
 
-    ratio_err1=sig_err*(binned_signal_score**2+2*binned_signal_score*binned_bkg_score)/(binned_bkg_score+binned_signal_score)**2
-    ratio_err2=bkg_err/(binned_bkg_score+binned_signal_score)**2
+    ratio_err1=sig_err*(binned_signal_score**2+2*binned_signal_score*binned_bkg_score)/(binned_bkg_score+binned_signal_score+1e-10)**2
+    ratio_err2=bkg_err/(binned_bkg_score+binned_signal_score+1e-10)**2
     ratio_err=np.sqrt(ratio_err1**2+ratio_err2**2)
     ax[1].errorbar(bin_centers,fom,ratio_err,np.ones_like(fom)*(bin_centers[1]-bin_centers[0])/2,fmt=".",color="black",markersize=5)
     ax[1].set_ylabel("$S^2/(S+B)$",fontsize=22)
     ax[1].set_xlabel(xlabel)
-    ax[1].set_ylim(0,1.2*(np.max(fom[~np.isnan(fom)])+np.max(ratio_err[~np.isnan(ratio_err)])))
-    ax[0].text(0.66,0.765,r"$\sum \frac{s^2}{s+b}=$"+f"{Q:.2f}",transform=ax[0].transAxes,fontsize=18)
+
+    if ratio_log==True:
+        ax[1].set_yscale("log")
+        ax[1].set_ylim((np.min(fom[~np.isnan(fom)])-np.min(ratio_err[~np.isnan(ratio_err)]))/5,
+                       5*(np.max(fom[~np.isnan(fom)])+np.max(ratio_err[~np.isnan(ratio_err)])))
+    else:
+        ax[1].set_ylim(-0.1,1.3*(np.max(fom[~np.isnan(fom)])+np.max(ratio_err[~np.isnan(ratio_err)])))
+    ax[1].grid(linestyle=":")
+
+    
+    mplhep.cms.text("Private Work",ax=ax[0])
+    mplhep.cms.lumitext(r"$\mathcal{Q}=$"+f"{Q:.1f}"+", $138 fb^{-1}(13 TeV)$",ax=ax[0],fontsize=22)
 
 
-    print("Q=",Q)
-    print(f"Error: {1/np.sqrt(Q)}")
+    #print("Q=",Q)
+    #print(f"Error: {1/np.sqrt(Q)}")
