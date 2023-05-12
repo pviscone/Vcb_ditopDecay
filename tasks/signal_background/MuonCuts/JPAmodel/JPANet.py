@@ -42,12 +42,6 @@ class JPANet(torch.nn.Module):
         self.liveloss = PlotLosses(
             groups={'Loss': ['train_loss', 'test_loss'], })
         self.log={}
-        self.loss_fn = torch.nn.NLLLoss()
-        self.SBLoss_fn = SBLoss()
-        self.AsimovLoss_fn = AsimovLoss()
-        self.Brier_Score_fn = Brier_Score()
-        self.SB_Gauss_Loss_fn = SB_Gauss_Loss()
-        self.NLoss_fn = torch.nn.NLLLoss()
         self.early_stopping = early_stopping
 
 
@@ -157,19 +151,17 @@ class JPANet(torch.nn.Module):
 
         return total_out
 
-    def train_loop(self, train,test,epochs,train_bunch=1,test_bunch=1,batch_size=1,show_each=False,optim={},loss=None):
+    def train_loop(self, train,test,epochs,train_bunch=1,test_bunch=1,batch_size=1,show_each=False,optim={},loss=None,callback=None):
         self.optim_dict = optim
         self.optimizer = torch.optim.Adam(self.parameters(), **self.optim_dict)
-        
-        
+        assert loss is not None
         epoch_loop = tqdm(range(epochs), desc="epoch")
         torch.backends.cudnn.benchmark = True
         out = Output()
         display(out)
         bunch_size = int(np.ceil(len(train)/train_bunch))
         assert bunch_size>batch_size
-        if loss is not None:
-            self.loss_fn=loss
+        self.loss_fn=loss
         for epoch in epoch_loop:
             
             self.epoch+=1
@@ -234,6 +226,8 @@ class JPANet(torch.nn.Module):
                         if(epoch%show_each==0):
                             self.liveloss.send()
                             self.liveloss.draw()
+                            if callback is not None:
+                                callback(self)
                             
 
             if self.early_stopping is not None:
