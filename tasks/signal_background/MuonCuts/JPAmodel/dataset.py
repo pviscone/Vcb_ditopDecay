@@ -2,7 +2,7 @@ import torch
 from torch.utils.data import Dataset
 import pandas as pd
 import numpy as np
-
+import awkward as ak
 
 class DatasetBuilder():
     def __init__(self,df,jets_per_event):
@@ -17,7 +17,7 @@ class DatasetBuilder():
         
         
 
-    def build_dataset(self,df,jets_per_event,stats=False):
+    def build_dataset(self,df,jets_per_event,stats=False,LHE_pdgId_powheg=None):
             mu_data=df.filter(regex="Muon.*(pt|eta|phi)").to_numpy()
             nu_data=df.filter(regex="MET.*(pt|eta|phi)").to_numpy()
             jet_data=df.filter(regex="Jet.*(pt|eta|phi|btagDeepFlavCvB|btagDeepFlavCvL|TLeptMass|THadMass|WHadMass)").to_numpy()
@@ -52,22 +52,35 @@ class DatasetBuilder():
                 jet_data=torch.tanh(0.01*((jet_data-jet_mean)/(jet_std+1e-6)))
                 jet_data[missing_mask]=-1.01
                 stats_dict={"mu_mean":mu_mean,"mu_std":mu_std,"nu_mean":nu_mean,"nu_std":nu_std,"jet_mean":jet_mean,"jet_std":jet_std}
-                return EventsDataset(mu_data,nu_data,jet_data,label,Lept_label),stats_dict
+                return EventsDataset(mu_data,nu_data,jet_data,label,Lept_label,stats_dict),stats_dict
             else:
                 mu_data=torch.tanh(0.01*((mu_data-self.mu_mean)/(self.mu_std+1e-6)))
                 nu_data=torch.tanh(0.01*((nu_data-self.nu_mean)/(self.nu_std+1e-6)))
                 jet_data=torch.tanh(0.01*((jet_data-self.jet_mean)/(self.jet_std+1e-6)))
                 jet_data[missing_mask]=-1.01
-                return EventsDataset(mu_data,nu_data,jet_data,label,Lept_label)
+                stats_dict={"mu_mean":self.mu_mean,"mu_std":self.mu_std,"nu_mean":self.nu_mean,"nu_std":self.nu_std,"jet_mean":self.jet_mean,"jet_std":self.jet_std}
+                if LHE_pdgId_powheg is not None:
+                    return EventsDataset(mu_data,nu_data,jet_data,label,Lept_label,stats_dict,LHE_pdgId_powheg)
+                else:
+                    return EventsDataset(mu_data,nu_data,jet_data,label,Lept_label,stats_dict)
             
         
 class EventsDataset(Dataset):
-    def __init__(self, mu_data, nu_data, jet_data, label,Lept_label):
+    def __init__(self, mu_data, nu_data, jet_data, label,Lept_label,stats_dict,LHE_pdgId_powheg=None):
         self.mu_data = mu_data
         self.nu_data = nu_data
         self.jet_data = jet_data
         self.label = label
         self.Lept_label=Lept_label
+        self.stats_dict=stats_dict
+        if LHE_pdgId_powheg is not None:
+            additional_parton=np.zeros(len(LHE_pdgId_powheg))
+            n_partons=ak.num(LHE_pdgId_powheg,axis=1).to_numpy()
+            additional_parton[n_partons==9]=LHE_pdgId_powheg[n_partons==9,2].to_numpy()
+            self.additional_parton=torch.tensor(additional_parton,dtype=int)
+            had_decay=LHE_pdgId_powheg[:,4:]
+            had_decay=had_decay[np.abs(had_decay)<5]
+            self.had_decay=torch.tensor(had_decay.to_numpy(),dtype=int)
 
     def __len__(self):
         return len(self.label)
