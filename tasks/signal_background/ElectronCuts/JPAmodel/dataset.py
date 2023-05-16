@@ -18,7 +18,7 @@ class DatasetBuilder():
         
 
     def build_dataset(self,df,jets_per_event,stats=False,LHE_pdgId_powheg=None):
-            mu_data=df.filter(regex="Muon.*(pt|eta|phi)").to_numpy()
+            mu_data=df.filter(regex="Electron.*(pt|eta|phi)").to_numpy()
             nu_data=df.filter(regex="MET.*(pt|eta|phi)").to_numpy()
             jet_data=df.filter(regex="Jet.*(pt|eta|phi|btagDeepFlavCvB|btagDeepFlavCvL|TLeptMass|THadMass|WHadMass)").to_numpy()
             label=df["label"].astype(int).to_numpy()

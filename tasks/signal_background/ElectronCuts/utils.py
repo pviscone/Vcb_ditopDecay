@@ -1,10 +1,7 @@
 import numpy as np
 import awkward as ak
-import sys
-from coffea.nanoevents.methods import vector
 
-sys.path.append("../../../utils/coffea_utils")
-from coffea_utils import Muon_cuts, np_and,np_or,MET_eta
+
 
 def build(coffea_obj,label=None,LHELept=None,num_jet_to_select=None):
     assert label is not None
@@ -25,7 +22,7 @@ def build(coffea_obj,label=None,LHELept=None,num_jet_to_select=None):
     Nu_feature=["pt", "eta", "phi","WLeptMass"]
     Jet_feature=["pt", "eta", "phi", "btagDeepFlavB",
                 "btagDeepFlavCvB", "btagDeepFlavCvL", "TLeptMass","THadMass","WHadMass"]
-    muon_matrix, mu_labels = build_matrix(coffea_obj,"Muon", Mu_feature,index=0)
+    muon_matrix, mu_labels = build_matrix(coffea_obj,"Electron", Mu_feature,index=0)
     nu_matrix, nu_labels = build_matrix(coffea_obj,"MET", Nu_feature)
     jet_matrix, jet_labels = pad_and_alternate(coffea_obj,"Jet",
                                                         Jet_feature,
@@ -86,22 +83,3 @@ def pad_and_alternate(events,obj, variable_list, pad):
             col_labels.append(f"{obj}{i}_{var}")
     return alternate_column(matrix_list), col_labels
 
-def select_muon_events(events,num_jet_to_select):
-    muon_selector=Muon_cuts()
-    events=muon_selector.process(events,out="events")
-    
-    events["Muon"] = events.Muon[:,0]
-    events["MET"]=ak.zip(
-        {
-            "pt": events.MET.pt,
-            "eta": MET_eta(events.Muon,events.MET),
-            "phi": events.MET.phi,
-            "mass": np.zeros_like(events.MET.pt),
-        },
-        with_name="PtEtaPhiMLorentzVector",
-        behavior=vector.behavior,
-    )
-    events["Jet"]=events.Jet[:,:num_jet_to_select]
-    events["MET","WMass"]=(events.MET+events.Muon).mass
-    events["Jet","TMass"]=(events.Jet+events.Muon+events.MET).mass
-    return events
