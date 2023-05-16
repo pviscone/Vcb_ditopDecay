@@ -26,8 +26,8 @@ device = torch.device(dev)
 
 #!-----------------Load datasets-----------------!#
 #powheg_dataset=torch.load("../../../root_files/signal_background/Electron/powheg_Electron_dataset.pt")
-train_dataset=torch.load("../../../root_files/signal_background/Electron/train_Electron_dataset.pt")
-test_dataset=torch.load("../../../root_files/signal_background/Electron/test_Electron_dataset.pt")
+train_dataset=torch.load("../../../root_files/signal_background/Electrons/train_Electron_dataset.pt")
+test_dataset=torch.load("../../../root_files/signal_background/Electrons/test_Electron_dataset.pt")
 """ train_dataset.mu_data=train_dataset.mu_data[:1000000]
 train_dataset.nu_data=train_dataset.nu_data[:1000000]
 train_dataset.jet_data=train_dataset.jet_data[:1000000]
@@ -99,7 +99,7 @@ print(f"Number of parameters: {model.n_parameters()}")
 #            "epoch":model.epoch}, "./loss.pt")
 #model.state_dict=torch.load("./state_dict.pt")
 model.train_loop(train_dataset,test_dataset,
-                 epochs=20,
+                 epochs=50,
                  show_each=1,
                  train_bunch=15,
                  test_bunch=8,
@@ -121,8 +121,8 @@ model.loss_plot()
 show_significance(model,
                 func=lambda x: np.arctanh(x),
                 normalize="lumi",
-                bins=np.linspace(0,7,35),
-                ylim=(1e-4,1e8),
+                bins=np.linspace(0,5.1,30),
+                ylim=(1.1e-2,1e7),
                 ratio_log=True,
                 log=True,
                 bunch=8)

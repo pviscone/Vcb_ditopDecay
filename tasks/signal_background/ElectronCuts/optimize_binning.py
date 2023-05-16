@@ -18,19 +18,19 @@ cpu = torch.device("cpu")
 device = torch.device(dev)
 
 
-signal=torch.load("../../../root_files/signal_background/Electron/test_Electron_dataset.pt")
+signal=torch.load("../../../root_files/signal_background/Electrons/test_Electron_dataset.pt")
 signal.mu_data=signal.mu_data[signal.label.squeeze()==1]
 signal.nu_data=signal.nu_data[signal.label.squeeze()==1]
 signal.jet_data=signal.jet_data[signal.label.squeeze()==1]
 signal.label=signal.label[signal.label.squeeze()==1]
 
-bkg=torch.load("../../../root_files/signal_background/Electron/test_Electron_dataset.pt")
+""" bkg=torch.load("../../../root_files/signal_background/Electrons/test_Electron_dataset.pt")
 bkg.mu_data=bkg.mu_data[bkg.label.squeeze()==0]
 bkg.nu_data=bkg.nu_data[bkg.label.squeeze()==0]
 bkg.jet_data=bkg.jet_data[bkg.label.squeeze()==0]
-bkg.label=bkg.label[bkg.label.squeeze()==0]
+bkg.label=bkg.label[bkg.label.squeeze()==0] """
 
-#powheg=torch.load("../../../root_files/signal_background/Electron/powheg_Electron_dataset.pt")
+powheg=torch.load("../../../root_files/signal_background/Electrons/powheg_Electron_dataset.pt")
 
 
 #%%
@@ -58,8 +58,8 @@ model = model.to(device)
 
 
 signal_score=torch.exp(model.predict(signal,bunch=11)[:,-1])
-bkg_score=torch.exp(model.predict(bkg,bunch=100)[:,-1])
-#bkg_score=torch.exp(model.predict(powheg_dataset,bunch=150)[:,-1])
+#bkg_score=torch.exp(model.predict(bkg,bunch=100)[:,-1])
+bkg_score=torch.exp(model.predict(powheg,bunch=150)[:,-1])
 
 
 #%%
@@ -67,7 +67,7 @@ importlib.reload(significance)
 func=lambda x: np.arctanh(x)
 significance.significance_plot(func(signal_score.detach().to(cpu).numpy()),
                             func(bkg_score.detach().to(cpu).numpy()),
-                            bins=np.linspace(0,7,50),
+                            bins=np.linspace(0,5,50),
                             ylim=(1.01e-2,2e6),
                             normalize="lumi",
                             ratio_log=True,
