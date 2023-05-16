@@ -15,8 +15,8 @@ def significance_plot(signal_score,bkg_score,bins=20,score_range=(0,3),
                         *0.33     #Muon fraction
                         )
     if normalize=="lumi":
-        signal_weight=np.ones_like(signal_score)*semileptonic_weight*0.518*8.4e-4/(len(signal_score))
-        bkg_weight=np.ones_like(bkg_score)*semileptonic_weight*0.5*(1-8.4e-4)/(len(bkg_score))
+        signal_weight=np.ones_like(signal_score)*semileptonic_weight*0.363*8.4e-4/(len(signal_score))
+        bkg_weight=np.ones_like(bkg_score)*semileptonic_weight*0.352*(1-8.4e-4)/(len(bkg_score))
     elif normalize=="equal":
         n_min=np.min([len(signal_score),len(bkg_score)])
         n_max=np.max([len(signal_score),len(bkg_score)])
