@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import mplhep
-
+import hist
 
 def significance_plot(signal_score,bkg_score,bins=20,score_range=(0,3),
                       ylim=None,log=True,xlabel="NN Score",normalize="lumi",ratio_log=False):
@@ -98,3 +98,73 @@ def significance_plot(signal_score,bkg_score,bins=20,score_range=(0,3),
 
     #print("Q=",Q)
     #print(f"Error: {1/np.sqrt(Q)}")
+
+#hist dict del tipo
+#{"signal":{"data":array,"color":"dodgerblue","stack":True},"bkg":{"data":array,"color":"red","stack":False}}
+def make_hist(hist_dict,xlim=None,bins=None,log=False,ylim=None):
+    mplhep.style.use("CMS")
+    assert xlim is not None
+    assert bins is not None
+    categories=list(hist_dict.keys())
+    stack_categories=[i for i in hist_dict if hist_dict[i]["stack"]==True]
+    
+    ax = hist.axis.Regular(bins, xlim[0], xlim[1], flow=False, name="x")
+    cax=hist.axis.StrCategory(stack_categories, name="type")
+    stack_hist=hist.Hist(ax,cax)
+    
+    hist_list=[]
+    stack_color=[]
+    no_stack_color=[]
+    no_stack_label=[]
+    for cat in categories:
+        if hist_dict[cat]["stack"] is True:
+            stack_hist.fill(hist_dict[cat]["data"],type=cat,weight=hist_dict[cat]["weight"]/len(hist_dict[cat]["data"]))
+            stack_color.append(hist_dict[cat]["color"])
+        else:
+            h=hist.Hist(hist.axis.Regular(bins, xlim[0], xlim[1], flow=False, name="x"))
+            h.fill(hist_dict[cat]["data"])
+            h=h*hist_dict[cat]["weight"]/len(hist_dict[cat]["data"])
+            hist_list.append(h)
+            no_stack_color.append(hist_dict[cat]["color"])
+            no_stack_label.append(cat)
+            
+    stack=stack_hist.stack("type")
+    tot=sum(stack)
+    
+    hist_list[0].plot_ratio(tot)
+    ax1=plt.subplot(211)
+    ax1.clear()
+    
+    
+    linewidth=[0]*len(stack_color)
+    linewidth[-1]=1.
+    stack.plot(stack=True,histtype="fill",color=stack_color,edgecolor=["black"]*len(stack_categories),linewidth=linewidth)
+    mplhep.histplot(tot,color="black",histtype="errorbar",markersize=0)
+    for i in range(0,len(no_stack_color)):
+        mplhep.histplot(hist_list[i],color=no_stack_color[i],histtype="step",linewidth=1.5,label=no_stack_label[i],yerr=True)
+        plt.hist(hist_dict[no_stack_label[i]]["data"],range=(xlim[0],xlim[1]),bins=bins,weights=np.ones(len(hist_dict[no_stack_label[i]]["data"]))*hist_dict[no_stack_label[i]]["weight"]/len(hist_dict[no_stack_label[i]]["data"]),histtype="step",color=hist_dict[no_stack_label[i]]["color"],hatch="/")
+
+        
+    if log is True:
+        plt.yscale("log")
+        
+    if ylim is not None:
+        plt.ylim(ylim[0],ylim[1])
+
+    plt.grid()
+    plt.legend()
+    plt.ylabel("Counts")
+    mplhep.cms.text("Private Work")
+    
+    ax2=plt.subplot(212)
+    ax2.clear()
+    
+    Q=hist_list[0]*hist_list[0]/(tot+hist_list[0])
+    Q_value=np.sum(Q.values()[~np.isnan(Q.values())])
+    mplhep.cms.lumitext(r"$\mathcal{Q}=$"+f"{Q_value:.1f}"+", $138 fb^{-1}(13 TeV)$",ax=ax1,fontsize=18)
+    mplhep.histplot(Q,yerr=True,xerr=True,histtype="errorbar",markersize=4,color="black")
+    plt.grid()
+    plt.yscale("log")
+    plt.ylabel("$\\frac{S^2}{S+B}$")
+    return ax1,ax2
+    
