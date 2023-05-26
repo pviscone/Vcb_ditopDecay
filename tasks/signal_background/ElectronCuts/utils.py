@@ -13,10 +13,10 @@ def build(coffea_obj,label=None,LHELept=None,num_jet_to_select=None):
     Electron_label=ak.sum(np.abs(coffea_obj.LHEPart.pdgId)==11,axis=1)>0
     Tau_label=ak.sum(np.abs(coffea_obj.LHEPart.pdgId)==15,axis=1)>0
     
-    Lept_label=np.zeros_like(Muon_label.to_numpy(),dtype=int)
-    Lept_label[Muon_label.to_numpy()]=13
-    Lept_label[Electron_label.to_numpy()]=11
-    Lept_label[Tau_label.to_numpy()]=15
+    Lept_label=np.ones_like(Muon_label.to_numpy(),dtype=int)
+    Lept_label[Muon_label.to_numpy()]*=13
+    Lept_label[Electron_label.to_numpy()]*=11
+    Lept_label[Tau_label.to_numpy()]*=15
     
     Mu_feature=["pt", "eta", "phi"]
     Nu_feature=["pt", "eta", "phi","WLeptMass"]
