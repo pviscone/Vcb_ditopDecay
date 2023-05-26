@@ -32,6 +32,9 @@ bkg.label=bkg.label[bkg.label.squeeze()==0]
  """
 powheg=torch.load("../../../root_files/signal_background/Muons/powheg_Muon_dataset.pt")
 
+diLept=torch.load("../../../root_files/signal_background/Muons/TTdiLept_Muon_dataset.pt")
+diHad=torch.load("../../../root_files/signal_background/Muons/TTdiHad_Muon_dataset.pt")
+WJets=torch.load("../../../root_files/signal_background/Muons/WJets_Muon_dataset.pt")
 
 #%%
 mu_feat=3
@@ -56,30 +59,25 @@ model.load_state_dict(state_dict)
 model = model.to(device)
 
 
+model.eval()
+with torch.inference_mode():
+    signal_score=torch.exp(model.predict(signal,bunch=20)[:,-1]).detach().to(cpu).numpy()
+    #bkg_score=torch.exp(model.predict(bkg,bunch=100)[:,-1])
+    bkg_score=torch.exp(model.predict(powheg,bunch=200)[:,-1]).detach().to(cpu).numpy()
+    diLept_score=torch.exp(model.predict(diLept,bunch=20)[:,-1]).detach().to(cpu).numpy()
+    diHad_score=torch.exp(model.predict(diHad,bunch=20)[:,-1]).detach().to(cpu).numpy()
+    WJets_score=torch.exp(model.predict(WJets,bunch=20)[:,-1]).detach().to(cpu).numpy()
 
-signal_score=torch.exp(model.predict(signal,bunch=11)[:,-1]).detach().to(cpu).numpy()
-#bkg_score=torch.exp(model.predict(bkg,bunch=100)[:,-1])
-bkg_score=torch.exp(model.predict(powheg,bunch=150)[:,-1]).detach().to(cpu).numpy()
 
 
-
-#%%
-importlib.reload(significance)
-func=lambda x: np.arctanh(x)
-significance.significance_plot(func(signal_score),
-                            func(bkg_score),
-                            bins=np.linspace(0,7,50),
-                            ylim=(1e-3,1e7),
-                            normalize="lumi",
-                            ratio_log=True,
-                            log=True,)
 # %%
-importlib.reload(significance)
+
 
 lumi=138e3
-ttbar_1lept=lumi*832*0.44*0.33
-
-
+ttbar_1lept=lumi*832*0.44*0.33  #single lepton
+ttbar_2had=lumi*832*0.45*0.003  #all quark types
+ttbar_2lept=lumi*832*0.11*0.237 #all lepton types
+wjets=lumi*59100*0.108*3*0.0003 #all lepton types
 
 additional_c=np.abs(powheg.additional_parton)==4
 additional_b=np.abs(powheg.additional_parton)==5
@@ -87,29 +85,65 @@ had_decay=np.abs(powheg.had_decay)
 charmed=np.bitwise_or(had_decay[:,0]==4,had_decay[:,1]==4).bool()
 up=np.bitwise_or(had_decay[:,0]==2,had_decay[:,1]==2).bool()
 
-
 func = lambda x: np.arctanh(x)
-hist_dict={ "signal":{"data":func(signal_score),
-                     "color":"crimson",
-                     "weight":ttbar_1lept*0.518*8.4e-4,
-                     "stack":False,},
-            "additional c":{"data":func(bkg_score[additional_c]),
-                          "color":"dodgerblue",
-                          "weight":ttbar_1lept*0.5*(1-8.4e-4)*torch.sum(additional_c)/len(additional_c),
-                          "stack":True,},
-            "additional b":{"data":func(bkg_score[additional_b]),
-                            "color":"orchid",
-                            "weight":ttbar_1lept*0.5*(1-8.4e-4)*torch.sum(additional_b)/len(additional_b),
-                            "stack":True,},
-            "$b\\bar{b} uql \\nu$":{"data":func(bkg_score[up]),
-                                    "color":"lime",
-                                    "weight":ttbar_1lept*0.5*(1-8.4e-4)*torch.sum(up)/len(up),
-                                    "stack":True,},
-            "$b\\bar{b} cql \\nu$":{"data":func(bkg_score[charmed]),
-                                    "color":"orange",
-                                    "weight":ttbar_1lept*0.5*(1-8.4e-4)*torch.sum(charmed)/len(charmed),
-                                    "stack":True,},
-}
+sig_score=func(signal_score)
+ttc=func(bkg_score[additional_c])
+ttb=func(bkg_score[additional_b])
+tt_charmed=func(bkg_score[charmed])
+tt_up=func(bkg_score[up])
 
-ax1,ax2=significance.make_hist(hist_dict,xlim=(0,7),bins=60,log=True)
+TTdiLept=func(diLept_score)
+TTdiHad=func(diHad_score)
+WJets_bkg=func(WJets_score)
+
+
+#%%
+importlib.reload(significance)
+hist_dict = {
+            "signal":{
+                "data":sig_score,
+                "color":"crimson",
+                "weight":ttbar_1lept*0.518*8.4e-4,
+                "histtype":"errorbar",
+                "stack":False,},
+            "$t\\bar{t}+b$":{
+                "data":ttb,
+                "color":"cornflowerblue",
+                "weight":ttbar_1lept*0.5*(1-8.4e-4)*torch.sum(additional_b)/len(additional_b),
+                "stack":True,},
+            "$t\\bar{t}+c$":{
+                "data":ttc,
+                "color":"lightsteelblue",
+                "weight":ttbar_1lept*0.5*(1-8.4e-4)*torch.sum(additional_c)/len(additional_c),
+                "stack":True,},
+            "$t\\bar{t} \\to b\\bar{b} uql \\nu$":{
+                "data":tt_up,
+                "color":"plum",
+                "weight":ttbar_1lept*0.5*(1-8.4e-4)*torch.sum(up)/len(up),
+                "stack":True,},
+            "$t\\bar{t} \\to b\\bar{b} cql \\nu$":{
+                "data":tt_charmed,
+                "color":"lightcoral",
+                "weight":ttbar_1lept*0.5*(1-8.4e-4)*torch.sum(charmed)/len(charmed),
+                "stack":True,},
+            "$Wj \\to l \\nu$":{
+                "data":WJets_bkg,
+                "color":"limegreen",
+                "weight":wjets,
+                "stack":True,},
+            "$t\\bar{t} \\to b\\bar{b} q \\bar{q} q \\bar{q}$":{
+                "data":TTdiHad,
+                "color":"orange",
+                "weight":ttbar_2had,
+                "stack":True,},
+            "$t\\bar{t} \\to b\\bar{b} l \\nu l \\nu$":{
+                "data":TTdiLept,
+                "color":"gold",
+                "weight":ttbar_2lept,
+                "stack":True,},
+            
+        }
+
+ax1,ax2=significance.make_hist(hist_dict,xlim=(0,6),bins=60,log=True)
+
 #%%
