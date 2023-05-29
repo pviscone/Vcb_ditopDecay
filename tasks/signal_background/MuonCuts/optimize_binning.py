@@ -9,7 +9,7 @@ import JPAmodel.JPANet as JPA
 import JPAmodel.significance as significance
 JPANet = JPA.JPANet
 
-
+#%%
 if torch.cuda.is_available():
     dev = "cuda:0"
 else:
@@ -32,8 +32,8 @@ bkg.label=bkg.label[bkg.label.squeeze()==0]
  """
 powheg=torch.load("../../../root_files/signal_background/Muons/powheg_Muon_dataset.pt")
 
-diLept=torch.load("../../../root_files/signal_background/Muons/TTdiLept_Muon_dataset.pt")
-diHad=torch.load("../../../root_files/signal_background/Muons/TTdiHad_Muon_dataset.pt")
+diLept=torch.load("../../../root_files/signal_background/Muons/TTdiLept_powheg_Muon_dataset.pt")
+diHad=torch.load("../../../root_files/signal_background/Muons/TTdiHad_powheg_Muon_dataset.pt")
 WJets=torch.load("../../../root_files/signal_background/Muons/WJets_Muon_dataset.pt")
 
 #%%
@@ -79,6 +79,9 @@ ttbar_2had=lumi*832*0.45*0.003  #all quark types
 ttbar_2lept=lumi*832*0.11*0.237 #all lepton types
 wjets=lumi*59100*0.108*3*0.0003 #all lepton types
 
+tau_mask=(powheg.Lept_label==15).squeeze()
+not_tau_mask=(powheg.Lept_label!=15).squeeze()
+
 additional_c=np.abs(powheg.additional_parton)==4
 additional_b=np.abs(powheg.additional_parton)==5
 had_decay=np.abs(powheg.had_decay)
@@ -87,10 +90,11 @@ up=np.bitwise_or(had_decay[:,0]==2,had_decay[:,1]==2).bool()
 
 func = lambda x: np.arctanh(x)
 sig_score=func(signal_score)
-ttc=func(bkg_score[additional_c])
-ttb=func(bkg_score[additional_b])
-tt_charmed=func(bkg_score[charmed])
-tt_up=func(bkg_score[up])
+tt_tau=func(bkg_score[tau_mask])
+ttc=func(bkg_score[np.bitwise_and(additional_c,not_tau_mask).bool()])
+ttb=func(bkg_score[np.bitwise_and(additional_b,not_tau_mask).bool()])
+tt_charmed=func(bkg_score[np.bitwise_and(charmed,not_tau_mask).bool()])
+tt_up=func(bkg_score[np.bitwise_and(up,not_tau_mask).bool()])
 
 TTdiLept=func(diLept_score)
 TTdiHad=func(diHad_score)
@@ -98,11 +102,13 @@ WJets_bkg=func(WJets_score)
 
 
 #%%
+
+#ATTENTO, non hai incluso il peso dei tau
 importlib.reload(significance)
 hist_dict = {
             "signal":{
                 "data":sig_score,
-                "color":"crimson",
+                "color":"red",
                 "weight":ttbar_1lept*0.518*8.4e-4,
                 "histtype":"errorbar",
                 "stack":False,},
@@ -126,6 +132,11 @@ hist_dict = {
                 "color":"lightcoral",
                 "weight":ttbar_1lept*0.5*(1-8.4e-4)*torch.sum(charmed)/len(charmed),
                 "stack":True,},
+            "$t\\bar{t} j \\to b\\bar{b} q \\bar{q} \\tau \\nu_{\\tau}$":{
+                "data":tt_tau,
+                "color":"cadetblue",
+                "weight":ttbar_1lept*(1-8.4e-4)*0.035,
+                "stack":True,},
             "$Wj \\to l \\nu$":{
                 "data":WJets_bkg,
                 "color":"limegreen",
@@ -147,3 +158,62 @@ hist_dict = {
 ax1,ax2=significance.make_hist(hist_dict,xlim=(0,6),bins=60,log=True)
 
 #%%
+
+
+def get(obj):
+    mean=powheg.stats_dict["jet_mean"][0].detach().numpy()
+    std=powheg.stats_dict["jet_std"][0].detach().numpy()
+    pt=obj.jet_data[:,3,0].detach().numpy()
+    return 100*std*np.tanh(pt)+mean
+
+
+importlib.reload(significance)
+hist_dict = {
+            "signal (renormalized)":{
+                "data": get(signal),
+                "color":"red",
+                "weight":ttbar_2lept+ttbar_2had+wjets+ttbar_1lept*0.5*(1-8.4e-4)/100,
+                "histtype":"step",
+                "stack":False,},
+            "$t\\bar{t}j \\to b\\bar{b} q \\bar{q} l \\nu /100$":{
+                "data":get(powheg),
+                "color":"cornflowerblue",
+                "weight":ttbar_1lept*0.5*(1-8.4e-4)/100,
+                "stack":True,},
+            "$Wj \\to l \\nu$":{
+                "data":get(WJets),
+                "color":"limegreen",
+                "weight":wjets,
+                "stack":True,},
+            "$t\\bar{t} \\to b\\bar{b} q \\bar{q} q \\bar{q}$":{
+                "data":get(diHad),
+                "color":"orange",
+                "weight":ttbar_2had,
+                "stack":True,},
+            "$t\\bar{t} \\to b\\bar{b} l \\nu l \\nu$":{
+                "data":get(diLept),
+                "color":"gold",
+                "weight":ttbar_2lept,
+                "stack":True,},
+            
+            
+        }
+
+ax1,ax2=significance.make_hist(hist_dict,xlim=(20,450),bins=80,log=True,significance=False,density=False,ylim=(1e-3,3e6))
+plt.ylim(3e-1,2e1)
+ax2.set_xlabel("$p_t$ [GeV]")
+ax2.set_ylabel("Sig./Bkg.")
+# %%
+# %%
+hist_kwargs = { "bins":50, "density":True, "log":True, "range":(0,5),"histtype":"step", "linewidth":2}
+plt.hist(sig_score,**hist_kwargs,color="red",label="signal")
+plt.hist(tt_tau,**hist_kwargs,color="cadetblue",label="$t\\bar{t} j \\to b\\bar{b} q \\bar{q} \\tau \\nu_{\\tau}$")
+plt.hist(ttc,**hist_kwargs,color="lightsteelblue",label="$t\\bar{t}+c$")
+plt.hist(ttb,**hist_kwargs,color="cornflowerblue",label="$t\\bar{t}+b$")
+plt.hist(tt_charmed,**hist_kwargs,color="lightcoral",label="$t\\bar{t} \\to b\\bar{b} cql \\nu$")
+plt.hist(tt_up,**hist_kwargs,color="plum",label="$t\\bar{t} \\to b\\bar{b} uql \\nu$")
+plt.hist(WJets_bkg,**hist_kwargs,color="limegreen",label="$Wj \\to l \\nu$")
+plt.hist(TTdiHad,**hist_kwargs,color="orange",label="$t\\bar{t} \\to b\\bar{b} q \\bar{q} q \\bar{q}$")
+plt.hist(TTdiLept,**hist_kwargs,color="gold",label="$t\\bar{t} \\to b\\bar{b} l \\nu l \\nu$")
+plt.legend(fontsize=18)
+plt.ylim(1e-6,1e3)

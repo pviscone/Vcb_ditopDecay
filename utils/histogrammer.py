@@ -66,6 +66,13 @@ class Histogrammer():
         else:
             linewidth = self.linewidth
             
+        if "weights" in kwargs:
+            weights = kwargs["weights"]*np.ones(len(array))/len(array)
+            del kwargs["weights"]
+        else:
+            weights = None
+            
+            
         common_kwargs = self.common_kwargs
         for key in kwargs.keys():
             if (key in common_kwargs):
@@ -100,10 +107,21 @@ class Histogrammer():
             if self.N:
                 legend_label += f" $N_{{Tot}}$={len(array)}"
 
-
+        if "weights" in kwargs:
+            weights = kwargs["weights"]*np.ones(len(new_array))/len(new_array)
+            del kwargs["weights"]
+        else:
+            weights = None
 
             
-        self.hist_list.append(plt.hist(new_array, label=legend_label, range=histrange, histtype=histtype,linewidth=linewidth, **kwargs, **common_kwargs))
+        self.hist_list.append(plt.hist(new_array,
+                                       label=legend_label,
+                                       range=histrange,
+                                       histtype=histtype,
+                                       linewidth=linewidth,
+                                       weights=weights,
+                                       **kwargs,
+                                       **common_kwargs))
     
 
     def plot(self):
