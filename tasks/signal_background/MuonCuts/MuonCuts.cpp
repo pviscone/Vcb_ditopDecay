@@ -55,42 +55,88 @@ RVec<float> TMass(const ROOT::Math::PtEtaPhiMVector &Mu4V,
     return tmass;
 }
 
-RVec<float> WHad_mass(const RVec<ROOT::Math::PtEtaPhiMVector> &Jet4V){
-    float Mw=80.385;
-    int n=Jet4V.size();
-    RVec<float> best_Wmass(n);
+RVec<float> pad_jet(const RVec<float> &jet_vec, int n){
+    RVec<float> jet_vec_pad(n);
     for(int i=0;i<n;i++){
-        RVec<float> temp_Wmass(n,0.);
-        for(int j=0;j<n;j++){
-            temp_Wmass[j]=(Jet4V[i]+Jet4V[j]).M();
+        if(i<jet_vec.size()){
+            jet_vec_pad[i]=jet_vec[i];
+        }else{
+            jet_vec_pad[i]=0.;
         }
-        int argBest_Wmass=ArgMin(abs(temp_Wmass-Mw));
-        best_Wmass[i]=temp_Wmass[argBest_Wmass];
     }
-    return best_Wmass;
+    return jet_vec_pad;
+}
+
+RVec<float> WHad_mass(const RVec<ROOT::Math::PtEtaPhiMVector> &Jet4V){
+    int n=Jet4V.size();
+    RVec<float> Wmass(n*n);
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
+            if (Jet4V[i].Pt()==0. or Jet4V[j].Pt()==0.){
+                Wmass[i*n+j]=0.;
+            }
+            else{
+                if (i==j){
+                    Wmass[i*n+j] = (Jet4V[i]).M();
+                } else{
+                Wmass[i*n+j]=(Jet4V[i]+Jet4V[j]).M();
+                }
+            }
+        }
+    }
+    return Wmass;
 }
 
 
 
 RVec<float> THad_mass(const RVec<ROOT::Math::PtEtaPhiMVector> &Jet4V){
-    float MT=173.1;
     int n=Jet4V.size();
-    RVec<float> best_Tmass(n);
+    RVec<float> Tmass(n*n*n);
     for(int i=0;i<n;i++){
-        RVec<float> temp_Tmass(n*n,0.);
         for(int j=0;j<n;j++){
             for(int k=0;k<n;k++){
-                temp_Tmass[j*n+k]=(Jet4V[i]+Jet4V[j]+Jet4V[k]).M();
+                if (Jet4V[i].Pt()==0. or Jet4V[j].Pt()==0. or Jet4V[k].Pt()==0.){
+                    Tmass[i*n*n+n*j+k]=0.;
+                }
+                else{
+                    if (i==j and j==k){
+                        Tmass[i*n*n + n*j + k] = (Jet4V[i]).M();
+                    } else{
+                        Tmass[i*n*n + n*j + k] = (Jet4V[i] + Jet4V[j] + Jet4V[k]).M();
+                    }
+                }
             }
         }
-        int argBest_Tmass=ArgMin(abs(temp_Tmass-MT));
-        best_Tmass[i]=temp_Tmass[argBest_Tmass];
     }
-    return best_Tmass;
+    return Tmass;
 }
 
-//"./powheg/root_files"
-void MuonCuts(std::string input,std::string output){
+RVec<float> Masses(const RVec<ROOT::Math::PtEtaPhiMVector> &Jet4V,
+                   const ROOT::Math::PtEtaPhiMVector &Mu4V,
+                   const ROOT::Math::PtEtaPhiMVector &Nu4V){
+    int n=Jet4V.size()+1;
+    auto W4V=Mu4V+Nu4V;
+    RVec<float> masses(n*n);
+    for (int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
+            if(i==0 and j==0){
+                masses[i*n+j]=(W4V).M();
+            } else if (i==0){
+                masses[i*n+j]=(W4V+Jet4V[j-1]).M();
+            } else if (j==0){
+                masses[i*n+j] = (W4V + Jet4V[i-1]).M();
+            } else if(i==j){
+                masses[i*n+j]=Jet4V[i-1].M();
+            } else{
+                masses[i*n+j]=(Jet4V[i-1]+Jet4V[j-1]).M();
+            }
+        }
+    }
+    return masses;
+}
+
+    //"./powheg/root_files"
+void MuonCuts(std::string input, std::string output) {
     std::vector<std::string> files_path;
     if(input.find(".root")==string::npos){
         for (const auto & entry : std::filesystem::directory_iterator(input)){
@@ -118,6 +164,7 @@ void MuonCuts(std::string input,std::string output){
                                        "Jet_eta",
                                        "Jet_phi",
                                        "Jet_mass",
+                                       "Jet_area",
                                        "Jet_muonIdx1",
                                        "Jet_jetId",
                                        "Jet_puId",
@@ -126,10 +173,10 @@ void MuonCuts(std::string input,std::string output){
                                        "Jet_btagDeepFlavCvB",
                                        "Jet_btagDeepFlavCvL"});
 
-    auto dfCuts=df.Filter("nMuon>=1");
-    dfCuts=dfCuts.Filter("nJet>=4");
-    dfCuts=dfCuts.Define("MuonMask","Muon_looseId && Muon_pfIsoId>1");
-    dfCuts=dfCuts.Define("JetMask","Jet_muonIdx1!=0 && Jet_jetId>0 && Jet_puId>0 && Jet_pt>20 && abs(Jet_eta)<4.8");
+    auto dfCuts=df.Filter("nMuon>=0","nEvents");
+
+    dfCuts=dfCuts.Define("MuonMask","Muon_looseId && Muon_pfIsoId>1")
+                 .Define("JetMask","Jet_muonIdx1!=0 && Jet_jetId>0 && Jet_puId>0 && Jet_pt>20 && abs(Jet_eta)<4.8");
 
     
     for(auto &name: df.GetColumnNames()){
@@ -140,27 +187,33 @@ void MuonCuts(std::string input,std::string output){
             dfCuts = dfCuts.Redefine(name, name+"[JetMask]");
         }
     }
-    dfCuts=dfCuts.Redefine("nMuon","Muon_pt.size()");
-    dfCuts=dfCuts.Redefine("nJet","Jet_pt.size()");
-    dfCuts=dfCuts.Filter("nMuon>=1 && nJet>=4");
-    dfCuts=dfCuts.Filter("Muon_pt[0]>26 && abs(Muon_eta[0])<2.4 && Max(Jet_btagDeepFlavB)>0.2793");
+    dfCuts=dfCuts.Redefine("nMuon","Muon_pt.size()")
+                 .Redefine("nJet","Jet_pt.size()")
+                 .Filter("nMuon>=1","Loose nMuon >=1")
+                 .Filter("Muon_pt[0]>26 && abs(Muon_eta[0])<2.4","Muon[0] pt>26 && abs(eta)<2.4")
+                 .Filter("nJet>=4", "Clean nJet>=4")
+                 .Filter("Max(Jet_btagDeepFlavB)>0.2793", "Max DeepFlavB>0.2793 (Medium)");
 
+    auto report=dfCuts.Report();
+    report->Print();
+
+    for (auto &name : df.GetColumnNames()) {
+        if (regex_match(name, std::regex("Jet_.*"))) {
+            dfCuts = dfCuts.Redefine(name, "pad_jet("+name+",7)");
+        }
+    }
     dfCuts=dfCuts.Define("MET_eta",Met_eta,{"Muon_pt",
                                             "Muon_eta",
                                             "Muon_phi",
                                             "MET_pt",
-                                            "MET_phi"});
+                                            "MET_phi"})
+                 .Define("Mu4V","ROOT::Math::PtEtaPhiMVector(Muon_pt[0],Muon_eta[0],Muon_phi[0],0.105)")
+                 .Define("Nu4V","ROOT::Math::PtEtaPhiMVector(MET_pt,MET_eta,MET_phi,0.)")
+                 .Define("MET_WLeptMass","(Mu4V+Nu4V).M()")
+                 .Define("Jet4V","Jet_4Vector(Jet_pt,Jet_eta,Jet_phi,Jet_mass)")
+                 .Define("Masses",Masses,{"Jet4V","Mu4V","Nu4V"});
 
-
-    dfCuts=dfCuts.Define("Mu4V","ROOT::Math::PtEtaPhiMVector(Muon_pt[0],Muon_eta[0],Muon_phi[0],0.105)");
-    dfCuts=dfCuts.Define("Nu4V","ROOT::Math::PtEtaPhiMVector(MET_pt,MET_eta,MET_phi,0.)");
-    dfCuts=dfCuts.Define("MET_WLeptMass","(Mu4V+Nu4V).M()");
-    dfCuts=dfCuts.Define("Jet4V","Jet_4Vector(Jet_pt,Jet_eta,Jet_phi,Jet_mass)");
-    dfCuts=dfCuts.Define("Jet_TLeptMass",TMass,{"Mu4V",
-                                            "Nu4V",
-                                            "Jet4V"});
-    dfCuts=dfCuts.Define("Jet_THadMass","THad_mass(Jet4V)");
-    dfCuts=dfCuts.Define("Jet_WHadMass","WHad_mass(Jet4V)");
+    
     dfCuts.Snapshot("Events",output,
                               {"LHEPart_pdgId",
                                "Muon_pt",
@@ -169,18 +222,12 @@ void MuonCuts(std::string input,std::string output){
                                "MET_pt",
                                "MET_eta",
                                "MET_phi",
-                               "MET_WLeptMass",
                                "Jet_pt",
                                "Jet_eta",
                                "Jet_phi",
-                               "Jet_mass",
-                               "Jet_WHadMass",
-                               "Jet_THadMass",
-                               "Jet_TLeptMass",
+                               "Jet_area",
                                "Jet_btagDeepFlavB",
                                "Jet_btagDeepFlavCvB",
-                               "Jet_btagDeepFlavCvL"});
-
-                                            
-
+                               "Jet_btagDeepFlavCvL",
+                               "Masses"});
 }
