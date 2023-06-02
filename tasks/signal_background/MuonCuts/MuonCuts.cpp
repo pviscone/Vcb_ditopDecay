@@ -116,20 +116,37 @@ RVec<float> Masses(const RVec<ROOT::Math::PtEtaPhiMVector> &Jet4V,
                    const ROOT::Math::PtEtaPhiMVector &Nu4V){
     int n=Jet4V.size()+1;
     auto W4V=Mu4V+Nu4V;
-    RVec<float> masses(n*n);
+    RVec<float> masses(n*(n+1)/2);
+    int idx=0;
     for (int i=0;i<n;i++){
         for(int j=0;j<n;j++){
-            if(i==0 and j==0){
-                masses[i*n+j]=(W4V).M();
-            } else if (i==0){
-                masses[i*n+j]=(W4V+Jet4V[j-1]).M();
-            } else if (j==0){
-                masses[i*n+j] = (W4V + Jet4V[i-1]).M();
-            } else if(i==j){
-                masses[i*n+j]=Jet4V[i-1].M();
-            } else{
-                masses[i*n+j]=(Jet4V[i-1]+Jet4V[j-1]).M();
+            if(i>j){
+                continue;
             }
+            if(i==0 and j==0){
+                masses[idx]=(W4V).M();
+            } else if (i==0){
+                if (Jet4V[j-1].M()==0.){
+                    masses[idx]=0.;
+                } else{
+                    masses[idx]=(W4V+Jet4V[j-1]).M();
+                }
+            } else if (j==0){
+                if (Jet4V[i-1].M()==0.){
+                    masses[idx]=0.;
+                } else{
+                    masses[idx]=(W4V+Jet4V[i-1]).M();
+                }
+            } else if(i==j){
+                masses[idx]=Jet4V[i-1].M();
+            } else{
+                if (Jet4V[i-1].M()==0. or Jet4V[j-1].M()==0.){
+                    masses[idx]=0.;
+                } else{
+                    masses[idx]=(Jet4V[i-1]+Jet4V[j-1]).M();
+                }
+            }
+            idx++;
         }
     }
     return masses;
