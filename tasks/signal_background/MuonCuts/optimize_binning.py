@@ -70,20 +70,19 @@ with torch.inference_mode():
 
 
 
-# %%
 
-
+#%%
 lumi=138e3
 ttbar_1lept=lumi*832*0.44*0.33  #single lepton
 ttbar_2had=lumi*832*0.45*0.003  #all quark types
 ttbar_2lept=lumi*832*0.11*0.237 #all lepton types
 wjets=lumi*59100*0.108*3*0.0003 #all lepton types
 
-tau_mask=(powheg.Lept_label==15).squeeze()
-not_tau_mask=(powheg.Lept_label!=15).squeeze()
+tau_mask=(powheg.data["LeptLabel"]==15).squeeze()
+not_tau_mask=(powheg.data["LeptLabel"]!=15).squeeze()
 
-additional_c=np.abs(powheg.additional_parton)==4
-additional_b=np.abs(powheg.additional_parton)==5
+additional_c=np.abs(powheg.data["AdditionalPartons"])==4
+additional_b=np.abs(powheg.data["AdditionalPartons"])==5
 had_decay=np.abs(powheg.had_decay)
 charmed=np.bitwise_or(had_decay[:,0]==4,had_decay[:,1]==4).bool()
 up=np.bitwise_or(had_decay[:,0]==2,had_decay[:,1]==2).bool()
@@ -217,3 +216,40 @@ plt.hist(TTdiHad,**hist_kwargs,color="orange",label="$t\\bar{t} \\to b\\bar{b} q
 plt.hist(TTdiLept,**hist_kwargs,color="gold",label="$t\\bar{t} \\to b\\bar{b} l \\nu l \\nu$")
 plt.legend(fontsize=18)
 plt.ylim(1e-6,1e3)
+
+
+#%%
+import corner
+import torch
+import numpy as np
+from JPAmodel.torch_dataset import EventsDataset
+
+#%%
+powheg=torch.load("../../../root_files/signal_background/Muons/NN/TTSemilept_MuonCuts.pt")
+powheg.slice(0,100000)
+
+#%%
+tt_charmed_nu,tt_charmed_mu,tt_charmed_jet,_=powheg[np.bitwise_and(charmed,not_tau_mask).bool()]
+tt_up_nu,tt_up_mu,tt_up_jet,_=powheg[np.bitwise_and(up,not_tau_mask).bool()]
+
+tt_charmed_jet_out=np.repeat(tt_charmed,7)
+
+
+tt_charmed_jet=torch.flatten(tt_charmed_jet,end_dim=1)
+tt_up_jet=torch.flatten(tt_up_jet,end_dim=1)
+
+
+# %%
+fig=corner.corner(tt_charmed_jet,range=[[0,200]]+[[-3.14,3.14]]+[[-6,6]]+[[0,1]]*3,
+              hist_kwargs={"ls": "--"},
+              bins=50,
+              contour_kwargs={"linestyles": "--"},
+              color="tab:blue",)
+
+corner.corner(tt_up_jet,range=[[0,200]]+[[-3.14,3.14]]+[[-6,6]]+[[0,1]]*3,
+              hist_kwargs={"ls": "--"},
+              bins=50,
+              contour_kwargs={"linestyles": "--"},
+              color="tab:orange",
+              fig=fig)
+# %%

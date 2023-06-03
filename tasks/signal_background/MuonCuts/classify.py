@@ -25,25 +25,13 @@ cpu = torch.device("cpu")
 device = torch.device(dev)
 
 #!-----------------Load datasets-----------------!#
-#powheg_dataset=torch.load("../../../root_files/signal_background/Muon/powheg_Muon_dataset.pt")
-train_dataset=torch.load("../../../root_files/signal_background/Muon/train_Muon_dataset.pt")
-test_dataset=torch.load("../../../root_files/signal_background/Muon/test_Muon_dataset.pt")
-""" train_dataset.mu_data=train_dataset.mu_data[:1000000]
-train_dataset.nu_data=train_dataset.nu_data[:1000000]
-train_dataset.jet_data=train_dataset.jet_data[:1000000]
-train_dataset.label=train_dataset.label[:1000000]
-test_dataset.mu_data=test_dataset.mu_data[:100000]
-test_dataset.nu_data=test_dataset.nu_data[:100000]
-test_dataset.jet_data=test_dataset.jet_data[:100000]
-test_dataset.label=test_dataset.label[:100000] """
-
-#test_dataset.to(device)
-#train_dataset.to(device)
-#powheg_dataset.to(device)
+print("Loading datasets...")
+train_dataset=torch.load("../../../root_files/signal_background/Muons/NN/train_Muons.pt")
+test_dataset=torch.load("../../../root_files/signal_background/Muons/NN/test_Muons.pt")
 
 
-signal_mask=test_dataset.label.squeeze()==1
-bkg_mask=test_dataset.label.squeeze()==0
+signal_mask=test_dataset.data["label"].squeeze()==1
+bkg_mask=test_dataset.data["label"].squeeze()==0
 
 importlib.reload(significance)
 def show_significance(mod,
@@ -74,8 +62,8 @@ importlib.reload(losses)
 JPANet = JPA.JPANet
 
 mu_feat=3
-nu_feat=4
-jet_feat=8
+nu_feat=3
+jet_feat=6
 
 model = JPANet(mu_arch=None, nu_arch=None, jet_arch=[jet_feat, 128, 128],
                jet_attention_arch=[128,128,128],
@@ -101,8 +89,8 @@ print(f"Number of parameters: {model.n_parameters()}")
 model.train_loop(train_dataset,test_dataset,
                  epochs=20,
                  show_each=1,
-                 train_bunch=15,
-                 test_bunch=8,
+                 train_bunch=150,
+                 test_bunch=100,
                  batch_size=20000,
                  loss=torch.nn.NLLLoss(weight=torch.tensor([0.25,1.]).to(device)),
                  optim={"lr": 1e-3, "weight_decay": 0.00, },

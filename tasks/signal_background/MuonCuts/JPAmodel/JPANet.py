@@ -1,15 +1,13 @@
 import torch
 import numpy as np
-from sklearn.model_selection import train_test_split
 from tqdm.notebook import tqdm
 import matplotlib.pyplot as plt
 from Attention_block import Attention
 from MLP import MLP
 from torchview import draw_graph
 from SelfAttentionPooling import SelfAttentionPooling
-from losses import SBLoss, AsimovLoss, SB_Gauss_Loss, Score_Ratio_Loss, Brier_Score
 from livelossplot import PlotLosses
-from dataset import loader
+from torch_dataset import loader
 from ipywidgets import Output
 from IPython.display import display
 
@@ -72,17 +70,13 @@ class JPANet(torch.nn.Module):
         else:
             self.ev_mlp = torch.nn.Identity()
 
-        if jet_arch is not None:
-            self.jet_mlp = MLP(arch=jet_arch,out_activation=torch.nn.SiLU(),
-                               dropout=dropout)
-            attention_input_dim = jet_arch[-1]
-        else:
-            self.jet_mlp = torch.nn.Identity()
-            attention_input_dim = self.jet_train.shape[2]
+
+        self.jet_mlp = MLP(arch=jet_arch,out_activation=torch.nn.SiLU(),dropout=dropout)
+
 
         
         if jet_attention_arch is not None:
-            self.jet_attention = Attention(input_dim=attention_input_dim,
+            self.jet_attention = Attention(input_dim=jet_arch[-1],
                 mlp_arch=jet_attention_arch,n_heads=n_heads, dropout=dropout)
         else:
             self.jet_attention = torch.nn.Identity()
@@ -168,10 +162,10 @@ class JPANet(torch.nn.Module):
             self.train()
             temp_train_loss=[]
 
-            
-            for bunch in loader(train,batch_size=bunch_size):
-
-                mu_bunch,nu_bunch,jet_bunch,y_bunch = bunch
+            i=0
+            for mu_bunch,nu_bunch,jet_bunch,y_bunch in loader(bunch_size,train.data["Lepton"],train.data["MET"],train.data["Jet"],train.data["label"]):
+                print("bunch",i)
+                i+=1
                 mu_bunch = mu_bunch.to(device,non_blocking=True)
                 nu_bunch = nu_bunch.to(device,non_blocking=True)
                 jet_bunch = jet_bunch.to(device,non_blocking=True)
@@ -194,12 +188,13 @@ class JPANet(torch.nn.Module):
                     self.optimizer.step()
                     temp_train_loss.append(train_loss_step.to(cpu).detach().item())
 
+
                 
                     
 
             self.eval()
             with torch.inference_mode():
-                y_test=test.label.to(device,non_blocking=True)
+                y_test=test.data["label"].to(device,non_blocking=True)
                 test_logits = self.predict(
                     test,bunch=test_bunch)
 
@@ -278,8 +273,7 @@ class JPANet(torch.nn.Module):
         with torch.inference_mode():
             bunch_size=dataset.label.shape[0]//bunch
             res=torch.zeros((1,2),device=device,dtype=torch.float32)
-            for bunch in loader(dataset,batch_size=bunch_size):
-                mu_bunch,nu_bunch,jet_bunch,y_bunch=bunch
+            for mu_bunch,nu_bunch,jet_bunch,y_bunch in loader(bunch_size,dataset.data["Lepton"],dataset.data["MET"],dataset.data["Jet"],dataset.data["label"]):
                 mu_bunch = mu_bunch.to(device,non_blocking=True)
                 nu_bunch = nu_bunch.to(device,non_blocking=True)
                 jet_bunch = jet_bunch.to(device,non_blocking=True)
