@@ -116,7 +116,7 @@ class JPANet(torch.nn.Module):
 
     def forward(self, mu, nu, jet):
 
-        pad_mask = ((jet == -1.01)[:, :, 0].squeeze()).to(torch.bool)
+        pad_mask = ((jet == 0)[:, :, 0].squeeze()).to(torch.bool)
         if pad_mask.dim()==1:
             pad_mask=torch.reshape(pad_mask,(1,pad_mask.shape[0]))
 
@@ -162,14 +162,12 @@ class JPANet(torch.nn.Module):
             self.train()
             temp_train_loss=[]
 
-            i=0
-            for mu_bunch,nu_bunch,jet_bunch,y_bunch in loader(bunch_size,train.data["Lepton"],train.data["MET"],train.data["Jet"],train.data["label"]):
-                print("bunch",i)
-                i+=1
+            for mu_bunch,nu_bunch,jet_bunch,y_bunch in (loader(bunch_size,train.data["Lepton"],train.data["MET"],train.data["Jet"],train.data["label"])):
+
                 mu_bunch = mu_bunch.to(device,non_blocking=True)
                 nu_bunch = nu_bunch.to(device,non_blocking=True)
                 jet_bunch = jet_bunch.to(device,non_blocking=True)
-                y_bunch =y_bunch.to(device,non_blocking=True)
+                y_bunch =y_bunch.to(torch.long).to(device,non_blocking=True)
         
                 n_batch=int(np.ceil(y_bunch.shape[0]/batch_size))
                 for n in range(n_batch):
@@ -194,7 +192,7 @@ class JPANet(torch.nn.Module):
 
             self.eval()
             with torch.inference_mode():
-                y_test=test.data["label"].to(device,non_blocking=True)
+                y_test=test.data["label"].to(torch.long).to(device,non_blocking=True)
                 test_logits = self.predict(
                     test,bunch=test_bunch)
 
@@ -271,13 +269,13 @@ class JPANet(torch.nn.Module):
     def predict(self,dataset,bunch=1):
         self.eval()
         with torch.inference_mode():
-            bunch_size=dataset.label.shape[0]//bunch
+            bunch_size=int(dataset.data["label"].shape[0]//bunch)
             res=torch.zeros((1,2),device=device,dtype=torch.float32)
             for mu_bunch,nu_bunch,jet_bunch,y_bunch in loader(bunch_size,dataset.data["Lepton"],dataset.data["MET"],dataset.data["Jet"],dataset.data["label"]):
                 mu_bunch = mu_bunch.to(device,non_blocking=True)
                 nu_bunch = nu_bunch.to(device,non_blocking=True)
                 jet_bunch = jet_bunch.to(device,non_blocking=True)
-                y_bunch =y_bunch.to(device,non_blocking=True)
+                y_bunch =y_bunch.to(torch.long).to(device,non_blocking=True)
                 temp_res=self.forward(mu_bunch,nu_bunch,jet_bunch)
                 res=torch.cat((res,temp_res),dim=0)
         return res[1:]
