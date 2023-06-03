@@ -28,19 +28,20 @@ device = torch.device(dev)
 print("Loading datasets...")
 train_dataset=torch.load("../../../root_files/signal_background/Muons/NN/train_Muons.pt")
 test_dataset=torch.load("../../../root_files/signal_background/Muons/NN/test_Muons.pt")
-
+#train_dataset.slice(0,500000)
+#test_dataset.slice(0,int(500000/4))
 
 signal_mask=test_dataset.data["label"].squeeze()==1
 bkg_mask=test_dataset.data["label"].squeeze()==0
 
 importlib.reload(significance)
 def show_significance(mod,
-                      func=lambda x: x,
-                      bins=np.linspace(0,1,100),
+                      func=lambda x: np.arctanh(x),
+                      bins=np.linspace(0,6,100),
                       normalize="lumi",
                       ratio_log=True,
                       log=True,
-                      bunch=10,
+                      bunch=7,
                       **kwargs):
     score=torch.exp(mod.predict(test_dataset,bunch=bunch)[:,-1])
     signal_score=score[signal_mask].detach().to(cpu).numpy()
@@ -89,9 +90,9 @@ print(f"Number of parameters: {model.n_parameters()}")
 model.train_loop(train_dataset,test_dataset,
                  epochs=20,
                  show_each=1,
-                 train_bunch=150,
-                 test_bunch=100,
-                 batch_size=20000,
+                 train_bunch=30,
+                 test_bunch=30/4,
+                 batch_size=10000,
                  loss=torch.nn.NLLLoss(weight=torch.tensor([0.25,1.]).to(device)),
                  optim={"lr": 1e-3, "weight_decay": 0.00, },
                  callback=show_significance,
@@ -109,7 +110,7 @@ model.loss_plot()
 show_significance(model,
                 func=lambda x: np.arctanh(x),
                 normalize="lumi",
-                bins=np.linspace(0,7,35),
+                bins=np.linspace(0,7,50),
                 ylim=(1e-4,1e8),
                 ratio_log=True,
                 log=True,
