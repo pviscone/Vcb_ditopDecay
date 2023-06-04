@@ -8,7 +8,7 @@ class Attention(torch.nn.Module):
 
         assert input_dim is not None
         
-
+        self.n_heads=n_heads
         self.norm1 = torch.nn.LayerNorm(input_dim)
         self.attention = torch.nn.MultiheadAttention(
             embed_dim=input_dim, num_heads=n_heads,batch_first=True)
@@ -23,11 +23,11 @@ class Attention(torch.nn.Module):
             self.mlp=torch.nn.Identity()
         
 
-    def forward(self, x,query=None,key_padding_mask=None,flatten=False):
+    def forward(self, x,query=None,attn_mask=None,flatten=False):
         if query is None:
             query=x
         out = self.norm1(x)
-        out, _ = self.attention(query, out, out,need_weights=False,key_padding_mask=key_padding_mask)
+        out, _ = self.attention(query, out, out,need_weights=False,attn_mask=attn_mask)
         out=self.dropout(out)
         if query is None:
             residuals=x

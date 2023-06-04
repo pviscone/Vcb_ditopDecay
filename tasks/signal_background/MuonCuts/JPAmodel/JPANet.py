@@ -113,13 +113,23 @@ class JPANet(torch.nn.Module):
 
 
         self.epoch=0
-
+        self.jet_mean=torch.tensor([6.3964e1,-4.7165e-3,-2.3042e-3,3.6918e-1,5.0398e-1,4.2594e-1],device=device)
+        self.jet_std=torch.tensor([50.1006,1.8142,1.6456,0.4087,0.3379,0.3796],device=device)
+        self.mu_mean=torch.tensor([6.5681e1,5.0793e-5,-1.7228e-3],device=device)
+        self.mu_std=torch.tensor([38.2836,1.8144,1.12],device=device)
+        self.nu_mean=torch.tensor([66.7863,0.1410,0.7417],device=device)
+        self.nu_std=torch.tensor([66.7836,1.7177,1.2575],device=device)
     def forward(self, mu, nu, jet):
-
+        #mu=torch.arctanh((mu-self.mu_mean)/(100*self.mu_std))
+        #nu=torch.arctanh((nu-self.nu_mean)/(100*self.nu_std))
+        #jet=torch.arctanh((jet-self.jet_mean)/(100*self.jet_std))
+        pad_mask = ((jet == 0)[:, :, 0].squeeze()).to(torch.bool)
+        mu=(mu-self.mu_mean)/(self.mu_std)
+        nu=(nu-self.nu_mean)/(self.nu_std)
+        jet=(jet-self.jet_mean)/(self.jet_std)
         pad_mask = ((jet == 0)[:, :, 0].squeeze()).to(torch.bool)
         if pad_mask.dim()==1:
             pad_mask=torch.reshape(pad_mask,(1,pad_mask.shape[0]))
-
         out_mu = self.mu_mlp(mu)
         out_nu = self.nu_mlp(nu)
         out_ev = self.ev_mlp(torch.cat((out_mu, out_nu), dim=2))
@@ -127,7 +137,9 @@ class JPANet(torch.nn.Module):
         del out_mu, out_nu
 
         out_jet = self.jet_mlp(jet)
-        out_jet = self.jet_attention(out_jet,key_padding_mask=pad_mask)
+        attn_mask=pad_mask[:,:,None]+pad_mask[:,None,:]
+        attn_mask=attn_mask.repeat_interleave(self.jet_attention.n_heads,dim=0)
+        out_jet = self.jet_attention(out_jet,attn_mask=attn_mask)
         
         total_out = torch.cat((out_ev, out_jet), dim=1)
         total_out = self.all_norm(total_out)
@@ -137,17 +149,23 @@ class JPANet(torch.nn.Module):
                                             out_ev.shape[0]),
                                     device=device, dtype=torch.bool)
                             .unsqueeze(1), pad_mask), dim=1)
-        total_out = self.all_attention(total_out,key_padding_mask=pad_mask)
         
+        
+        total_out = torch.nan_to_num(total_out, nan=0.0)
+        attn_mask=pad_mask[:,:,None]+pad_mask[:,None,:]
+        attn_mask=attn_mask.repeat_interleave(self.all_attention.n_heads,dim=0)
+        total_out = self.all_attention(total_out,attn_mask=attn_mask)
+        
+        total_out = torch.nan_to_num(total_out, nan=0.0)
         total_out = self.pooling(total_out,pad_mask=pad_mask)
         total_out = self.post_pooling_mlp(total_out)
         total_out = self.output(total_out)
 
         return total_out
 
-    def train_loop(self, train,test,epochs,train_bunch=1,test_bunch=1,batch_size=1,show_each=False,optim={},loss=None,callback=None):
+    def train_loop(self, train,test,epochs,train_bunch=1,test_bunch=1,batch_size=1,show_each=False,optim={},loss=None,callback=None,shuffle=False):
         self.optim_dict = optim
-        self.optimizer = torch.optim.Adam(self.parameters(), **self.optim_dict)
+        self.optimizer = torch.optim.RAdam(self.parameters(), **self.optim_dict)
         assert loss is not None
         epoch_loop = tqdm(range(epochs), desc="epoch")
         torch.backends.cudnn.benchmark = True
@@ -157,6 +175,8 @@ class JPANet(torch.nn.Module):
         assert bunch_size>batch_size
         self.loss_fn=loss
         for epoch in epoch_loop:
+            if shuffle:
+                train.shuffle()
             
             self.epoch+=1
             self.train()
