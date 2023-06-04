@@ -109,7 +109,6 @@ class EventsDataset(Dataset):
             for key in keys:
                 if self.data[key] is None:
                     continue
-                idx=torch.randperm(self.data[key].shape[0])
                 self.data[key]=self.data[key][idx].clone()
             
     def get_batch(self,start,end):
