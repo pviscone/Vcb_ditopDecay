@@ -3,11 +3,9 @@
 import sys
 sys.path.append("./JPAmodel/")
 import importlib
-import pandas as pd
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-import mplhep
 import JPAmodel.JPANet as JPA
 import JPAmodel.losses as losses
 import JPAmodel.significance as significance
@@ -18,6 +16,7 @@ torch.backends.cudnn.benchmark = True
 
 
 if torch.cuda.is_available():
+    
     dev = "cuda:0"
 else:
     dev = "cpu"
@@ -37,7 +36,7 @@ bkg_mask=test_dataset.data["label"].squeeze()==0
 importlib.reload(significance)
 def show_significance(mod,
                       func=lambda x: np.arctanh(x),
-                      bins=np.linspace(0,6,100),
+                      bins=np.linspace(0,7,100),
                       normalize="lumi",
                       ratio_log=True,
                       log=True,
@@ -76,7 +75,7 @@ model = JPANet(mu_arch=None, nu_arch=None, jet_arch=[jet_feat, 128, 128],
                n_heads=2, dropout=0.02,
                early_stopping=None,
                )
-#model=torch.compile(model)
+model=torch.compile(model)
 model = model.to(device)
 print(f"Number of parameters: {model.n_parameters()}")
 
@@ -90,14 +89,14 @@ print(f"Number of parameters: {model.n_parameters()}")
 model.train_loop(train_dataset,test_dataset,
                  epochs=20,
                  show_each=1,
-                 train_bunch=30,
-                 test_bunch=30/4,
-                 batch_size=10000,
+                 train_bunch=20,
+                 test_bunch=20/4,
+                 batch_size=20000,
                  loss=torch.nn.NLLLoss(weight=torch.tensor([0.25,1.]).to(device)),
                  optim={"lr": 1e-3, "weight_decay": 0.00, },
                  callback=show_significance,
+                 shuffle=True,
                  )
-
 
 #!---------------------Plot loss---------------------
 model.loss_plot()
@@ -110,7 +109,7 @@ model.loss_plot()
 show_significance(model,
                 func=lambda x: np.arctanh(x),
                 normalize="lumi",
-                bins=np.linspace(0,7,50),
+                bins=np.linspace(0,6.5,50),
                 ylim=(1e-4,1e8),
                 ratio_log=True,
                 log=True,
