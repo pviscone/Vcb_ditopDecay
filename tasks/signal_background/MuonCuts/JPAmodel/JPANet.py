@@ -72,6 +72,8 @@ class JPANet(torch.nn.Module):
             self.ev_mlp = torch.nn.Identity()
 
         self.mass_mlp = MLP(arch=masses_arch,out_activation=torch.nn.SiLU(),dropout=dropout)
+        self.mass_linear = torch.nn.Linear(masses_arch[-1],masses_arch[-1])
+        
         self.jet_mlp = MLP(arch=jet_arch,out_activation=torch.nn.SiLU(),dropout=dropout)
 
 
@@ -152,6 +154,7 @@ class JPANet(torch.nn.Module):
         
         #!Mass inputs
         out_mass=self.mass_mlp(masses)
+        out_mass=self.mass_linear(out_mass)
         out_mass=vec_to_sym(out_mass)
         
         #! Jet attention + mask
