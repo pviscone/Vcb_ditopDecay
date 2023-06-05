@@ -68,6 +68,7 @@ jet_feat=6
 model = JPANet(mu_arch=None, nu_arch=None, jet_arch=[jet_feat, 128, 128],
                jet_attention_arch=[128,128,128],
                event_arch=[mu_feat+nu_feat, 128, 128,128],
+               masses_arch=[36,128,128,36],
                pre_attention_arch=None,
                final_attention=True,
                post_attention_arch=[128,128],
@@ -94,10 +95,10 @@ model.train_loop(train_dataset,test_dataset,
                  batch_size=20000,
                  loss=torch.nn.NLLLoss(weight=torch.tensor([0.25,1.]).to(device)),
                  optim={"lr": 1e-3, "weight_decay": 0.00, },
-                 callback=show_significance,
+                 callback=None,
                  shuffle=True,
                  )
-
+#callback=show_significance
 #!---------------------Plot loss---------------------
 model.loss_plot()
 # model.graph(test_dataset)
