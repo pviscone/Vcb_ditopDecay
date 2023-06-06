@@ -33,6 +33,7 @@ class JPANet(torch.nn.Module):
                  jet_attention_arch=None, post_attention_arch=None, final_attention=False,post_pooling_arch=None,
                  masses_arch=None,
                  n_heads=1,
+                 n_jet=7,
                  early_stopping=None, dropout=0.15):
         super().__init__()
         assert post_attention_arch is not None
@@ -72,7 +73,8 @@ class JPANet(torch.nn.Module):
             self.ev_mlp = torch.nn.Identity()
 
         self.mass_mlp = MLP(arch=masses_arch,out_activation=torch.nn.SiLU(),dropout=dropout)
-        self.mass_linear = torch.nn.Linear(masses_arch[-1],masses_arch[-1])
+        self.mass_linear1 = torch.nn.Linear(masses_arch[-1],int(n_jet*(n_jet+1)/2))
+        self.mass_linear2 = torch.nn.Linear(masses_arch[-1],int((n_jet+1)*(n_jet+2)/2))
         
         self.jet_mlp = MLP(arch=jet_arch,out_activation=torch.nn.SiLU(),dropout=dropout)
 
@@ -153,14 +155,13 @@ class JPANet(torch.nn.Module):
         out_jet = self.jet_mlp(jet)
         
         #!Mass inputs
-        out_mass=self.mass_mlp(masses)
-        out_mass=self.mass_linear(out_mass)
-        out_mass=vec_to_sym(out_mass)
+        out_mass_embed=self.mass_mlp(masses)
         
         #! Jet attention + mask
         attn_mask=pad_mask[:,:,None]+pad_mask[:,None,:]
 
-        jet_mass_mask=out_mass[:,1:,1:]
+        jet_mass_mask=self.mass_linear1(out_mass_embed)
+        jet_mass_mask=vec_to_sym(jet_mass_mask)
         jet_mass_mask[attn_mask]=-torch.inf
         jet_mass_mask=jet_mass_mask.repeat_interleave(self.jet_attention.n_heads,dim=0)
         out_jet = self.jet_attention(out_jet,attn_mask=jet_mass_mask)
@@ -179,7 +180,8 @@ class JPANet(torch.nn.Module):
         total_out = torch.nan_to_num(total_out, nan=0.0)
         attn_mask=pad_mask[:,:,None]+pad_mask[:,None,:]
 
-        total_mask=out_mass
+        total_mask=self.mass_linear2(out_mass_embed)
+        total_mask=vec_to_sym(total_mask)
         total_mask[attn_mask]=-torch.inf
         total_mask=total_mask.repeat_interleave(self.all_attention.n_heads,dim=0)
         total_out = self.all_attention(total_out,attn_mask=total_mask)
@@ -192,7 +194,7 @@ class JPANet(torch.nn.Module):
 
         return total_out
 
-    def train_loop(self, train,test,epochs,train_bunch=1,test_bunch=1,batch_size=1,show_each=False,optim={},loss=None,callback=None,shuffle=False):
+    def train_loop(self, train,test,epochs,train_bunch=1,test_bunch=1,batch_size=1,show_each=False,optim={},loss=None,callback=None,shuffle=False,save_each=None):
         self.optim_dict = optim
         self.optimizer = torch.optim.RAdam(self.parameters(), **self.optim_dict)
         assert loss is not None
@@ -273,6 +275,9 @@ class JPANet(torch.nn.Module):
                             self.liveloss.draw()
                             if callback is not None:
                                 callback(self)
+                if save_each is not None:
+                    if(self.epoch%save_each==0 and self.epoch!=0):
+                        torch.save(self.state_dict(),f"state_dict_{self.epoch}.pt")
                             
 
             if self.early_stopping is not None:
