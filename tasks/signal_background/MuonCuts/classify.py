@@ -40,7 +40,7 @@ def show_significance(mod,
                       normalize="lumi",
                       ratio_log=True,
                       log=True,
-                      bunch=7,
+                      bunch=6,
                       **kwargs):
     score=torch.exp(mod.predict(test_dataset,bunch=bunch)[:,-1])
     signal_score=score[signal_mask].detach().to(cpu).numpy()
@@ -68,13 +68,14 @@ jet_feat=6
 model = JPANet(mu_arch=None, nu_arch=None, jet_arch=[jet_feat, 128, 128],
                jet_attention_arch=[128,128,128],
                event_arch=[mu_feat+nu_feat, 128, 128,128],
-               masses_arch=[36,128,128,36],
+               masses_arch=[36,128,128],
                pre_attention_arch=None,
                final_attention=True,
                post_attention_arch=[128,128],
                post_pooling_arch=[128,128,64],
-               n_heads=2, dropout=0.02,
+               n_heads=2, dropout=0.0225,
                early_stopping=None,
+               n_jet=7,
                )
 model=torch.compile(model)
 model = model.to(device)
@@ -91,12 +92,13 @@ model.train_loop(train_dataset,test_dataset,
                  epochs=20,
                  show_each=1,
                  train_bunch=20,
-                 test_bunch=20/4,
+                 test_bunch=6,
                  batch_size=20000,
-                 loss=torch.nn.NLLLoss(weight=torch.tensor([0.25,1.]).to(device)),
+                 loss=torch.nn.NLLLoss(weight=torch.tensor([0.2,1.]).to(device)),
                  optim={"lr": 1e-3, "weight_decay": 0.00, },
                  callback=None,
                  shuffle=True,
+                 save_each=10
                  )
 #callback=show_significance
 #!---------------------Plot loss---------------------
