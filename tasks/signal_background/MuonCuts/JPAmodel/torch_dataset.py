@@ -155,7 +155,7 @@ class EventsDataset(Dataset):
             for key in self.data.keys():
                 if (self.data[key] is None or dataset.data[key] is None):
                     continue
-                if (key=="AdditionalPartons"):
+                if (key=="AdditionalPartons" or "HadDecay"):
                     if (dataset.data[key].ndim==1):
                         dataset.data[key]=(dataset.data[key]).unsqueeze(dim=1)
                     if (self.data[key].ndim==1):
