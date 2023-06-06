@@ -152,6 +152,18 @@ RVec<float> Masses(const RVec<ROOT::Math::PtEtaPhiMVector> &Jet4V,
     return masses;
 }
 
+RVec<bool> muon_jet_matching(const RVec<float> &eta_jet,
+                             const RVec<float> &phi_jet,
+                             const float &eta_muon,
+                             const float &phi_muon){
+    RVec<float>phi_muon_vec(eta_jet.size(),phi_muon);
+    RVec<float>eta_muon_vec(eta_jet.size(),eta_muon);
+    RVec<float>deltaR=ROOT::VecOps::DeltaR(eta_jet,eta_muon_vec,phi_jet,phi_muon_vec);
+    return deltaR>0.4;
+}
+
+
+
     //"./powheg/root_files"
 void MuonCuts(std::string input, std::string output) {
     std::vector<std::string> files_path;
@@ -167,7 +179,7 @@ void MuonCuts(std::string input, std::string output) {
     RDataFrame df("Events",files_path,{"LHEPart_pdgId",
                                        "LHEPart_pt",
                                        "LHEPart_eta",
-                                       "LHEPart_phi"
+                                       "LHEPart_phi",
                                        "Muon_pt",
                                        "Muon_eta",
                                        "Muon_phi",
@@ -192,59 +204,63 @@ void MuonCuts(std::string input, std::string output) {
 
     auto dfCuts=df.Filter("nMuon>=0","nEvents");
 
-    dfCuts=dfCuts.Define("MuonMask","Muon_looseId && Muon_pfIsoId>1")
-                 .Define("JetMask","Jet_muonIdx1!=0 && Jet_jetId>0 && Jet_puId>0 && Jet_pt>20 && abs(Jet_eta)<4.8");
+    dfCuts=dfCuts.Define("MuonMask","Muon_looseId && Muon_pfIsoId>1");
+                 
 
     
     for(auto &name: df.GetColumnNames()){
         if(regex_match(name, std::regex("Muon_.*"))){
             dfCuts = dfCuts.Redefine(name, name+"[MuonMask]");
         }
-        if(regex_match(name, std::regex("Jet_.*"))){
-            dfCuts = dfCuts.Redefine(name, name+"[JetMask]");
+
+    }
+
+    dfCuts = dfCuts.Define("JetMask", "Jet_jetId>0 && Jet_puId>0 && Jet_pt>20 && abs(Jet_eta)<4.8")
+                   .Define("JetMatchingMask", "muon_jet_matching(Jet_eta,Jet_phi,Muon_eta[0],Muon_phi[0])");
+
+    for (auto &name : df.GetColumnNames()) {
+        if (regex_match(name, std::regex("Jet_.*"))) {
+            dfCuts = dfCuts.Redefine(name, name + "[JetMask && JetMatchingMask]");
         }
     }
-    dfCuts=dfCuts.Redefine("nMuon","Muon_pt.size()")
-                 .Redefine("nJet","Jet_pt.size()")
-                 .Filter("nMuon>=1","Loose nMuon >=1")
-                 .Filter("Muon_pt[0]>26 && abs(Muon_eta[0])<2.4","Muon[0] pt>26 && abs(eta)<2.4")
-                 .Filter("nJet>=4", "Clean nJet>=4")
-                 .Filter("Max(Jet_btagDeepFlavB)>0.2793", "Max DeepFlavB>0.2793 (Medium)");
 
-    auto report=dfCuts.Report();
+    dfCuts = dfCuts.Redefine("nMuon", "Muon_pt.size()")
+                    .Redefine("nJet", "Jet_pt.size()")
+                    .Filter("nMuon>=1", "Loose nMuon >=1")
+                    .Filter("Muon_pt[0]>26 && abs(Muon_eta[0])<2.4", "Muon[0] pt>26 && abs(eta)<2.4")
+                    .Filter("nJet>=4", "Clean nJet>=4")
+                    .Filter("Max(Jet_btagDeepFlavB)>0.2793", "Max DeepFlavB>0.2793 (Medium)");
+
+    auto report = dfCuts.Report();
     report->Print();
 
     for (auto &name : df.GetColumnNames()) {
         if (regex_match(name, std::regex("Jet_.*"))) {
-            dfCuts = dfCuts.Redefine(name, "pad_jet("+name+",7)");
+            dfCuts = dfCuts.Redefine(name, "pad_jet(" + name + ",7)");
         }
     }
-    dfCuts=dfCuts.Define("MET_eta",Met_eta,{"Muon_pt",
-                                            "Muon_eta",
-                                            "Muon_phi",
-                                            "MET_pt",
-                                            "MET_phi"})
-                 .Define("Mu4V","ROOT::Math::PtEtaPhiMVector(Muon_pt[0],Muon_eta[0],Muon_phi[0],0.105)")
-                 .Define("Nu4V","ROOT::Math::PtEtaPhiMVector(MET_pt,MET_eta,MET_phi,0.)")
-                 .Define("MET_WLeptMass","(Mu4V+Nu4V).M()")
-                 .Define("Jet4V","Jet_4Vector(Jet_pt,Jet_eta,Jet_phi,Jet_mass)")
-                 .Define("Masses",Masses,{"Jet4V","Mu4V","Nu4V"});
+    dfCuts = dfCuts.Define("MET_eta", Met_eta, {"Muon_pt", "Muon_eta", "Muon_phi", "MET_pt", "MET_phi"})
+                    .Define("Mu4V", "ROOT::Math::PtEtaPhiMVector(Muon_pt[0],Muon_eta[0],Muon_phi[0],0.105)")
+                    .Define("Nu4V", "ROOT::Math::PtEtaPhiMVector(MET_pt,MET_eta,MET_phi,0.)")
+                    .Define("MET_WLeptMass", "(Mu4V+Nu4V).M()")
+                    .Define("Jet4V", "Jet_4Vector(Jet_pt,Jet_eta,Jet_phi,Jet_mass)")
+                    .Define("Masses", Masses, {"Jet4V", "Mu4V", "Nu4V"});
 
-    
-    dfCuts.Snapshot("Events",output,
-                              {"LHEPart_pdgId",
-                               "Muon_pt",
-                               "Muon_eta",
-                               "Muon_phi",
-                               "MET_pt",
-                               "MET_eta",
-                               "MET_phi",
-                               "Jet_pt",
-                               "Jet_eta",
-                               "Jet_phi",
-                               "Jet_area",
-                               "Jet_btagDeepFlavB",
-                               "Jet_btagDeepFlavCvB",
-                               "Jet_btagDeepFlavCvL",
-                               "Masses"});
+    dfCuts.Snapshot("Events", output,
+                    {"LHEPart_pdgId",
+                        "Muon_pt",
+                        "Muon_eta",
+                        "Muon_phi",
+                        "MET_pt",
+                        "MET_eta",
+                        "MET_phi",
+                        "Jet_pt",
+                        "Jet_eta",
+                        "Jet_phi",
+                        "Jet_area",
+                        "Jet_btagDeepFlavB",
+                        "Jet_btagDeepFlavCvB",
+                        "Jet_btagDeepFlavCvL",
+                        "Masses"});
+    exit(0);
 }

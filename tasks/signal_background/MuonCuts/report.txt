@@ -1,0 +1,53 @@
+-------------------- signal --------------------
+
+
+Processing MuonCuts.cpp("../../../../Preselection_Skim/signal/BigMuons.root/","../../../../Preselection_Skim/signal/signal_MuonCuts.root")...
+nEvents   : pass=10708941   all=10708941   -- eff=100.00 % cumulative eff=100.00 %
+Loose nMuon >=1: pass=8681553    all=10708941   -- eff=81.07 % cumulative eff=81.07 %
+Muon[0] pt>26 && abs(eta)<2.4: pass=6863287    all=8681553    -- eff=79.06 % cumulative eff=64.09 %
+Clean nJet>=4: pass=5712798    all=6863287    -- eff=83.24 % cumulative eff=53.35 %
+Max DeepFlavB>0.2793 (Medium): pass=5535759    all=5712798    -- eff=96.90 % cumulative eff=51.69 %
+
+
+-------------------- Semilept --------------------
+
+
+Processing MuonCuts.cpp("../../../../Preselection_Skim/powheg/root_files/","../../../../Preselection_Skim/powheg/TTSemiLept_MuonCuts.root")...
+nEvents   : pass=355826000  all=355826000  -- eff=100.00 % cumulative eff=100.00 %
+Loose nMuon >=1: pass=117178068  all=355826000  -- eff=32.93 % cumulative eff=32.93 %
+Muon[0] pt>26 && abs(eta)<2.4: pass=81323548   all=117178068  -- eff=69.40 % cumulative eff=22.85 %
+Clean nJet>=4: pass=69137671   all=81323548   -- eff=85.02 % cumulative eff=19.43 %
+Max DeepFlavB>0.2793 (Medium): pass=63686318   all=69137671   -- eff=92.12 % cumulative eff=17.90 %
+
+
+---------------------- diHad --------------------
+
+
+Processing MuonCuts.cpp("../../../../Preselection_Skim/diHad/root_files/","../../../../Preselection_Skim/diHad/TTdiHad_MuonCuts.root")...
+nEvents   : pass=43126999   all=43126999   -- eff=100.00 % cumulative eff=100.00 %
+Loose nMuon >=1: pass=1749455    all=43126999   -- eff=4.06 % cumulative eff=4.06 %
+Muon[0] pt>26 && abs(eta)<2.4: pass=196020     all=1749455    -- eff=11.20 % cumulative eff=0.45 %
+Clean nJet>=4: pass=174259     all=196020     -- eff=88.90 % cumulative eff=0.40 %
+Max DeepFlavB>0.2793 (Medium): pass=136842     all=174259     -- eff=78.53 % cumulative eff=0.32 %
+
+
+---------------------- diLept --------------------
+
+
+Processing MuonCuts.cpp("../../../../Preselection_Skim/diLept/root_files/","../../../../Preselection_Skim/diLept/TTdiLept_MuonCuts.root")...
+nEvents   : pass=44556000   all=44556000   -- eff=100.00 % cumulative eff=100.00 %
+Loose nMuon >=1: pass=24157135   all=44556000   -- eff=54.22 % cumulative eff=54.22 %
+Muon[0] pt>26 && abs(eta)<2.4: pass=18209495   all=24157135   -- eff=75.38 % cumulative eff=40.87 %
+Clean nJet>=4: pass=11403558   all=18209495   -- eff=62.62 % cumulative eff=25.59 %
+Max DeepFlavB>0.2793 (Medium): pass=10559381   all=11403558   -- eff=92.60 % cumulative eff=23.70 %
+
+
+---------------------- WJets --------------------
+
+
+Processing MuonCuts.cpp("../../../../Preselection_Skim/WJets/root_files/","../../../../Preselection_Skim/WJets/WJets_MuonCuts.root")...
+nEvents   : pass=83009353   all=83009353   -- eff=100.00 % cumulative eff=100.00 %
+Loose nMuon >=1: pass=20951137   all=83009353   -- eff=25.24 % cumulative eff=25.24 %
+Muon[0] pt>26 && abs(eta)<2.4: pass=12440717   all=20951137   -- eff=59.38 % cumulative eff=14.99 %
+Clean nJet>=4: pass=198753     all=12440717   -- eff=1.60 % cumulative eff=0.24 %
+Max DeepFlavB>0.2793 (Medium): pass=25730      all=198753     -- eff=12.95 % cumulative eff=0.03 %
