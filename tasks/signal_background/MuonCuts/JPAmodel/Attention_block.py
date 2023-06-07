@@ -11,7 +11,7 @@ class Attention(torch.nn.Module):
         self.n_heads=n_heads
         self.norm1 = torch.nn.LayerNorm(input_dim)
         self.attention = torch.nn.MultiheadAttention(
-            embed_dim=input_dim, num_heads=n_heads,batch_first=True)
+            embed_dim=input_dim, num_heads=n_heads,batch_first=True,dropout=dropout)
         if dropout is not None:
             self.dropout = torch.nn.Dropout(dropout)
         else:
