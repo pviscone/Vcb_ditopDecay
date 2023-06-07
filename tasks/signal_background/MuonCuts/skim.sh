@@ -1,4 +1,5 @@
-rm -f report.txt ../../../../Preselection_Skim/{signal/signal_MuonCuts,powheg/TTSemiLept_MuonCuts,diHad/TTdiHad_MuonCuts,diLept/TTdiLept_MuonCuts,WJets/WJets_MuonCuts}.root
+#rm -f report.txt 
+rm -f ../../../../Preselection_Skim/{signal/signal_MuonCuts,powheg/TTSemiLept_MuonCuts,diHad/TTdiHad_MuonCuts,diLept/TTdiLept_MuonCuts,WJets/WJets_MuonCuts}.root
 
 
 echo "-------------------- signal --------------------"
