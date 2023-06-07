@@ -73,6 +73,7 @@ class JPANet(torch.nn.Module):
             self.ev_mlp = torch.nn.Identity()
 
         self.mass_mlp = MLP(arch=masses_arch,out_activation=torch.nn.SiLU(),dropout=dropout)
+        self.mass_norm = torch.nn.LayerNorm(masses_arch[-1])
         self.mass_linear1 = torch.nn.Linear(masses_arch[-1],int(n_jet*(n_jet+1)/2))
         self.mass_linear2 = torch.nn.Linear(masses_arch[-1],int((n_jet+1)*(n_jet+2)/2))
         
@@ -111,7 +112,7 @@ class JPANet(torch.nn.Module):
         
         self.post_pooling_mlp=MLP(arch=post_pooling_arch,out_activation=torch.nn.SiLU(),dropout=None)
 
-        self.output=MLP(arch=[post_pooling_arch[-1],2],out_activation=torch.nn.LogSoftmax(dim=1),
+        self.output=MLP(arch=[post_pooling_arch[-1],3],out_activation=torch.nn.LogSoftmax(dim=1),
                         dropout=None)
 
 
@@ -156,6 +157,7 @@ class JPANet(torch.nn.Module):
         
         #!Mass inputs
         out_mass_embed=self.mass_mlp(masses)
+        out_mass_embed=self.mass_norm(out_mass_embed)
         
         #! Jet attention + mask
         attn_mask=pad_mask[:,:,None]+pad_mask[:,None,:]
@@ -327,7 +329,7 @@ class JPANet(torch.nn.Module):
         self.eval()
         with torch.inference_mode():
             bunch_size=int(dataset.data["label"].shape[0]//bunch)
-            res=torch.zeros((1,2),device=device,dtype=torch.float32)
+            res=torch.zeros((1,3),device=device,dtype=torch.float32)
             for mu_bunch,nu_bunch,jet_bunch,mass_bunch,y_bunch in loader(bunch_size,dataset.data["Lepton"],dataset.data["MET"],dataset.data["Jet"],dataset.data["Masses"],dataset.data["label"]):
                 mu_bunch = mu_bunch.to(device,non_blocking=True)
                 nu_bunch = nu_bunch.to(device,non_blocking=True)
@@ -346,3 +348,7 @@ def vec_to_sym(matrix):
     z=torch.zeros(matrix.shape[0],n,n,device=device,dtype=torch.float32)
     z[:,tri_idx[0],tri_idx[1]]=matrix
     return z+torch.transpose(z,2,1)-torch.diag_embed(torch.diagonal(z,dim1=2,dim2=1))
+
+
+
+# To change the output dim change the last layer and the res tensor in predict
