@@ -162,6 +162,30 @@ RVec<bool> muon_jet_matching(const RVec<float> &eta_jet,
     return deltaR>0.4;
 }
 
+RVec<float> SecondLepton(const RVec<float> &Muon, const RVec<float> &Electron){
+    RVec<float> res(3);
+    if (Muon.size()<2){
+        res[0]=0;
+    }else{
+        res[0]=Muon[1];
+    }
+
+    int n_electron= Electron.size();
+    if(n_electron<1){
+        res[1]=0;
+        res[2]=0;
+    }
+    else if (n_electron<2){
+        res[1]=Electron[1];
+        res[2]=0;
+    }
+    else{
+        res[1]=Electron[1];
+        res[2]=Electron[2];
+    }
+    return res;
+}
+
 
 
     //"./powheg/root_files"
@@ -240,27 +264,30 @@ void MuonCuts(std::string input, std::string output) {
         }
     }
     dfCuts = dfCuts.Define("MET_eta", Met_eta, {"Muon_pt", "Muon_eta", "Muon_phi", "MET_pt", "MET_phi"})
-                    .Define("Mu4V", "ROOT::Math::PtEtaPhiMVector(Muon_pt[0],Muon_eta[0],Muon_phi[0],0.105)")
-                    .Define("Nu4V", "ROOT::Math::PtEtaPhiMVector(MET_pt,MET_eta,MET_phi,0.)")
-                    .Define("MET_WLeptMass", "(Mu4V+Nu4V).M()")
-                    .Define("Jet4V", "Jet_4Vector(Jet_pt,Jet_eta,Jet_phi,Jet_mass)")
-                    .Define("Masses", Masses, {"Jet4V", "Mu4V", "Nu4V"});
+                 .Define("Mu4V", "ROOT::Math::PtEtaPhiMVector(Muon_pt[0],Muon_eta[0],Muon_phi[0],0.105)")
+                 .Define("Nu4V", "ROOT::Math::PtEtaPhiMVector(MET_pt,MET_eta,MET_phi,0.)")
+                 .Define("MET_WLeptMass", "(Mu4V+Nu4V).M()")
+                 .Define("Jet4V", "Jet_4Vector(Jet_pt,Jet_eta,Jet_phi,Jet_mass)")
+                 .Define("Masses", Masses, {"Jet4V", "Mu4V", "Nu4V"})
+                 .Define("SecondLept_pt", SecondLepton, {"Muon_pt", "Electron_pt"})
+                 .Define("SecondLept_eta", SecondLepton, {"Muon_eta", "Electron_eta"})
+                 .Define("SecondLept_phi", SecondLepton, {"Muon_phi", "Electron_phi"});
 
     dfCuts.Snapshot("Events", output,
-                    {"LHEPart_pdgId",
-                        "Muon_pt",
-                        "Muon_eta",
-                        "Muon_phi",
-                        "MET_pt",
-                        "MET_eta",
-                        "MET_phi",
-                        "Jet_pt",
-                        "Jet_eta",
-                        "Jet_phi",
-                        "Jet_area",
-                        "Jet_btagDeepFlavB",
-                        "Jet_btagDeepFlavCvB",
-                        "Jet_btagDeepFlavCvL",
-                        "Masses"});
+                            {"LHEPart_pdgId",
+                            "Muon_pt",
+                            "Muon_eta",
+                            "Muon_phi",
+                            "MET_pt",
+                            "MET_eta",
+                            "MET_phi",
+                            "Jet_pt",
+                            "Jet_eta",
+                            "Jet_phi",
+                            "Jet_area",
+                            "Jet_btagDeepFlavB",
+                            "Jet_btagDeepFlavCvB",
+                            "Jet_btagDeepFlavCvL",
+                            "Masses"});
     exit(0);
 }
