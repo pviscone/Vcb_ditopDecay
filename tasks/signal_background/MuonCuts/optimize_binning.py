@@ -18,13 +18,12 @@ cpu = torch.device("cpu")
 device = torch.device(dev)
 
 
-signal=torch.load("../../../root_files/signal_background/Muons/NN/test_Muons.pt")
-signal.mask(signal.data["label"]==1)
+signal=torch.load("../../../root_files/signal_background/Muons/NN/test_signal_Muons.pt")
 
 
-powheg=torch.load("../../../root_files/signal_background/Muons/NN/TTSemilept_MuonCuts.pt")
-
-diLept=torch.load("../../../root_files/signal_background/Muons/NN/TTdiLept_MuonCuts.pt")
+bkg=torch.load("../../../root_files/signal_background/Muons/NN/OtherBkg_Muons.pt")
+semiLept=bkg.mask(torch.abs(bkg.data["type"])==0,retrieve=True)
+diLept=bkg.mask((bkg.data["type"])==-1,retrieve=True)
 diHad=torch.load("../../../root_files/signal_background/Muons/NN/TTdiHad_MuonCuts.pt")
 WJets=torch.load("../../../root_files/signal_background/Muons/NN/WJets_MuonCuts.pt")
 
@@ -36,17 +35,17 @@ jet_feat=6
 model = JPANet(mu_arch=None, nu_arch=None, jet_arch=[jet_feat, 128, 128],
                jet_attention_arch=[128,128,128],
                event_arch=[mu_feat+nu_feat, 128, 128,128],
-               masses_arch=[36,128,128,36],
+               masses_arch=[36,128,128],
                pre_attention_arch=None,
                final_attention=True,
                post_attention_arch=[128,128],
                post_pooling_arch=[128,128,64],
-               n_heads=2, dropout=0.02,
+               n_heads=2, dropout=0.0225,
                early_stopping=None,
                )
-model=torch.compile(model)
-state_dict=torch.load("./state_dict60.pt")
-state_dict.pop("_orig_mod.loss_fn.weight")
+#model=torch.compile(model)
+state_dict=torch.load("./state_dict_40.pt")
+state_dict.pop("loss_fn.weight")
 model.load_state_dict(state_dict)
 model = model.to(device)
 
@@ -54,7 +53,7 @@ model = model.to(device)
 model.eval()
 with torch.inference_mode():
     signal_score=torch.exp(model.predict(signal,bunch=20)[:,-1]).detach().to(cpu).numpy()
-    bkg_score=torch.exp(model.predict(powheg,bunch=200)[:,-1]).detach().to(cpu).numpy()
+    bkg_score=torch.exp(model.predict(semiLept,bunch=200)[:,-1]).detach().to(cpu).numpy()
     diLept_score=torch.exp(model.predict(diLept,bunch=20)[:,-1]).detach().to(cpu).numpy()
     diHad_score=torch.exp(model.predict(diHad,bunch=20)[:,-1]).detach().to(cpu).numpy()
     WJets_score=torch.exp(model.predict(WJets,bunch=20)[:,-1]).detach().to(cpu).numpy()
@@ -69,12 +68,12 @@ ttbar_2had=lumi*832*0.45*0.0032  #all quark types
 ttbar_2lept=lumi*832*0.11*0.2365 #all lepton types
 wjets=lumi*59100*0.108*3*0.0003 #all lepton types
 
-tau_mask=(torch.abs(powheg.data["LeptLabel"])==15).squeeze()
-not_tau_mask=(torch.abs(powheg.data["LeptLabel"])!=15).squeeze()
+tau_mask=(torch.abs(semiLept.data["LeptLabel"])==15).squeeze()
+not_tau_mask=(torch.abs(semiLept.data["LeptLabel"])!=15).squeeze()
 
-additional_c=(np.abs(powheg.data["AdditionalPartons"])==4).squeeze()
-additional_b=(np.abs(powheg.data["AdditionalPartons"])==5).squeeze()
-had_decay=np.abs(powheg.data["HadDecay"])
+additional_c=(np.abs(semiLept.data["AdditionalPartons"])==4).squeeze()
+additional_b=(np.abs(semiLept.data["AdditionalPartons"])==5).squeeze()
+had_decay=np.abs(semiLept.data["HadDecay"])
 charmed=np.bitwise_or(had_decay[:,0]==4,had_decay[:,1]==4).bool()
 up=np.bitwise_or(had_decay[:,0]==2,had_decay[:,1]==2).bool()
 
@@ -126,8 +125,8 @@ hist_dict = {
                 "color":"cadetblue",
                 "weight":ttbar_1lept*(1-8.4e-4)*0.178*torch.sum(tau_mask)/len(tau_mask),
                 "stack":True,},
-                        "$Wj \\to l \\nu$":{
-            "data":WJets_bkg,
+            "$Wj \\to l \\nu$":{
+                "data":WJets_bkg,
                 "color":"limegreen",
                 "weight":wjets,
                 "stack":True,},
@@ -144,23 +143,6 @@ hist_dict = {
             
         }
 
-"""
-            "$Wj \\to l \\nu$":{
-                "data":WJets_bkg,
-                "color":"limegreen",
-                "weight":wjets,
-                "stack":True,},
-            "$t\\bar{t} \\to b\\bar{b} q \\bar{q} q \\bar{q}$":{
-                "data":TTdiHad,
-                "color":"orange",
-                "weight":ttbar_2had,
-                "stack":True,},
-            "$t\\bar{t} \\to b\\bar{b} l \\nu l \\nu$":{
-                "data":TTdiLept,
-                "color":"gold",
-                "weight":ttbar_2lept,
-                "stack":True,},
-            """
 
 
 ax1,ax2=significance.make_hist(hist_dict,xlim=(0,7),bins=60,log=True)
@@ -184,7 +166,7 @@ hist_dict = {
                 "histtype":"step",
                 "stack":False,},
             "$t\\bar{t}j \\to b\\bar{b} q \\bar{q} l \\nu /100$":{
-                "data":get(powheg),
+                "data":get(semiLept),
                 "color":"cornflowerblue",
                 "weight":ttbar_1lept*0.5*(1-8.4e-4)/100,
                 "stack":True,},
