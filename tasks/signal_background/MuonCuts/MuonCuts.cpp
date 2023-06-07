@@ -274,20 +274,23 @@ void MuonCuts(std::string input, std::string output) {
                  .Define("SecondLept_phi", SecondLepton, {"Muon_phi", "Electron_phi"});
 
     dfCuts.Snapshot("Events", output,
-                            {"LHEPart_pdgId",
-                            "Muon_pt",
-                            "Muon_eta",
-                            "Muon_phi",
-                            "MET_pt",
-                            "MET_eta",
-                            "MET_phi",
-                            "Jet_pt",
-                            "Jet_eta",
-                            "Jet_phi",
-                            "Jet_area",
-                            "Jet_btagDeepFlavB",
-                            "Jet_btagDeepFlavCvB",
-                            "Jet_btagDeepFlavCvL",
-                            "Masses"});
+                    {"LHEPart_pdgId",
+                     "Muon_pt",
+                     "Muon_eta",
+                     "Muon_phi",
+                     "MET_pt",
+                     "MET_eta",
+                     "MET_phi",
+                     "Jet_pt",
+                     "Jet_eta",
+                     "Jet_phi",
+                     "Jet_area",
+                     "Jet_btagDeepFlavB",
+                     "Jet_btagDeepFlavCvB",
+                     "Jet_btagDeepFlavCvL",
+                     "Masses",
+                     "SecondLept_pt",
+                     "SecondLept_eta",
+                     "SecondLept_phi"});
     exit(0);
 }
