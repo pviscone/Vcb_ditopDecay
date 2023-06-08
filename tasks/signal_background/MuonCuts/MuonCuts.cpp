@@ -176,12 +176,12 @@ RVec<float> SecondLepton(const RVec<float> &Muon, const RVec<float> &Electron){
         res[2]=0;
     }
     else if (n_electron<2){
-        res[1]=Electron[1];
+        res[1]=Electron[0];
         res[2]=0;
     }
     else{
-        res[1]=Electron[1];
-        res[2]=Electron[2];
+        res[1]=Electron[0];
+        res[2]=Electron[1];
     }
     return res;
 }
