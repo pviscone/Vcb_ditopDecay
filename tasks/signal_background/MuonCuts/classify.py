@@ -28,19 +28,6 @@ print("Loading datasets...")
 train_dataset=torch.load("../../../root_files/signal_background/Muons/NN/train_Muons.pt")
 test_dataset=torch.load("../../../root_files/signal_background/Muons/NN/test_Muons.pt")
 
-#%%
-n_diLept_train=torch.sum(train_dataset.data["type"]==-1)
-n_signal_train=torch.sum(train_dataset.data["type"]==1)
-
-train_dataset.data["label"][train_dataset.data["type"]==-1]=torch.ones(n_diLept_train).reshape((n_diLept_train,1))
-train_dataset.data["label"][train_dataset.data["type"]==1]=2*torch.ones(n_signal_train).reshape((n_signal_train,1))
-
-n_diLept_test=torch.sum(test_dataset.data["type"]==-1)
-n_signal_test=torch.sum(test_dataset.data["type"]==1)
-
-test_dataset.data["label"][test_dataset.data["type"]==-1]=torch.ones(n_diLept_test).reshape((n_diLept_test,1))
-test_dataset.data["label"][test_dataset.data["type"]==1]=2*torch.ones(n_signal_test).reshape((n_signal_test,1))
-
 
 #%%
 #! Show significance function
@@ -64,6 +51,7 @@ def show_significance(mod,
                         bins=60,
                         log=True,
                         bunch=7,
+                        save=None,
                         **kwargs):
     score=func(torch.exp(mod.predict(test_dataset,bunch=bunch)[:,-1]).detach().cpu().numpy())
     signal_score=score[signal_mask]
@@ -95,7 +83,12 @@ def show_significance(mod,
     }
     
     ax1,ax2=significance.make_hist(hist_dict,xlim=xlim,bins=bins,log=log,**kwargs)
-# %%
+    plt.show()
+    if save is not None:
+        plt.savefig(save)
+
+
+#%%
 #!---------------------Model---------------------
 importlib.reload(JPA)
 importlib.reload(losses)
@@ -112,6 +105,7 @@ model = JPANet(mu_arch=None, nu_arch=None, jet_arch=[jet_feat, 128, 128],
                pre_attention_arch=None,
                final_attention=True,
                post_attention_arch=[128,128],
+               secondLept_arch=[3*3,128,128],
                post_pooling_arch=[128,128,64],
                n_heads=2, dropout=0.02,
                early_stopping=None,
@@ -132,14 +126,14 @@ print(f"Number of parameters: {model.n_parameters()}")
 model.train_loop(train_dataset,test_dataset,
                  epochs=70,
                  show_each=1,
-                 train_bunch=20,
-                 test_bunch=7,
-                 batch_size=20000,
+                 train_bunch=21,
+                 test_bunch=8,
+                 batch_size=10000,
                  loss=torch.nn.NLLLoss(weight=torch.tensor([0.33,1,1.]).to(device)),
                  optim={"lr": 1e-3, "weight_decay": 0.00, },
-                 callback=None,
                  shuffle=True,
-                 save_each=10
+                 save_each=10,
+                 callback=None
                  )
 #callback=show_significance
 #!---------------------Plot loss---------------------
@@ -150,6 +144,10 @@ model.loss_plot()
 
 # %%
 #!---------------------Plot significance---------------------
+torch.save({"train_loss":model.train_loss,
+            "test_loss":model.test_loss,
+            "epoch":model.epoch}, "./loss.pt")
+show_significance(model, save="score.png")
 
-show_significance(model)
-
+#%%
+exit(0)

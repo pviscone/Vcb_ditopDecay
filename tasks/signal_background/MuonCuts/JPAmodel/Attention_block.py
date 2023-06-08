@@ -23,11 +23,12 @@ class Attention(torch.nn.Module):
             self.mlp=torch.nn.Identity()
         
 
-    def forward(self, x,query=None,attn_mask=None,flatten=False):
+    def forward(self, x,query=None,attn_mask=None,flatten=False,key_padding_mask=None):
         if query is None:
             query=x
         out = self.norm1(x)
-        out, _ = self.attention(query, out, out,need_weights=False,attn_mask=attn_mask)
+        out, _ = self.attention(query, out, out,need_weights=False,
+                                attn_mask=attn_mask,key_padding_mask=key_padding_mask)
         out=self.dropout(out)
         if query is None:
             residuals=x
