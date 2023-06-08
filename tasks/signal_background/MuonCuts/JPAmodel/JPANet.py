@@ -198,11 +198,18 @@ class JPANet(torch.nn.Module):
                                        attn_mask=total_mask,key_padding_mask=pad_mask)
         
         #!Second Lepton
-        #secondLept=(secondLept)/(self.mu_std)
-        #secondLept=torch.flatten(secondLept,start_dim=1)
-        #secondLept_out=self.secondLept_mlp(secondLept)
-        #secondLept_out = torch.nan_to_num(secondLept_out, nan=0.0)
         
+        secondLept=(secondLept)/(self.mu_std)
+        secondLept_mask=((secondLept == 0)[:, :, 0].squeeze()).to(torch.float32)
+        secondLept_mask[secondLept_mask==1]=-torch.inf
+        secondLept_out=self.secondLept_mlp(secondLept)
+        secondLept_out=self.secondLept_norm(secondLept_out)
+        pad_mask=torch.cat((pad_mask,secondLept_mask),dim=1)
+        total_out=torch.cat((total_out,secondLept_out),dim=1)
+       
+        
+        #secondLept_out = torch.nan_to_num(secondLept_out, nan=0.0)
+
 
         
         #!Pool and output
@@ -214,6 +221,8 @@ class JPANet(torch.nn.Module):
         return total_out
 
     def train_loop(self, train,test,epochs,train_bunch=1,test_bunch=1,batch_size=1,show_each=False,optim={},loss=None,callback=None,shuffle=False,save_each=None):
+        
+
         self.optim_dict = optim
         self.optimizer = torch.optim.RAdam(self.parameters(), **self.optim_dict)
         assert loss is not None

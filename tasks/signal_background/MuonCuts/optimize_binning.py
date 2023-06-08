@@ -22,8 +22,8 @@ signal=torch.load("../../../root_files/signal_background/Muons/NN/test_signal_Mu
 
 
 bkg=torch.load("../../../root_files/signal_background/Muons/NN/OtherBkg_Muons.pt")
-semiLept=bkg.mask(torch.abs(bkg.data["type"])==0,retrieve=True)
-diLept=bkg.mask((bkg.data["type"])==-1,retrieve=True)
+semiLept=bkg.mask(torch.abs(bkg.data["label"])==0,retrieve=True)
+diLept=bkg.mask((bkg.data["label"])==1,retrieve=True)
 diHad=torch.load("../../../root_files/signal_background/Muons/NN/TTdiHad_MuonCuts.pt")
 WJets=torch.load("../../../root_files/signal_background/Muons/NN/WJets_MuonCuts.pt")
 
@@ -39,12 +39,14 @@ model = JPANet(mu_arch=None, nu_arch=None, jet_arch=[jet_feat, 128, 128],
                pre_attention_arch=None,
                final_attention=True,
                post_attention_arch=[128,128],
+               secondLept_arch=[3,128,128],
                post_pooling_arch=[128,128,64],
-               n_heads=2, dropout=0.0225,
+               n_heads=2, dropout=0.02,
                early_stopping=None,
+               n_jet=7,
                )
 #model=torch.compile(model)
-state_dict=torch.load("./state_dict_40.pt")
+state_dict=torch.load("./state_dict_100.pt")
 state_dict.pop("loss_fn.weight")
 model.load_state_dict(state_dict)
 model = model.to(device)
@@ -135,17 +137,13 @@ hist_dict = {
                 "color":"orange",
                 "weight":ttbar_2had,
                 "stack":True,},
-            "$t\\bar{t} \\to b\\bar{b} l \\nu l \\nu$":{
-                "data":TTdiLept,
-                "color":"gold",
-                "weight":ttbar_2lept,
-                "stack":True,},
+
             
         }
 
 
 
-ax1,ax2=significance.make_hist(hist_dict,xlim=(0,7),bins=60,log=True)
+ax1,ax2=significance.make_hist(hist_dict,xlim=(0,6),bins=60,log=True,ylim=(1e-1,1e7))
 
 #%%
 
