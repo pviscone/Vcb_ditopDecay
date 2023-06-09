@@ -46,7 +46,7 @@ model = JPANet(mu_arch=None, nu_arch=None, jet_arch=[jet_feat, 128, 128],
                n_jet=7,
                )
 #model=torch.compile(model)
-state_dict=torch.load("./state_dict_100.pt")
+state_dict=torch.load("./state_dict_100_3class.pt")
 state_dict.pop("loss_fn.weight")
 model.load_state_dict(state_dict)
 model = model.to(device)
@@ -55,7 +55,7 @@ model = model.to(device)
 model.eval()
 with torch.inference_mode():
     signal_score=torch.exp(model.predict(signal,bunch=20)[:,-1]).detach().to(cpu).numpy()
-    bkg_score=torch.exp(model.predict(semiLept,bunch=200)[:,-1]).detach().to(cpu).numpy()
+    bkg_score=torch.exp(model.predict(semiLept,bunch=150)[:,-1]).detach().to(cpu).numpy()
     diLept_score=torch.exp(model.predict(diLept,bunch=20)[:,-1]).detach().to(cpu).numpy()
     diHad_score=torch.exp(model.predict(diHad,bunch=20)[:,-1]).detach().to(cpu).numpy()
     WJets_score=torch.exp(model.predict(WJets,bunch=20)[:,-1]).detach().to(cpu).numpy()
@@ -136,6 +136,11 @@ hist_dict = {
                 "data":TTdiHad,
                 "color":"orange",
                 "weight":ttbar_2had,
+                "stack":True,},
+            "$t\\bar{t} \\to b\\bar{b} l \\nu l \\nu$":{
+                "data":TTdiLept,
+                "color":"orange",
+                "weight":ttbar_2lept,
                 "stack":True,},
 
             
