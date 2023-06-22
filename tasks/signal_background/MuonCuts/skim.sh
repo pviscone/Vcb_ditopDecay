@@ -1,18 +1,28 @@
-#rm -f report.txt 
-rm -f ../../../../Preselection_Skim/{signal/signal_MuonCuts,powheg/TTSemiLept_MuonCuts,diHad/TTdiHad_MuonCuts,diLept/TTdiLept_MuonCuts,WJets/WJets_MuonCuts}.root
+#rm -f report.txt
+#rm -f ../../../../Preselection_Skim/{signal/signal,powheg/TTSemiLept,diHad/TTdiHad,diLept/TTdiLept,WJets/WJets}*_MuonCuts.root
+rm -f ../../../../Preselection_Skim/NN/**/*.root
+
+rootfilePATH="/scratchnvme/pviscone/Preselection_Skim"
 
 
 echo "-------------------- signal --------------------"
-root -l 'MuonCuts.cpp("../../../../Preselection_Skim/signal/BigMuons.root/","../../../../Preselection_Skim/signal/signal_MuonCuts.root")'
+root -l 'MuonCuts.cpp("../../../../Preselection_Skim/signal/signal_train.root/","../../../../Preselection_Skim/NN/train/root/signal_train_MuonCuts.root")'
+root -l 'MuonCuts.cpp("../../../../Preselection_Skim/signal/signal_test.root/","../../../../Preselection_Skim/NN/test/root/signal_test_MuonCuts.root")'
+ln -s ../../../../Preselection_Skim/NN/test/root/signal_test_MuonCuts.root ../../../../Preselection_Skim/NN/predict/root/signal_predict_MuonCuts.root
+
 echo ""
 echo "-------------------- Semilept --------------------"
-root -l 'MuonCuts.cpp("../../../../Preselection_Skim/powheg/root_files/","../../../../Preselection_Skim/powheg/TTSemiLept_MuonCuts.root")'
+root -l 'MuonCuts.cpp("../../../../Preselection_Skim/powheg/root_files/train","../../../../Preselection_Skim/NN/train/root/TTSemiLept_train_MuonCuts.root")'
+root -l 'MuonCuts.cpp("../../../../Preselection_Skim/powheg/root_files/test","../../../../Preselection_Skim/NN/test/root/TTSemiLept_test_MuonCuts.root")'
+root -l 'MuonCuts.cpp("../../../../Preselection_Skim/powheg/root_files/predict","../../../../Preselection_Skim/NN/predict/root/TTSemiLept_predict_MuonCuts.root")'
 echo ""
 echo "---------------------- diHad --------------------"
-root -l 'MuonCuts.cpp("../../../../Preselection_Skim/diHad/root_files/","../../../../Preselection_Skim/diHad/TTdiHad_MuonCuts.root")'
+root -l 'MuonCuts.cpp("../../../../Preselection_Skim/diHad/root_files/","../../../../Preselection_Skim/NN/predict/root/TTdiHad_predict_MuonCuts.root")'
 echo ""
 echo "---------------------- diLept --------------------"
-root -l 'MuonCuts.cpp("../../../../Preselection_Skim/diLept/root_files/","../../../../Preselection_Skim/diLept/TTdiLept_MuonCuts.root")'
+root -l 'MuonCuts.cpp("../../../../Preselection_Skim/diLept/root_files/train","../../../../Preselection_Skim/NN/train/root/TTdiLept_train_MuonCuts.root")'
+root -l 'MuonCuts.cpp("../../../../Preselection_Skim/diLept/root_files/test","../../../../Preselection_Skim/NN/test/root/TTdiLept_test_MuonCuts.root")'
+ln -s ../../../../Preselection_Skim/NN/test/root/TTdiLept_test_MuonCuts.root ../../../../Preselection_Skim/NN/predict/root/TTdiLept_predict_MuonCuts.root
 echo ""
 echo "---------------------- WJets --------------------"
-root -l 'MuonCuts.cpp("../../../../Preselection_Skim/WJets/root_files/","../../../../Preselection_Skim/WJets/WJets_MuonCuts.root")'
+root -l 'MuonCuts.cpp("../../../../Preselection_Skim/WJets/root_files/","../../../../Preselection_Skim/NN/predict/root/WJets_predict_MuonCuts.root")'

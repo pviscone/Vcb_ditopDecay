@@ -198,7 +198,7 @@ void MuonCuts(std::string input, std::string output) {
     }else{
         files_path.push_back(input);
     }
-    EnableImplicitMT();
+    EnableImplicitMT(20);
     
     RDataFrame df("Events",files_path,{"LHEPart_pdgId",
                                        "LHEPart_pt",
