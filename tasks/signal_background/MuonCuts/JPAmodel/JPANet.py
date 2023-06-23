@@ -10,6 +10,14 @@ from livelossplot import PlotLosses
 from torch_dataset import loader
 from ipywidgets import Output
 from IPython.display import display
+import gc
+
+import requests
+
+tok="6072568249:AAHd2tum9gWxhCNVXeA_lg2G6DS17_xG764"
+id="266333680"
+url=f"https://api.telegram.org/bot{tok}/sendPhoto"
+data = {"chat_id": id, "caption": "image_caption"}
 
 import os
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
@@ -220,7 +228,7 @@ class JPANet(torch.nn.Module):
 
         return total_out
 
-    def train_loop(self, train,test,epochs,train_bunch=1,test_bunch=1,batch_size=1,show_each=False,optim={},loss=None,callback=None,shuffle=False,save_each=None):
+    def train_loop(self, train,test,epochs,train_bunch=1,test_bunch=1,batch_size=1,show_each=False,optim={},loss=None,callback=None,shuffle=False,save_each=None,send_telegram=False,callback_each=10):
         
 
         self.optim_dict = optim
@@ -273,7 +281,9 @@ class JPANet(torch.nn.Module):
 
                 
                     
-
+            del mu_bunch,nu_bunch,jet_bunch,mass_bunch,secondLept_bunch,y_bunch
+            gc.collect()
+            torch.cuda.empty_cache()
             self.eval()
             with torch.inference_mode():
                 y_test=test.data["label"].to(torch.long).to(device,non_blocking=True)
@@ -303,8 +313,26 @@ class JPANet(torch.nn.Module):
                         if(epoch%show_each==0):
                             self.liveloss.send()
                             self.liveloss.draw()
-                            if callback is not None:
+                        if callback is not None:
+                            if(epoch%callback_each==0):
                                 callback(self)
+                                
+                            if send_telegram is True:
+                                plt.figure()
+                                plt.plot(self.train_loss,label="train")
+                                plt.plot(self.test_loss,label="test")
+                                plt.legend()
+                                plt.savefig("temp.png")
+                                
+                                
+
+                                files = {'photo':open('temp.png', 'rb')}
+                                #files1 = {'file':open('temp1.png', 'rb')}
+                                ret = requests.post(url, data=data, files=files)
+                                #ret2 = requests.post(url, data=data, files=files1)
+
+
+
                 if save_each is not None:
                     if(self.epoch%save_each==0 and self.epoch!=0):
                         torch.save(self.state_dict(),f"state_dict_{self.epoch}.pt")
@@ -367,6 +395,10 @@ class JPANet(torch.nn.Module):
                 y_bunch =y_bunch.to(torch.long).to(device,non_blocking=True)
                 temp_res=self.forward(mu_bunch,nu_bunch,jet_bunch,mass_bunch,secondLept_bunch)
                 res=torch.cat((res,temp_res),dim=0)
+        
+        del mu_bunch,nu_bunch,jet_bunch,mass_bunch,secondLept_bunch,y_bunch
+        gc.collect()
+        torch.cuda.empty_cache()
         return res[1:]
             
 

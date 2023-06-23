@@ -11,8 +11,11 @@ import JPAmodel.losses as losses
 import JPAmodel.significance as significance
 JPANet = JPA.JPANet
 import os
+import gc
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
 torch.backends.cudnn.benchmark = True
+
+
 
 
 if torch.cuda.is_available():
@@ -25,8 +28,8 @@ device = torch.device(dev)
 
 #!-----------------Load datasets-----------------!#
 print("Loading datasets...")
-train_dataset=torch.load("../../../root_files/signal_background/Muons/NN/train_Muons.pt")
-test_dataset=torch.load("../../../root_files/signal_background/Muons/NN/test_Muons.pt")
+train_dataset=torch.load("../../../root_files/signal_background/Muons/train_Muons.pt")
+test_dataset=torch.load("../../../root_files/signal_background/Muons/test_Muons.pt")
 
 
 #%%
@@ -50,7 +53,7 @@ def show_significance(mod,
                         xlim=(0,7),
                         bins=60,
                         log=True,
-                        bunch=7,
+                        bunch=8,
                         save=None,
                         **kwargs):
     score=func(torch.exp(mod.predict(test_dataset,bunch=bunch)[:,-1]).detach().cpu().numpy())
@@ -84,6 +87,7 @@ def show_significance(mod,
     
     ax1,ax2=significance.make_hist(hist_dict,xlim=xlim,bins=bins,log=log,**kwargs)
     plt.show()
+    plt.savefig("temp1.png")
     if save is not None:
         plt.savefig(save)
 
@@ -123,24 +127,30 @@ print(f"Number of parameters: {model.n_parameters()}")
 #            "epoch":model.epoch}, "./loss.pt")
 #state_dict=torch.load("./state_dict_70.pt")
 #model.load_state_dict(state_dict)
+
+#balanced weight ~0.25,1,1
+
 model.train_loop(train_dataset,test_dataset,
-                 epochs=70,
+                 epochs=100,
                  show_each=1,
-                 train_bunch=20,
+                 train_bunch=17,
                  test_bunch=7,
-                 batch_size=20000,
-                 loss=torch.nn.NLLLoss(weight=torch.tensor([0.25,1,1.]).to(device)),
+                 batch_size=20480,
+                 loss=torch.nn.NLLLoss(weight=torch.tensor([0.242,0.938,1]).to(device)),
                  optim={"lr": 1e-3, "weight_decay": 0.00, },
                  shuffle=True,
                  save_each=10,
-                 callback=None
+                 callback=show_significance,
+                 callback_each=5,
+                 send_telegram=False,
                  )
 #callback=show_significance
 #!---------------------Plot loss---------------------
 model.loss_plot()
 # model.graph(test_dataset)
-
-
+#torch.nn.NLLLoss(weight=torch.tensor([2e-4,2.3e-3,1]).to(device))
+gc.collect()
+torch.cuda.empty_cache()
 
 # %%
 #!---------------------Plot significance---------------------
@@ -150,4 +160,4 @@ torch.save({"train_loss":model.train_loss,
 show_significance(model, save="score.png")
 
 #%%
-exit(0)
+#exit(0)
