@@ -106,7 +106,10 @@ def make_hist(hist_dict,xlim=None,bins=None,log=False,ylim=None,significance=Tru
     categories=list(hist_dict.keys())
     stack_categories=[i for i in hist_dict if hist_dict[i]["stack"]==True]
     
-    ax = hist.axis.Regular(bins, xlim[0], xlim[1], flow=False, name="x")
+    if type(bins)==list:
+        ax = hist.axis.Variable(bins, flow=False, name="x")
+    else:
+        ax = hist.axis.Regular(bins, xlim[0], xlim[1], flow=False, name="x")
     cax=hist.axis.StrCategory(stack_categories, name="type")
     stack_hist=hist.Hist(ax,cax,storage=hist.storage.Weight())
     
@@ -120,7 +123,10 @@ def make_hist(hist_dict,xlim=None,bins=None,log=False,ylim=None,significance=Tru
             stack_hist.fill(hist_dict[cat]["data"],type=cat,weight=hist_dict[cat]["weight"]/len(hist_dict[cat]["data"]))
             stack_color.append(hist_dict[cat]["color"])
         else:
-            h=hist.Hist(hist.axis.Regular(bins, xlim[0], xlim[1], flow=False, name="x"),storage=hist.storage.Weight())
+            if type(bins)==list:
+                h=hist.Hist(hist.axis.Variable(bins, flow=False, name="x"),storage=hist.storage.Weight())
+            else:
+                h=hist.Hist(hist.axis.Regular(bins, xlim[0], xlim[1], flow=False, name="x"),storage=hist.storage.Weight())
             h.fill(hist_dict[cat]["data"],weight=hist_dict[cat]["weight"]/len(hist_dict[cat]["data"]))
             hist_list.append(h)
             no_stack_color.append(hist_dict[cat]["color"])
@@ -160,7 +166,10 @@ def make_hist(hist_dict,xlim=None,bins=None,log=False,ylim=None,significance=Tru
         ax2.clear()
         
         sig=sum(hist_list)
-        Q=hist.Hist(hist.axis.Regular(bins,xlim[0],xlim[1],flow=False,name="x"))
+        if type(bins)==list:
+            Q=hist.Hist(hist.axis.Variable(bins, flow=False, name="x"))
+        else:
+            Q=hist.Hist(hist.axis.Regular(bins,xlim[0],xlim[1],flow=False,name="x"))
         
         Q_array=sig.values()**2/(sig.values()+tot.values()+1e-10)
         
