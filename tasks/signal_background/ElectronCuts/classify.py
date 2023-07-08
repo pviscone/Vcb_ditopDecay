@@ -28,8 +28,8 @@ device = torch.device(dev)
 
 #!-----------------Load datasets-----------------!#
 print("Loading datasets...")
-train_dataset=torch.load("../../../root_files/signal_background/Muons/train_Muons.pt")
-test_dataset=torch.load("../../../root_files/signal_background/Muons/test_Muons.pt")
+train_dataset=torch.load("../../../root_files/signal_background/Electrons/train_Electrons.pt")
+test_dataset=torch.load("../../../root_files/signal_background/Electrons/test_Electrons.pt")
 
 
 #%%
