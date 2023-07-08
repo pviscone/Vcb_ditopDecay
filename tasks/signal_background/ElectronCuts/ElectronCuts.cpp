@@ -11,14 +11,14 @@ using namespace ROOT::VecOps;
 
 
 float Met_eta(const RVec<float> &Lept_pt, const RVec<float> &Lept_eta, const RVec<float> &Lept_phi,const float &Met_pt, const float &Met_phi){
-    float Electron_pt=Lept_pt[0];
-    float Electron_phi=Lept_phi[0];
-    float Electron_eta=Lept_eta[0];
+    float Muon_pt=Lept_pt[0];
+    float Muon_phi=Lept_phi[0];
+    float Muon_eta=Lept_eta[0];
     float Mw=80.385;
-    float El2=pow(Electron_pt,2)*pow(cosh(Electron_eta),2);
-    float pt_scalar_product=Met_pt*Electron_pt*cos(Met_phi-Electron_phi);
-    float a = pow(Electron_pt,2);
-    float b = -Electron_pt*sinh(Electron_eta)*(pow(Mw,2)+2*pt_scalar_product);
+    float El2=pow(Muon_pt,2)*pow(cosh(Muon_eta),2);
+    float pt_scalar_product=Met_pt*Muon_pt*cos(Met_phi-Muon_phi);
+    float a = pow(Muon_pt,2);
+    float b = -Muon_pt*sinh(Muon_eta)*(pow(Mw,2)+2*pt_scalar_product);
     float c = (-pow((pow(Mw,2)+2*pt_scalar_product),2)+4*El2*pow(Met_pt,2))/4;
     float delta= pow(b,2)-4*a*c;
     if(delta<0){
@@ -55,46 +55,142 @@ RVec<float> TMass(const ROOT::Math::PtEtaPhiMVector &Mu4V,
     return tmass;
 }
 
-RVec<float> WHad_mass(const RVec<ROOT::Math::PtEtaPhiMVector> &Jet4V){
-    float Mw=80.385;
-    int n=Jet4V.size();
-    RVec<float> best_Wmass(n);
+RVec<float> pad_jet(const RVec<float> &jet_vec, int n){
+    RVec<float> jet_vec_pad(n);
     for(int i=0;i<n;i++){
-        RVec<float> temp_Wmass(n,0.);
-        for(int j=0;j<n;j++){
-            temp_Wmass[j]=(Jet4V[i]+Jet4V[j]).M();
+        if(i<jet_vec.size()){
+            jet_vec_pad[i]=jet_vec[i];
+        }else{
+            jet_vec_pad[i]=0.;
         }
-        int argBest_Wmass=ArgMin(abs(temp_Wmass-Mw));
-        best_Wmass[i]=temp_Wmass[argBest_Wmass];
     }
-    return best_Wmass;
+    return jet_vec_pad;
+}
+
+RVec<float> WHad_mass(const RVec<ROOT::Math::PtEtaPhiMVector> &Jet4V){
+    int n=Jet4V.size();
+    RVec<float> Wmass(n*n);
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
+            if (Jet4V[i].Pt()==0. or Jet4V[j].Pt()==0.){
+                Wmass[i*n+j]=0.;
+            }
+            else{
+                if (i==j){
+                    Wmass[i*n+j] = (Jet4V[i]).M();
+                } else{
+                Wmass[i*n+j]=(Jet4V[i]+Jet4V[j]).M();
+                }
+            }
+        }
+    }
+    return Wmass;
 }
 
 
 
 RVec<float> THad_mass(const RVec<ROOT::Math::PtEtaPhiMVector> &Jet4V){
-    float MT=173.1;
     int n=Jet4V.size();
-    RVec<float> best_Tmass(n);
+    RVec<float> Tmass(n*n*n);
     for(int i=0;i<n;i++){
-        RVec<float> temp_Tmass(n*n,0.);
         for(int j=0;j<n;j++){
             for(int k=0;k<n;k++){
-                temp_Tmass[j*n+k]=(Jet4V[i]+Jet4V[j]+Jet4V[k]).M();
+                if (Jet4V[i].Pt()==0. or Jet4V[j].Pt()==0. or Jet4V[k].Pt()==0.){
+                    Tmass[i*n*n+n*j+k]=0.;
+                }
+                else{
+                    if (i==j and j==k){
+                        Tmass[i*n*n + n*j + k] = (Jet4V[i]).M();
+                    } else{
+                        Tmass[i*n*n + n*j + k] = (Jet4V[i] + Jet4V[j] + Jet4V[k]).M();
+                    }
+                }
             }
         }
-        int argBest_Tmass=ArgMin(abs(temp_Tmass-MT));
-        best_Tmass[i]=temp_Tmass[argBest_Tmass];
     }
-    return best_Tmass;
+    return Tmass;
 }
 
-//"./powheg/root_files"
-void ElectronCuts(std::string input,std::string output){
+RVec<float> Masses(const RVec<ROOT::Math::PtEtaPhiMVector> &Jet4V,
+                   const ROOT::Math::PtEtaPhiMVector &Mu4V,
+                   const ROOT::Math::PtEtaPhiMVector &Nu4V){
+    int n=Jet4V.size()+1;
+    auto W4V=Mu4V+Nu4V;
+    RVec<float> masses(n*(n+1)/2);
+    int idx=0;
+    for (int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
+            if(i>j){
+                continue;
+            }
+            if(i==0 and j==0){
+                masses[idx]=(W4V).M();
+            } else if (i==0){
+                if (Jet4V[j-1].M()==0.){
+                    masses[idx]=0.;
+                } else{
+                    masses[idx]=(W4V+Jet4V[j-1]).M();
+                }
+            } else if (j==0){
+                if (Jet4V[i-1].M()==0.){
+                    masses[idx]=0.;
+                } else{
+                    masses[idx]=(W4V+Jet4V[i-1]).M();
+                }
+            } else if(i==j){
+                masses[idx]=Jet4V[i-1].M();
+            } else{
+                if (Jet4V[i-1].M()==0. or Jet4V[j-1].M()==0.){
+                    masses[idx]=0.;
+                } else{
+                    masses[idx]=(Jet4V[i-1]+Jet4V[j-1]).M();
+                }
+            }
+            idx++;
+        }
+    }
+    return masses;
+}
+
+RVec<bool> muon_jet_matching(const RVec<float> &eta_jet,
+                             const RVec<float> &phi_jet,
+                             const float &eta_muon,
+                             const float &phi_muon){
+    RVec<float>phi_muon_vec(eta_jet.size(),phi_muon);
+    RVec<float>eta_muon_vec(eta_jet.size(),eta_muon);
+    RVec<float>deltaR=ROOT::VecOps::DeltaR(eta_jet,eta_muon_vec,phi_jet,phi_muon_vec);
+    return deltaR>0.4;
+}
+
+RVec<float> SecondLepton(const RVec<float> &Muon, const RVec<float> &Electron) {
+    RVec<float> res(3);
+    if (Electron.size()<2){
+        res[0]=0;
+    }else{
+        res[0]=Electron[1];
+    }
+
+    int n_muon= Muon.size();
+    if(n_muon<1){
+        res[1]=0;
+        res[2]=0;
+    }
+    else if (n_muon<2){
+        res[1]=Muon[0];
+        res[2]=0;
+    }
+    else{
+        res[1]=Muon[0];
+        res[2]=Muon[1];
+    }
+    return res;
+}
+
+    //"./powheg/root_files"
+void ElectronCuts(std::string input, std::string output) {
     std::vector<std::string> files_path;
     if(input.find(".root")==string::npos){
         for (const auto & entry : std::filesystem::directory_iterator(input)){
-            std::cout << entry.path() << std::endl;
             files_path.push_back(entry.path());
         }
     }else{
@@ -102,85 +198,75 @@ void ElectronCuts(std::string input,std::string output){
     }
     EnableImplicitMT();
     
-    RDataFrame df("Events",files_path,{"LHEPart_pdgId",
-                                       "LHEPart_pt",
-                                       "LHEPart_eta",
-                                       "LHEPart_phi"
-                                       "Electron_pt",
-                                       "Electron_eta",
-                                       "Electron_phi",
-                                       "Electron_mvaFall17V2Iso_WP90",
-                                       "Electron_charge",
-                                       "nElectron",
-                                       "MET_pt",
-                                       "MET_phi",
-                                       "Jet_pt",
-                                       "Jet_eta",
-                                       "Jet_phi",
-                                       "Jet_mass",
-                                       "Jet_electronIdx1",
-                                       "Jet_jetId",
-                                       "Jet_puId",
-                                       "nJet",
-                                       "Jet_btagDeepFlavB",
-                                       "Jet_btagDeepFlavCvB",
-                                       "Jet_btagDeepFlavCvL"});
+    RDataFrame df("Events",files_path);
 
-    auto dfCuts=df.Filter("nElectron>=1");
-    dfCuts=dfCuts.Filter("nJet>=4");
+    auto dfCuts=df.Filter("nElectron>=0","nEvents");
+
     dfCuts = dfCuts.Define("ElectronMask", "Electron_mvaFall17V2Iso_WP90");
-    dfCuts=dfCuts.Define("JetMask","Jet_electronIdx1!=0 && Jet_jetId>0 && Jet_puId>0 && Jet_pt>20 && abs(Jet_eta)<4.8");
+    dfCuts = dfCuts.Define("MuonMask", "Muon_looseId && Muon_pfIsoId>1");
 
-    
     for(auto &name: df.GetColumnNames()){
         if(regex_match(name, std::regex("Electron_.*"))){
             dfCuts = dfCuts.Redefine(name, name+"[ElectronMask]");
         }
-        if(regex_match(name, std::regex("Jet_.*"))){
-            dfCuts = dfCuts.Redefine(name, name+"[JetMask]");
+        else if (regex_match(name, std::regex("Muon_(pt|eta|phi)"))) {
+            dfCuts = dfCuts.Redefine(name, name + "[MuonMask]");
         }
     }
-    dfCuts=dfCuts.Redefine("nElectron","Electron_pt.size()");
-    dfCuts=dfCuts.Redefine("nJet","Jet_pt.size()");
-    dfCuts=dfCuts.Filter("nElectron>=1 && nJet>=4");
-    dfCuts=dfCuts.Filter("Electron_pt[0]>30 && abs(Electron_eta[0])<2.4 && Max(Jet_btagDeepFlavB)>0.2793");
-
-    dfCuts=dfCuts.Define("MET_eta",Met_eta,{"Electron_pt",
-                                            "Electron_eta",
-                                            "Electron_phi",
-                                            "MET_pt",
-                                            "MET_phi"});
 
 
-    dfCuts=dfCuts.Define("Mu4V","ROOT::Math::PtEtaPhiMVector(Electron_pt[0],Electron_eta[0],Electron_phi[0],0.000511)");
-    dfCuts=dfCuts.Define("Nu4V","ROOT::Math::PtEtaPhiMVector(MET_pt,MET_eta,MET_phi,0.)");
-    dfCuts=dfCuts.Define("MET_WLeptMass","(Mu4V+Nu4V).M()");
-    dfCuts=dfCuts.Define("Jet4V","Jet_4Vector(Jet_pt,Jet_eta,Jet_phi,Jet_mass)");
-    dfCuts=dfCuts.Define("Jet_TLeptMass",TMass,{"Mu4V",
-                                            "Nu4V",
-                                            "Jet4V"});
-    dfCuts=dfCuts.Define("Jet_THadMass","THad_mass(Jet4V)");
-    dfCuts=dfCuts.Define("Jet_WHadMass","WHad_mass(Jet4V)");
-    dfCuts.Snapshot("Events",output,
-                              {"LHEPart_pdgId",
-                               "Electron_pt",
-                               "Electron_eta",
-                               "Electron_phi",
-                               "MET_pt",
-                               "MET_eta",
-                               "MET_phi",
-                               "MET_WLeptMass",
-                               "Jet_pt",
-                               "Jet_eta",
-                               "Jet_phi",
-                               "Jet_mass",
-                               "Jet_WHadMass",
-                               "Jet_THadMass",
-                               "Jet_TLeptMass",
-                               "Jet_btagDeepFlavB",
-                               "Jet_btagDeepFlavCvB",
-                               "Jet_btagDeepFlavCvL"});
+    dfCuts = dfCuts.Define("JetMask", "Jet_jetId>0 && Jet_puId>0 && Jet_pt>20 && abs(Jet_eta)<4.8")
+                   .Define("JetMatchingMask", "muon_jet_matching(Jet_eta,Jet_phi,Electron_eta[0],Electron_phi[0])");
 
-                                            
+    for (auto &name : df.GetColumnNames()) {
+        if (regex_match(name, std::regex("Jet_.*"))) {
+            dfCuts = dfCuts.Redefine(name, name + "[JetMask && JetMatchingMask]");
+        }
+    }
 
+    dfCuts = dfCuts.Redefine("nElectron", "Electron_pt.size()")
+                 .Redefine("nJet", "Jet_pt.size()")
+                 .Filter("nElectron>=1", "WP90 nElectron >=1")
+                 .Filter("Electron_pt[0]>30 && abs(Electron_eta[0])<2.4", "Electron_pt[0]>30 && abs(eta)<2.4")
+                 .Filter("nJet>=4", "Clean nJet>=4")
+                 .Filter("Max(Jet_btagDeepFlavB)>0.2793", "Max DeepFlavB>0.2793 (Medium)");
+
+    auto report = dfCuts.Report();
+    report->Print();
+
+    for (auto &name : df.GetColumnNames()) {
+        if (regex_match(name, std::regex("Jet_.*"))) {
+            dfCuts = dfCuts.Redefine(name, "pad_jet(" + name + ",7)");
+        }
+    }
+    dfCuts = dfCuts.Define("MET_eta", Met_eta, {"Electron_pt", "Electron_eta", "Electron_phi", "MET_pt", "MET_phi"})
+                 .Define("E4V", "ROOT::Math::PtEtaPhiMVector(Electron_pt[0],Electron_eta[0],Electron_phi[0],0.00051)")
+                 .Define("Nu4V", "ROOT::Math::PtEtaPhiMVector(MET_pt,MET_eta,MET_phi,0.)")
+                 .Define("MET_WLeptMass", "(E4V+Nu4V).M()")
+                 .Define("Jet4V", "Jet_4Vector(Jet_pt,Jet_eta,Jet_phi,Jet_mass)")
+                 .Define("Masses", Masses, {"Jet4V", "E4V", "Nu4V"})
+                 .Define("SecondLept_pt", SecondLepton, {"Muon_pt", "Electron_pt"})
+                 .Define("SecondLept_eta", SecondLepton, {"Muon_eta", "Electron_eta"})
+                 .Define("SecondLept_phi", SecondLepton, {"Muon_phi", "Electron_phi"});
+
+    dfCuts.Snapshot("Events", output,
+                    {"LHEPart_pdgId",
+                     "Electron_pt",
+                     "Electron_eta",
+                     "Electron_phi",
+                     "MET_pt",
+                     "MET_eta",
+                     "MET_phi",
+                     "Jet_pt",
+                     "Jet_eta",
+                     "Jet_phi",
+                     "Jet_area",
+                     "Jet_btagDeepFlavB",
+                     "Jet_btagDeepFlavCvB",
+                     "Jet_btagDeepFlavCvL",
+                     "Masses",
+                     "SecondLept_pt",
+                     "SecondLept_eta",
+                     "SecondLept_phi"});
+    exit(0);
 }

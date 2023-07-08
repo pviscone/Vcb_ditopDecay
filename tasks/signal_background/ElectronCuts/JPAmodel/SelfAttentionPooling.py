@@ -24,15 +24,12 @@ class SelfAttentionPooling(nn.Module):
         return:
             utter_rep: size (N, H)
         """
-        if pad_mask is not None:
-            mask=pad_mask.float()
-            mask[mask!=0]=-torch.inf
-        else:
-            mask=0
+        if pad_mask is None:
+            pad_mask=0
         
         softmax = nn.functional.softmax
         
-        att_w = softmax(self.W(batch_rep).squeeze(-1)+mask,dim=1).unsqueeze(-1)
+        att_w = softmax(self.W(batch_rep).squeeze(-1)+pad_mask,dim=1).unsqueeze(-1)
         res = torch.sum(batch_rep * att_w, dim=1)
         res=self.norm(res)
 

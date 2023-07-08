@@ -1,13 +1,12 @@
 import torch
 
-semileptonic_weight=(138e3    #Lumi
-                    *832      #Cross section
-                    *0.44 #Semileptonic BR
+semileptonic_weight=(0.44 #Semileptonic BR
                     *0.33     #Muon fraction
                     )
 bkg_weight=semileptonic_weight*0.5*(1-8.4e-4)
 signal_weight=semileptonic_weight*0.518*8.4e-4
 
+diLept_weight=(0.11*0.2365)
 
 class SBLoss(torch.nn.Module):
     def __init__(self):
@@ -25,11 +24,12 @@ class AsimovLoss(torch.nn.Module):
         super(AsimovLoss, self).__init__()
         
     def forward(self, output, target):
-        s=signal_weight*torch.sum(torch.exp(output[target==1,1]))/output[target==1].shape[0]
-        b=bkg_weight*torch.sum(torch.exp(output[target==0,1]))/output[target==0].shape[0]
+        s=signal_weight*torch.sum(torch.exp(output[target==2,2]))/output[target==2].shape[0]
+        b=bkg_weight*torch.sum(torch.exp(output[target==0,2]))/output[target==0].shape[0]
+        b+=diLept_weight*torch.sum(torch.exp(output[target==1,2]))/output[target==1].shape[0]
         Z_a=torch.sqrt(2*((s+b)*torch.log(1+s/b)-s))
-        return -Z_a
-        #return 1/Z_a
+        #return -Z_a
+        return 1/Z_a
 
     
 class SB_Gauss_Loss(torch.nn.Module):

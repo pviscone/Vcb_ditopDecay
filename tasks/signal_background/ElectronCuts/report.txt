@@ -1,0 +1,79 @@
+-------------------- signal --------------------
+
+Processing ElectronCuts.cpp("../../../../Preselection_Skim/signal_Electrons/signal_Electrons_train.root/","../../../../Preselection_Skim/NN_Electrons/train/root/signal_train_ElectronCuts.root")...
+nEvents   : pass=8743654    all=8743654    -- eff=100.00 % cumulative eff=100.00 %
+WP90 nElectron >=1: pass=6460121    all=8743654    -- eff=73.88 % cumulative eff=73.88 %
+Electron_pt[0]>30 && abs(eta)<2.4: pass=4570829    all=6460121    -- eff=70.75 % cumulative eff=52.28 %
+Clean nJet>=4: pass=3798405    all=4570829    -- eff=83.10 % cumulative eff=43.44 %
+Max DeepFlavB>0.2793 (Medium): pass=3678792    all=3798405    -- eff=96.85 % cumulative eff=42.07 %
+
+Processing ElectronCuts.cpp("../../../../Preselection_Skim/signal_Electrons/signal_Electrons_test.root/","../../../../Preselection_Skim/NN_Electrons/test/root/signal_test_ElectronCuts.root")...
+nEvents   : pass=1542810    all=1542810    -- eff=100.00 % cumulative eff=100.00 %
+WP90 nElectron >=1: pass=1139560    all=1542810    -- eff=73.86 % cumulative eff=73.86 %
+Electron_pt[0]>30 && abs(eta)<2.4: pass=806781     all=1139560    -- eff=70.80 % cumulative eff=52.29 %
+Clean nJet>=4: pass=670872     all=806781     -- eff=83.15 % cumulative eff=43.48 %
+Max DeepFlavB>0.2793 (Medium): pass=649769     all=670872     -- eff=96.85 % cumulative eff=42.12 %
+
+-------------------- Semilept --------------------
+
+Processing ElectronCuts.cpp("../../../../Preselection_Skim/powheg/root_files/train","../../../../Preselection_Skim/NN_Electrons/train/root/TTSemiLept_train_ElectronCuts.root")...
+nEvents   : pass=108296000  all=108296000  -- eff=100.00 % cumulative eff=100.00 %
+WP90 nElectron >=1: pass=31536224   all=108296000  -- eff=29.12 % cumulative eff=29.12 %
+Electron_pt[0]>30 && abs(eta)<2.4: pass=19968107   all=31536224   -- eff=63.32 % cumulative eff=18.44 %
+Clean nJet>=4: pass=16964389   all=19968107   -- eff=84.96 % cumulative eff=15.66 %
+Max DeepFlavB>0.2793 (Medium): pass=15624709   all=16964389   -- eff=92.10 % cumulative eff=14.43 %
+
+Processing ElectronCuts.cpp("../../../../Preselection_Skim/powheg/root_files/test","../../../../Preselection_Skim/NN_Electrons/test/root/TTSemiLept_test_ElectronCuts.root")...
+nEvents   : pass=17674000   all=17674000   -- eff=100.00 % cumulative eff=100.00 %
+WP90 nElectron >=1: pass=5145067    all=17674000   -- eff=29.11 % cumulative eff=29.11 %
+Electron_pt[0]>30 && abs(eta)<2.4: pass=3258740    all=5145067    -- eff=63.34 % cumulative eff=18.44 %
+Clean nJet>=4: pass=2768620    all=3258740    -- eff=84.96 % cumulative eff=15.66 %
+Max DeepFlavB>0.2793 (Medium): pass=2549713    all=2768620    -- eff=92.09 % cumulative eff=14.43 %
+
+Processing ElectronCuts.cpp("../../../../Preselection_Skim/powheg/root_files/predict","../../../../Preselection_Skim/NN_Electrons/predict/root/TTSemiLept_predict_ElectronCuts.root")...
+nEvents   : pass=108004000  all=108004000  -- eff=100.00 % cumulative eff=100.00 %
+WP90 nElectron >=1: pass=31448559   all=108004000  -- eff=29.12 % cumulative eff=29.12 %
+Electron_pt[0]>30 && abs(eta)<2.4: pass=19916472   all=31448559   -- eff=63.33 % cumulative eff=18.44 %
+Clean nJet>=4: pass=16922761   all=19916472   -- eff=84.97 % cumulative eff=15.67 %
+Max DeepFlavB>0.2793 (Medium): pass=15586860   all=16922761   -- eff=92.11 % cumulative eff=14.43 %
+
+---------------------- diHad --------------------
+
+Processing ElectronCuts.cpp("../../../../Preselection_Skim/diHad/root_files/","../../../../Preselection_Skim/NN_Electrons/predict/root/TTdiHad_predict_ElectronCuts.root")...
+nEvents   : pass=43126999   all=43126999   -- eff=100.00 % cumulative eff=100.00 %
+WP90 nElectron >=1: pass=1008498    all=43126999   -- eff=2.34 % cumulative eff=2.34 %
+Electron_pt[0]>30 && abs(eta)<2.4: pass=70443      all=1008498    -- eff=6.98 % cumulative eff=0.16 %
+Clean nJet>=4: pass=64209      all=70443      -- eff=91.15 % cumulative eff=0.15 %
+Max DeepFlavB>0.2793 (Medium): pass=50019      all=64209      -- eff=77.90 % cumulative eff=0.12 %
+
+---------------------- diLept --------------------
+
+Processing ElectronCuts.cpp("../../../../Preselection_Skim/diLept/root_files/train","../../../../Preselection_Skim/NN_Electrons/train/root/TTdiLept_train_ElectronCuts.root")...
+nEvents   : pass=21152000   all=21152000   -- eff=100.00 % cumulative eff=100.00 %
+WP90 nElectron >=1: pass=10421851   all=21152000   -- eff=49.27 % cumulative eff=49.27 %
+Electron_pt[0]>30 && abs(eta)<2.4: pass=7138262    all=10421851   -- eff=68.49 % cumulative eff=33.75 %
+Clean nJet>=4: pass=4483006    all=7138262    -- eff=62.80 % cumulative eff=21.19 %
+Max DeepFlavB>0.2793 (Medium): pass=4147059    all=4483006    -- eff=92.51 % cumulative eff=19.61 %
+
+Processing ElectronCuts.cpp("../../../../Preselection_Skim/diLept/root_files/test","../../../../Preselection_Skim/NN_Electrons/test/root/TTdiLept_test_ElectronCuts.root")...
+nEvents   : pass=3510000    all=3510000    -- eff=100.00 % cumulative eff=100.00 %
+WP90 nElectron >=1: pass=1728806    all=3510000    -- eff=49.25 % cumulative eff=49.25 %
+Electron_pt[0]>30 && abs(eta)<2.4: pass=1184524    all=1728806    -- eff=68.52 % cumulative eff=33.75 %
+Clean nJet>=4: pass=742860     all=1184524    -- eff=62.71 % cumulative eff=21.16 %
+Max DeepFlavB>0.2793 (Medium): pass=686942     all=742860     -- eff=92.47 % cumulative eff=19.57 %
+
+Processing ElectronCuts.cpp("../../../../Preselection_Skim/diLept/root_files/predict","../../../../Preselection_Skim/NN_Electrons/predict/root/TTdiLept_predict_ElectronCuts.root")...
+nEvents   : pass=19894000   all=19894000   -- eff=100.00 % cumulative eff=100.00 %
+WP90 nElectron >=1: pass=9802184    all=19894000   -- eff=49.27 % cumulative eff=49.27 %
+Electron_pt[0]>30 && abs(eta)<2.4: pass=6714205    all=9802184    -- eff=68.50 % cumulative eff=33.75 %
+Clean nJet>=4: pass=4214202    all=6714205    -- eff=62.77 % cumulative eff=21.18 %
+Max DeepFlavB>0.2793 (Medium): pass=3896937    all=4214202    -- eff=92.47 % cumulative eff=19.59 %
+
+---------------------- WJets --------------------
+
+Processing ElectronCuts.cpp("../../../../Preselection_Skim/WJets/root_files/","../../../../Preselection_Skim/NN_Electrons/predict/root/WJets_predict_ElectronCuts.root")...
+nEvents   : pass=83009353   all=83009353   -- eff=100.00 % cumulative eff=100.00 %
+WP90 nElectron >=1: pass=17801420   all=83009353   -- eff=21.45 % cumulative eff=21.45 %
+Electron_pt[0]>30 && abs(eta)<2.4: pass=8787000    all=17801420   -- eff=49.36 % cumulative eff=10.59 %
+Clean nJet>=4: pass=164555     all=8787000    -- eff=1.87 % cumulative eff=0.20 %
+Max DeepFlavB>0.2793 (Medium): pass=21159      all=164555     -- eff=12.86 % cumulative eff=0.03 %

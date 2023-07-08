@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import mplhep
 import hist
-
+plt.rcParams['axes.axisbelow'] = True
 def significance_plot(signal_score,bkg_score,bins=20,score_range=(0,3),
                       ylim=None,log=True,xlabel="NN Score",normalize="lumi",ratio_log=False):
     fig, ax = plt.subplots(nrows=2, ncols=1, height_ratios=[3, 1], sharex=True)
@@ -10,13 +10,11 @@ def significance_plot(signal_score,bkg_score,bins=20,score_range=(0,3),
     mplhep.style.use("CMS")
     plt.rc('axes', axisbelow=True)
     semileptonic_weight=(138e3    #Lumi
-                        *832      #Cross section
-                        *0.44 #Semileptonic BR
-                        *0.33     #Muon fraction
+                        *832      #Cross section #Semileptonic BR
                         )
     if normalize=="lumi":
-        signal_weight=np.ones_like(signal_score)*semileptonic_weight*0.363*8.4e-4/(len(signal_score))
-        bkg_weight=np.ones_like(bkg_score)*semileptonic_weight*0.352*(1-8.4e-4)/(len(bkg_score))
+        signal_weight=np.ones_like(signal_score)*semileptonic_weight*0.44*0.33*0.518*8.4e-4/(len(signal_score))
+        bkg_weight=np.ones_like(bkg_score)*semileptonic_weight*(0.44*0.179*(1-8.4e-4)+0.11*0.237)/(len(bkg_score))
     elif normalize=="equal":
         n_min=np.min([len(signal_score),len(bkg_score)])
         n_max=np.max([len(signal_score),len(bkg_score)])
@@ -98,6 +96,9 @@ def significance_plot(signal_score,bkg_score,bins=20,score_range=(0,3),
 
     #print("Q=",Q)
     #print(f"Error: {1/np.sqrt(Q)}")
+
+#hist dict del tipo
+#{"signal":{"data":array,"color":"dodgerblue","stack":True},"bkg":{"data":array,"color":"red","stack":False}}
 def make_hist(hist_dict,xlim=None,bins=None,log=False,ylim=None,significance=True,**kwargs):
     mplhep.style.use("CMS")
     assert xlim is not None
