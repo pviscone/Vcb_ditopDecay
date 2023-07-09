@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import JPAmodel.JPANet as JPA
 import JPAmodel.significance as significance
+import corner
 JPANet = JPA.JPANet
 
 #%%
@@ -18,14 +19,13 @@ cpu = torch.device("cpu")
 device = torch.device(dev)
 
 
-signal=torch.load("../../../root_files/signal_background/Muons/NN/test_signal_Muons.pt")
+signal=torch.load("../../../root_files/signal_background/Electrons/predict/torch/signal_predict_ElectronCuts.pt")
 
 
-bkg=torch.load("../../../root_files/signal_background/Muons/NN/OtherBkg_Muons.pt")
-semiLept=bkg.mask(torch.abs(bkg.data["label"])==0,retrieve=True)
-diLept=bkg.mask((bkg.data["label"])==1,retrieve=True)
-diHad=torch.load("../../../root_files/signal_background/Muons/NN/TTdiHad_MuonCuts.pt")
-WJets=torch.load("../../../root_files/signal_background/Muons/NN/WJets_MuonCuts.pt")
+semiLept=torch.load("../../../root_files/signal_background/Electrons/predict/torch/TTSemiLept_predict_ElectronCuts.pt")
+diLept=torch.load("../../../root_files/signal_background/Electrons/predict/torch/TTdiLept_predict_ElectronCuts.pt")
+diHad=torch.load("../../../root_files/signal_background/Electrons/predict/torch/TTdiHad_predict_ElectronCuts.pt")
+WJets=torch.load("../../../root_files/signal_background/Electrons/predict/torch/WJets_predict_ElectronCuts.pt")
 
 #%%
 mu_feat=3
@@ -46,7 +46,7 @@ model = JPANet(mu_arch=None, nu_arch=None, jet_arch=[jet_feat, 128, 128],
                n_jet=7,
                )
 #model=torch.compile(model)
-state_dict=torch.load("./state_dict_100_3class.pt")
+state_dict=torch.load("./state_dict_110_final.pt")
 state_dict.pop("loss_fn.weight")
 model.load_state_dict(state_dict)
 model = model.to(device)
@@ -60,14 +60,18 @@ with torch.inference_mode():
     diHad_score=torch.exp(model.predict(diHad,bunch=20)[:,-1]).detach().to(cpu).numpy()
     WJets_score=torch.exp(model.predict(WJets,bunch=20)[:,-1]).detach().to(cpu).numpy()
 
-
+torch.save(signal_score,"../../../root_files/signal_background/Electrons/predict/torch/signal_score_Electrons.pt")
+torch.save(bkg_score,"../../../root_files/signal_background/Electrons/predict/torch/bkg_score_Electrons.pt")
+torch.save(diLept_score,"../../../root_files/signal_background/Electrons/predict/torch/diLept_score_Electrons.pt")
+torch.save(diHad_score,"../../../root_files/signal_background/Electrons/predict/torch/diHad_score_Electrons.pt")
+torch.save(WJets_score,"../../../root_files/signal_background/Electrons/predict/torch/WJets_score_Electrons.pt")
 
 
 #%%
 lumi=138e3
 ttbar_1lept=lumi*832*0.44  #all lepton
-ttbar_2had=lumi*832*0.45*0.0012  #all quark types
-ttbar_2lept=lumi*832*0.11*0.196 #all lepton types
+ttbar_2had=lumi*832*0.45*0.0032  #all quark types
+ttbar_2lept=lumi*832*0.11*0.2365 #all lepton types
 wjets=lumi*59100*0.108*3*0.0003 #all lepton types
 
 tau_mask=(torch.abs(semiLept.data["LeptLabel"])==15).squeeze()
@@ -99,45 +103,45 @@ hist_dict = {
             "signal":{
                 "data":sig_score,
                 "color":"red",
-                "weight":ttbar_1lept*0.421*0.33*8.4e-4,
+                "weight":ttbar_1lept*0.518*0.33*8.4e-4,
                 "histtype":"errorbar",
                 "stack":False,},
             "$t\\bar{t}+b$":{
                 "data":ttb,
                 "color":"cornflowerblue",
-                "weight":ttbar_1lept*0.144*(1-8.4e-4)*torch.sum(additional_b)/len(additional_b),
+                "weight":ttbar_1lept*0.178*(1-8.4e-4)*torch.sum(additional_b)/len(additional_b),
                 "stack":True,},
             "$t\\bar{t}+c$":{
                 "data":ttc,
                 "color":"lightsteelblue",
-                "weight":ttbar_1lept*0.144*(1-8.4e-4)*torch.sum(additional_c)/len(additional_c),
+                "weight":ttbar_1lept*0.178*(1-8.4e-4)*torch.sum(additional_c)/len(additional_c),
                 "stack":True,},
-            "$t\\bar{t} \\to b\\bar{b} uql \\nu$":{
+            "$t\\bar{t} j \\to b\\bar{b} uql \\nu$":{
                 "data":tt_up,
                 "color":"plum",
-                "weight":ttbar_1lept*0.144*(1-8.4e-4)*torch.sum(up)/len(up),
+                "weight":ttbar_1lept*0.178*(1-8.4e-4)*torch.sum(up)/len(up),
                 "stack":True,},
-            "$t\\bar{t} \\to b\\bar{b} cql \\nu$":{
+            "$t\\bar{t} j \\to b\\bar{b} cql \\nu$":{
                 "data":tt_charmed,
                 "color":"lightcoral",
-                "weight":ttbar_1lept*0.144*(1-8.4e-4)*torch.sum(charmed)/len(charmed),
+                "weight":ttbar_1lept*0.178*(1-8.4e-4)*torch.sum(charmed)/len(charmed),
                 "stack":True,},
             "$t\\bar{t} j \\to b\\bar{b} q \\bar{q} \\tau \\nu_{\\tau}$":{
                 "data":tt_tau,
                 "color":"cadetblue",
-                "weight":ttbar_1lept*(1-8.4e-4)*0.144*torch.sum(tau_mask)/len(tau_mask),
+                "weight":ttbar_1lept*(1-8.4e-4)*0.178*torch.sum(tau_mask)/len(tau_mask),
                 "stack":True,},
             "$Wj \\to l \\nu$":{
                 "data":WJets_bkg,
                 "color":"limegreen",
                 "weight":wjets,
                 "stack":True,},
-            "$t\\bar{t} \\to b\\bar{b} q \\bar{q} q \\bar{q}$":{
+            "$t\\bar{t} j \\to b\\bar{b} q \\bar{q} q \\bar{q}$":{
                 "data":TTdiHad,
                 "color":"orange",
                 "weight":ttbar_2had,
                 "stack":True,},
-            "$t\\bar{t} \\to b\\bar{b} l \\nu l \\nu$":{
+            "$t\\bar{t} j \\to b\\bar{b} l \\nu l \\nu$":{
                 "data":TTdiLept,
                 "color":"orange",
                 "weight":ttbar_2lept,
@@ -150,53 +154,6 @@ hist_dict = {
 
 ax1,ax2=significance.make_hist(hist_dict,xlim=(0,6),bins=60,log=True,ylim=(1e-1,1e7))
 
-#%%
-
-
-def get(obj):
-    mean=powheg.stats_dict["jet_mean"][0].detach().numpy()
-    std=powheg.stats_dict["jet_std"][0].detach().numpy()
-    pt=obj.jet_data[:,3,0].detach().numpy()
-    return 100*std*np.tanh(pt)+mean
-
-
-importlib.reload(significance)
-hist_dict = {
-            "signal (renormalized)":{
-                "data": get(signal),
-                "color":"red",
-                "weight":ttbar_2lept+ttbar_2had+wjets+ttbar_1lept*0.5*(1-8.4e-4)/100,
-                "histtype":"step",
-                "stack":False,},
-            "$t\\bar{t}j \\to b\\bar{b} q \\bar{q} l \\nu /100$":{
-                "data":get(semiLept),
-                "color":"cornflowerblue",
-                "weight":ttbar_1lept*0.5*(1-8.4e-4)/100,
-                "stack":True,},
-            "$Wj \\to l \\nu$":{
-                "data":get(WJets),
-                "color":"limegreen",
-                "weight":wjets,
-                "stack":True,},
-            "$t\\bar{t} \\to b\\bar{b} q \\bar{q} q \\bar{q}$":{
-                "data":get(diHad),
-                "color":"orange",
-                "weight":ttbar_2had,
-                "stack":True,},
-            "$t\\bar{t} \\to b\\bar{b} l \\nu l \\nu$":{
-                "data":get(diLept),
-                "color":"gold",
-                "weight":ttbar_2lept,
-                "stack":True,},
-            
-            
-        }
-
-ax1,ax2=significance.make_hist(hist_dict,xlim=(20,450),bins=80,log=True,significance=False,density=False,ylim=(1e-3,3e6))
-plt.ylim(3e-1,2e1)
-ax2.set_xlabel("$p_t$ [GeV]")
-ax2.set_ylabel("Sig./Bkg.")
-# %%
 # %%
 hist_kwargs = { "bins":50, "density":True, "log":True, "range":(0,5),"histtype":"step", "linewidth":2}
 plt.hist(sig_score,**hist_kwargs,color="red",label="signal")
@@ -212,38 +169,22 @@ plt.legend(fontsize=18)
 plt.ylim(1e-6,1e3)
 
 
-#%%
-import corner
-import torch
-import numpy as np
-from JPAmodel.torch_dataset import EventsDataset
-
-#%%
-powheg=torch.load("../../../root_files/signal_background/Muons/NN/TTSemilept_MuonCuts.pt")
-powheg.slice(0,100000)
-
-#%%
-tt_charmed_nu,tt_charmed_mu,tt_charmed_jet,_=powheg[np.bitwise_and(charmed,not_tau_mask).bool()]
-tt_up_nu,tt_up_mu,tt_up_jet,_=powheg[np.bitwise_and(up,not_tau_mask).bool()]
-
-tt_charmed_jet_out=np.repeat(tt_charmed,7)
-
-
-tt_charmed_jet=torch.flatten(tt_charmed_jet,end_dim=1)
-tt_up_jet=torch.flatten(tt_up_jet,end_dim=1)
 
 
 # %%
-fig=corner.corner(tt_charmed_jet,range=[[0,200]]+[[-3.14,3.14]]+[[-6,6]]+[[0,1]]*3,
+
+"""
+fig=corner.corner(tt_charmed.data["Jet"][:100000],range=[[0,200]]+[[-3.14,3.14]]+[[-6,6]]+[[0,1]]*3,
               hist_kwargs={"ls": "--"},
               bins=50,
               contour_kwargs={"linestyles": "--"},
               color="tab:blue",)
 
-corner.corner(tt_up_jet,range=[[0,200]]+[[-3.14,3.14]]+[[-6,6]]+[[0,1]]*3,
+corner.corner(tt_up.data["Jet"][:100000],range=[[0,200]]+[[-3.14,3.14]]+[[-6,6]]+[[0,1]]*3,
               hist_kwargs={"ls": "--"},
               bins=50,
               contour_kwargs={"linestyles": "--"},
               color="tab:orange",
               fig=fig)
+"""
 # %%
