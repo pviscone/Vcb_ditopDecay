@@ -9,6 +9,21 @@ Clean nJet>=4: pass=5712798    all=6863287    -- eff=83.24 % cumulative eff=53.3
 Max DeepFlavB>0.2793 (Medium): pass=5535759    all=5712798    -- eff=96.90 % cumulative eff=51.69 %
 
 
+---------------- signal Electrons-------------------
+nEvents   : pass=10288474   all=10288474   -- eff=100.00 % cumulative eff=100.00 %
+Loose nMuon >=1: pass=558230     all=10288474   -- eff=5.43 % cumulative eff=5.43 %
+Muon[0] pt>26 && abs(eta)<2.4: pass=66375      all=558230     -- eff=11.89 % cumulative eff=0.65 %
+Clean nJet>=4: pass=51796      all=66375      -- eff=78.04 % cumulative eff=0.50 %
+Max DeepFlavB>0.2793 (Medium): pass=47394      all=51796      -- eff=91.50 % cumulative eff=0.46 %
+
+
+-------------------- signal Tau --------------------
+nEvents   : pass=495486     all=495486     -- eff=100.00 % cumulative eff=100.00 %
+Loose nMuon >=1: pass=77630      all=495486     -- eff=15.67 % cumulative eff=15.67 %
+Muon[0] pt>26 && abs(eta)<2.4: pass=24102      all=77630      -- eff=31.05 % cumulative eff=4.86 %
+Clean nJet>=4: pass=19590      all=24102      -- eff=81.28 % cumulative eff=3.95 %
+Max DeepFlavB>0.2793 (Medium): pass=18849      all=19590      -- eff=96.22 % cumulative eff=3.80 %
+
 -------------------- Semilept --------------------
 
 

@@ -6,10 +6,20 @@ rm -f $rootfilePATH/NN/**/*.root
 
 
 
-echo "-------------------- signal --------------------"
+echo "------------------- signal Muon --------------------"
 root -l 'MuonCuts.cpp("../../../../Preselection_Skim/signal/signal_train.root/","../../../../Preselection_Skim/NN/train/root/signal_train_MuonCuts.root")'
 root -l 'MuonCuts.cpp("../../../../Preselection_Skim/signal/signal_test.root/","../../../../Preselection_Skim/NN/test/root/signal_test_MuonCuts.root")'
 ln -s ../../../../Preselection_Skim/NN/test/root/signal_test_MuonCuts.root ../../../../Preselection_Skim/NN/predict/root/signal_predict_MuonCuts.root
+echo ""
+
+
+echo "----------------- signal Electrons -----------------"
+root -l 'MuonCuts.cpp("../../../../Preselection_Skim/signal_Electrons/BigElectrons.root/","../../../../Preselection_Skim/NN/predict/root/signal_Electrons_predict_MuonCuts.root")'
+
+
+echo ""
+echo "-------------------- signal Tau --------------------"
+root -l 'MuonCuts.cpp("../../../../Preselection_Skim/signal_Tau/signal_tau.root/","../../../../Preselection_Skim/NN/predict/root/signal_Taus_predict_MuonCuts.root")'
 
 echo ""
 echo "-------------------- Semilept --------------------"

@@ -1,4 +1,4 @@
--------------------- signal --------------------
+----------------- signal Electrons --------------------
 
 Processing ElectronCuts.cpp("../../../../Preselection_Skim/signal_Electrons/signal_Electrons_train.root/","../../../../Preselection_Skim/NN_Electrons/train/root/signal_train_ElectronCuts.root")...
 nEvents   : pass=8743654    all=8743654    -- eff=100.00 % cumulative eff=100.00 %
@@ -13,6 +13,22 @@ WP90 nElectron >=1: pass=1139560    all=1542810    -- eff=73.86 % cumulative eff
 Electron_pt[0]>30 && abs(eta)<2.4: pass=806781     all=1139560    -- eff=70.80 % cumulative eff=52.29 %
 Clean nJet>=4: pass=670872     all=806781     -- eff=83.15 % cumulative eff=43.48 %
 Max DeepFlavB>0.2793 (Medium): pass=649769     all=670872     -- eff=96.85 % cumulative eff=42.12 %
+
+------------------  signal Tau -------------------
+Processing ElectronCuts.cpp("../../../../Preselection_Skim/signal_Tau/signal_tau.root/","../../../../Preselection_Skim/NN_Electrons/predict/root/signal_Taus_predict_ElectronCuts.root")...
+nEvents   : pass=495486     all=495486     -- eff=100.00 % cumulative eff=100.00 %
+WP90 nElectron >=1: pass=63173      all=495486     -- eff=12.75 % cumulative eff=12.75 %
+Electron_pt[0]>30 && abs(eta)<2.4: pass=16721      all=63173      -- eff=26.47 % cumulative eff=3.37 %
+Clean nJet>=4: pass=13843      all=16721      -- eff=82.79 % cumulative eff=2.79 %
+Max DeepFlavB>0.2793 (Medium): pass=13388      all=13843      -- eff=96.71 % cumulative eff=2.70 %
+
+
+------------------  signal Muons ------------------
+nEvents   : pass=10708941   all=10708941   -- eff=100.00 % cumulative eff=100.00 %
+WP90 nElectron >=1: pass=366471     all=10708941   -- eff=3.42 % cumulative eff=3.42 %
+Electron_pt[0]>30 && abs(eta)<2.4: pass=23614      all=366471     -- eff=6.44 % cumulative eff=0.22 %
+Clean nJet>=4: pass=18702      all=23614      -- eff=79.20 % cumulative eff=0.17 %
+Max DeepFlavB>0.2793 (Medium): pass=17064      all=18702      -- eff=91.24 % cumulative eff=0.16 %
 
 -------------------- Semilept --------------------
 

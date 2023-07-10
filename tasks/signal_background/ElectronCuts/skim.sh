@@ -6,10 +6,17 @@ rm -f $rootfilePATH/NN_Electrons/**/*.root
 
 
 
-echo "-------------------- signal --------------------"
+echo "----------------- signal Electrons -----------------"
 root -l 'ElectronCuts.cpp("../../../../Preselection_Skim/signal_Electrons/signal_Electrons_train.root/","../../../../Preselection_Skim/NN_Electrons/train/root/signal_train_ElectronCuts.root")'
 root -l 'ElectronCuts.cpp("../../../../Preselection_Skim/signal_Electrons/signal_Electrons_test.root/","../../../../Preselection_Skim/NN_Electrons/test/root/signal_test_ElectronCuts.root")'
 ln -s ../../../../Preselection_Skim/NN_Electrons/test/root/signal_test_ElectronCuts.root ../../../../Preselection_Skim/NN_Electrons/predict/root/signal_predict_ElectronCuts.root
+
+echo "-------------------- signal MU --------------------"
+root -l 'ElectronCuts.cpp("../../../../Preselection_Skim/signal/BigMuons.root/","../../../../Preselection_Skim/NN_Electrons/predict/root/signal_Muons_predict_ElectronCuts.root")'
+
+echo ""
+echo "-------------------- signal Tau --------------------"
+root -l 'ElectronCuts.cpp("../../../../Preselection_Skim/signal_Tau/signal_tau.root/","../../../../Preselection_Skim/NN_Electrons/predict/root/signal_Taus_predict_ElectronCuts.root")'
 
 echo ""
 echo "-------------------- Semilept --------------------"

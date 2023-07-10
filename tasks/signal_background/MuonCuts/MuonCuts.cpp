@@ -229,14 +229,15 @@ void MuonCuts(std::string input, std::string output) {
     auto dfCuts=df.Filter("nMuon>=0","nEvents");
 
     dfCuts=dfCuts.Define("MuonMask","Muon_looseId && Muon_pfIsoId>1");
-                 
+    dfCuts = dfCuts.Define("ElectronMask", "Electron_mvaFall17V2Iso_WP90");
 
     
     for(auto &name: df.GetColumnNames()){
         if(regex_match(name, std::regex("Muon_.*"))){
             dfCuts = dfCuts.Redefine(name, name+"[MuonMask]");
+        } else if (regex_match(name, std::regex("Electron_(pt|eta|phi)"))) {
+            dfCuts = dfCuts.Redefine(name, name + "[ElectronMask]");
         }
-
     }
 
     dfCuts = dfCuts.Define("JetMask", "Jet_jetId>0 && Jet_puId>0 && Jet_pt>20 && abs(Jet_eta)<4.8")

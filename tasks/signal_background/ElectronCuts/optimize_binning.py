@@ -19,13 +19,15 @@ cpu = torch.device("cpu")
 device = torch.device(dev)
 
 
-signal=torch.load("../../../root_files/signal_background/Electrons/predict/torch/signal_predict_ElectronCuts.pt")
+path="/scratchnvme/pviscone/Preselection_Skim/NN_Electrons/predict/torch/"
 
-
-semiLept=torch.load("../../../root_files/signal_background/Electrons/predict/torch/TTSemiLept_predict_ElectronCuts.pt")
-diLept=torch.load("../../../root_files/signal_background/Electrons/predict/torch/TTdiLept_predict_ElectronCuts.pt")
-diHad=torch.load("../../../root_files/signal_background/Electrons/predict/torch/TTdiHad_predict_ElectronCuts.pt")
-WJets=torch.load("../../../root_files/signal_background/Electrons/predict/torch/WJets_predict_ElectronCuts.pt")
+signal=torch.load(path+"signal_predict_ElectronCuts.pt")
+signal_Muons=torch.load(path+"signalMuons_predict_ElectronCuts.pt")
+signal_Taus=torch.load(path+"signalTaus_predict_ElectronCuts.pt")
+semiLept=torch.load(path+"TTSemiLept_predict_ElectronCuts.pt")
+diLept=torch.load(path+"TTdiLept_predict_ElectronCuts.pt")
+diHad=torch.load(path+"TTdiHad_predict_ElectronCuts.pt")
+WJets=torch.load(path+"WJets_predict_ElectronCuts.pt")
 
 #%%
 mu_feat=3
@@ -46,7 +48,7 @@ model = JPANet(mu_arch=None, nu_arch=None, jet_arch=[jet_feat, 128, 128],
                n_jet=7,
                )
 #model=torch.compile(model)
-state_dict=torch.load("./state_dict_110_final.pt")
+state_dict=torch.load("./state_dict_100_final.pt",map_location=torch.device(device))
 state_dict.pop("loss_fn.weight")
 model.load_state_dict(state_dict)
 model = model.to(device)
@@ -54,24 +56,29 @@ model = model.to(device)
 
 model.eval()
 with torch.inference_mode():
-    signal_score=torch.exp(model.predict(signal,bunch=20)[:,-1]).detach().to(cpu).numpy()
-    bkg_score=torch.exp(model.predict(semiLept,bunch=150)[:,-1]).detach().to(cpu).numpy()
-    diLept_score=torch.exp(model.predict(diLept,bunch=20)[:,-1]).detach().to(cpu).numpy()
-    diHad_score=torch.exp(model.predict(diHad,bunch=20)[:,-1]).detach().to(cpu).numpy()
-    WJets_score=torch.exp(model.predict(WJets,bunch=20)[:,-1]).detach().to(cpu).numpy()
+    signal_score=torch.exp(model.predict(signal,bunch=1)[:,-1]).detach().to(cpu).numpy()
+    signal_Muons_score=torch.exp(model.predict(signal_Muons,bunch=1)[:,-1]).detach().to(cpu).numpy()
+    signal_Taus_score=torch.exp(model.predict(signal_Taus,bunch=1)[:,-1]).detach().to(cpu).numpy()
+    bkg_score=torch.exp(model.predict(semiLept,bunch=1)[:,-1]).detach().to(cpu).numpy()
+    diLept_score=torch.exp(model.predict(diLept,bunch=1)[:,-1]).detach().to(cpu).numpy()
+    diHad_score=torch.exp(model.predict(diHad,bunch=1)[:,-1]).detach().to(cpu).numpy()
+    WJets_score=torch.exp(model.predict(WJets,bunch=1)[:,-1]).detach().to(cpu).numpy()
 
-torch.save(signal_score,"../../../root_files/signal_background/Electrons/predict/torch/signal_score_Electrons.pt")
-torch.save(bkg_score,"../../../root_files/signal_background/Electrons/predict/torch/bkg_score_Electrons.pt")
-torch.save(diLept_score,"../../../root_files/signal_background/Electrons/predict/torch/diLept_score_Electrons.pt")
-torch.save(diHad_score,"../../../root_files/signal_background/Electrons/predict/torch/diHad_score_Electrons.pt")
-torch.save(WJets_score,"../../../root_files/signal_background/Electrons/predict/torch/WJets_score_Electrons.pt")
+save_path="/scratchnvme/pviscone/Preselection_Skim/NN_Electrons/scores/"
+torch.save(signal_score,save_path+"signal_score_Electrons.pt")
+torch.save(signal_Muons_score,save_path+"signal_Muons_score_Electrons.pt")
+torch.save(signal_Taus_score,save_path+"signal_Taus_score_Electrons.pt")
+torch.save(bkg_score,save_path+"bkg_score_Electrons.pt")
+torch.save(diLept_score,save_path+"diLept_score_Electrons.pt")
+torch.save(diHad_score,save_path+"diHad_score_Electrons.pt")
+torch.save(WJets_score,save_path+"WJets_score_Electrons.pt")
 
 
 #%%
 lumi=138e3
 ttbar_1lept=lumi*832*0.44  #all lepton
-ttbar_2had=lumi*832*0.45*0.0032  #all quark types
-ttbar_2lept=lumi*832*0.11*0.2365 #all lepton types
+ttbar_2had=lumi*832*0.45*0.0012  #all quark types
+ttbar_2lept=lumi*832*0.11*0.196 #all lepton types
 wjets=lumi*59100*0.108*3*0.0003 #all lepton types
 
 tau_mask=(torch.abs(semiLept.data["LeptLabel"])==15).squeeze()
@@ -94,42 +101,53 @@ tt_up=func(bkg_score[np.bitwise_and(up,not_tau_mask).bool()])
 TTdiLept=func(diLept_score)
 TTdiHad=func(diHad_score)
 WJets_bkg=func(WJets_score)
-
+signal_Muons_score=func(signal_Muons_score)
+signal_Taus_score=func(signal_Taus_score)
 
 #%%
 
 importlib.reload(significance)
 hist_dict = {
-            "signal":{
+            "signal Electrons":{
                 "data":sig_score,
                 "color":"red",
-                "weight":ttbar_1lept*0.518*0.33*8.4e-4,
+                "weight":ttbar_1lept*0.421*0.33*8.4e-4,
                 "histtype":"errorbar",
                 "stack":False,},
+            "$t\\bar{t} j \\to b\\bar{b} cb \\mu \\nu$":{
+                "data":signal_Muons_score,
+                "color":"darkorange",
+                "weight":ttbar_1lept*0.0016*0.33*8.4e-4,
+                "stack":True,},
+            "$t\\bar{t} j \\to b\\bar{b} cb \\tau \\nu$":{
+                "data":signal_Taus_score,
+                "color":"chocolate",
+                "weight":ttbar_1lept*0.027*0.33*8.4e-4,
+                "stack":True,},
             "$t\\bar{t}+b$":{
                 "data":ttb,
                 "color":"cornflowerblue",
-                "weight":ttbar_1lept*0.178*(1-8.4e-4)*torch.sum(additional_b)/len(additional_b),
+                "weight":ttbar_1lept*0.144*(1-8.4e-4)*torch.sum(additional_b)/len(additional_b),
                 "stack":True,},
             "$t\\bar{t}+c$":{
                 "data":ttc,
                 "color":"lightsteelblue",
-                "weight":ttbar_1lept*0.178*(1-8.4e-4)*torch.sum(additional_c)/len(additional_c),
+                "weight":ttbar_1lept*0.144*(1-8.4e-4)*torch.sum(additional_c)/len(additional_c),
                 "stack":True,},
             "$t\\bar{t} j \\to b\\bar{b} uql \\nu$":{
                 "data":tt_up,
                 "color":"plum",
-                "weight":ttbar_1lept*0.178*(1-8.4e-4)*torch.sum(up)/len(up),
+                "weight":ttbar_1lept*0.144*(1-8.4e-4)*torch.sum(up)/len(up),
                 "stack":True,},
             "$t\\bar{t} j \\to b\\bar{b} cql \\nu$":{
                 "data":tt_charmed,
                 "color":"lightcoral",
-                "weight":ttbar_1lept*0.178*(1-8.4e-4)*torch.sum(charmed)/len(charmed),
+                "weight":ttbar_1lept*0.144*(1-8.4e-4)*torch.sum(charmed)/len(charmed),
                 "stack":True,},
             "$t\\bar{t} j \\to b\\bar{b} q \\bar{q} \\tau \\nu_{\\tau}$":{
                 "data":tt_tau,
                 "color":"cadetblue",
-                "weight":ttbar_1lept*(1-8.4e-4)*0.178*torch.sum(tau_mask)/len(tau_mask),
+                "weight":ttbar_1lept*(1-8.4e-4)*0.144*torch.sum(tau_mask)/len(tau_mask),
                 "stack":True,},
             "$Wj \\to l \\nu$":{
                 "data":WJets_bkg,
@@ -152,11 +170,13 @@ hist_dict = {
 
 
 
-ax1,ax2=significance.make_hist(hist_dict,xlim=(0,6),bins=60,log=True,ylim=(1e-1,1e7))
+ax1,ax2=significance.make_hist(hist_dict,xlim=(0,5),bins=40,log=True,ylim=(1e-1,1e7))
 
 # %%
 hist_kwargs = { "bins":50, "density":True, "log":True, "range":(0,5),"histtype":"step", "linewidth":2}
 plt.hist(sig_score,**hist_kwargs,color="red",label="signal")
+plt.hist(signal_Muons_score,**hist_kwargs,color="darkorange",label="signal Muons")
+plt.hist(signal_Taus_score,**hist_kwargs,color="chocolate",label="signal Taus")
 plt.hist(tt_tau,**hist_kwargs,color="cadetblue",label="$t\\bar{t} j \\to b\\bar{b} q \\bar{q} \\tau \\nu_{\\tau}$")
 plt.hist(ttc,**hist_kwargs,color="lightsteelblue",label="$t\\bar{t}+c$")
 plt.hist(ttb,**hist_kwargs,color="cornflowerblue",label="$t\\bar{t}+b$")
