@@ -1,0 +1,6 @@
+Electrons_MCStats: 0.84 < r < 1.16 (16.19%)
+Electrons_noMCStats: 0.89 < r < 1.11 (10.75%)
+Muons_MCStats: 0.87 < r < 1.13 (12.83%)
+Muons_noMCStats: 0.91 < r < 1.09 (9.25%)
+both_MCStats: 0.90 < r < 1.10 (10.03%)
+both_noMCStats: 0.93 < r < 1.07 (6.99%)

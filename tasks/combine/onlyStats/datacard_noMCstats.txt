@@ -1,0 +1,17 @@
+imax 2
+jmax 7
+kmax 0
+---------------
+shapes * * hist2.root $CHANNEL/$PROCESS
+---------------
+bin		Muons	Electrons
+
+------------------------------
+bin             Muons   Muons   Muons   Muons   Muons	Muons		Muons           Electrons   Electrons   Electrons   Electrons   Electrons   Electrons        Electrons
+process         signal  bkg     diHad	diLept  WJets   signalTaus	signalElectrons signal      bkg         diHad	    diLept      WJets   signalTaus	     signalMuons
+process         0       1       2       3       4		5			6               -1          7           8           9           10		11			     12
+rate            -1      -1      -1      -1      -1      -1			-1              -1          -1          -1          -1          -1		-1			     -1
+------------------------------
+
+
+
