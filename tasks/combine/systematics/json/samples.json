@@ -1,9 +1,37 @@
 {
-    "signalMuons":"/scratchnvme/pviscone/Preselection_Skim/signal/BigMuons.root",
-    "signalElectrons":"/scratchnvme/pviscone/Preselection_Skim/signal_Electrons/BigElectrons.root",
-    "signalTau":"/scratchnvme/pviscone/Preselection_Skim/signal_Tau/signal_tau.root",
-    "bkg":"/scratchnvme/pviscone/Preselection_Skim/powheg/root_files/predict",
-    "TTdiHad":"/scratchnvme/pviscone/Preselection_Skim/diHad/root_files",
-    "TTdiLept":"/scratchnvme/pviscone/Preselection_Skim/diLept/root_files/predict",
-    "WJets":"/scratchnvme/pviscone/Preselection_Skim/WJets/root_files"
+    "signalMu":{
+        "path":"/scratchnvme/pviscone/Preselection_Skim/signal/BigMuons.root",
+        "Muons_weight":7240.0,
+        "Electrons_weight": 22.41
+        },
+    "signalEle":{
+        "path":"/scratchnvme/pviscone/Preselection_Skim/signal_Electrons/BigElectrons.root",
+        "Muons_weight": 64.42,
+        "Electrons_weight":5895.633
+        },
+    "signalTau":{
+        "path":"/scratchnvme/pviscone/Preselection_Skim/signal_Tau/signal_tau.root",
+        "Muons_weight":532.15,
+        "Electrons_weight":378.1
+        },
+    "bkg":{
+        "path":"/scratchnvme/pviscone/Preselection_Skim/powheg/root_files/predict",
+        "Muons_weight":50476604.0,
+        "Electrons_weight":50476604.0
+        },
+    "diHad":{
+        "path":"/scratchnvme/pviscone/Preselection_Skim/diHad/root_files",
+        "Muons_weight":165335.04,
+        "Electrons_weight":62000.64
+        },
+    "diLept":{
+        "path":"/scratchnvme/pviscone/Preselection_Skim/diLept/root_files/predict",
+        "Muons_weight":2993253.12,
+        "Electrons_weight":2475432.96
+        },
+    "WJets":{
+        "path":"/scratchnvme/pviscone/Preselection_Skim/WJets/root_files",
+        "Muons_weight":792743.76,
+        "Electrons_weight":792743.76
+        }
 }
