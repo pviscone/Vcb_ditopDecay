@@ -1,0 +1,9 @@
+{
+    "signalMuons":"/scratchnvme/pviscone/Preselection_Skim/signal/BigMuons.root",
+    "signalElectrons":"/scratchnvme/pviscone/Preselection_Skim/signal_Electrons/BigElectrons.root",
+    "signalTau":"/scratchnvme/pviscone/Preselection_Skim/signal_Tau/signal_tau.root",
+    "bkg":"/scratchnvme/pviscone/Preselection_Skim/powheg/root_files/predict",
+    "TTdiHad":"/scratchnvme/pviscone/Preselection_Skim/diHad/root_files",
+    "TTdiLept":"/scratchnvme/pviscone/Preselection_Skim/diLept/root_files/predict",
+    "WJets":"/scratchnvme/pviscone/Preselection_Skim/WJets/root_files"
+}
