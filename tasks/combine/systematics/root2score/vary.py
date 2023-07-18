@@ -22,7 +22,7 @@ ROOT.gInterpreter.Declare("""
 
 json_path="/scratchnvme/pviscone/Vcb_ditopDecay/tasks/combine/systematics/json"
 #!JES
-ROOT.gInterpreter.Declare(f'auto cset = correction::CorrectionSet::from_file("{json_path}/jet_jerc.json");')
+ROOT.gInterpreter.Declare(f'auto cset = correction::CorrectionSet::from_file("json/jet_jerc.json");')
 ROOT.gInterpreter.Declare('auto JES = cset->at("Summer19UL18_V5_MC_Total_AK4PFchs");')
 
 
