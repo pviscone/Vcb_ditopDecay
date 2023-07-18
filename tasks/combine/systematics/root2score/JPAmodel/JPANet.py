@@ -1,23 +1,11 @@
 import torch
 import numpy as np
-from tqdm.notebook import tqdm
-import matplotlib.pyplot as plt
 from root2score.JPAmodel.Attention_block import Attention
 from root2score.JPAmodel.MLP import MLP
-from torchview import draw_graph
 from root2score.JPAmodel.SelfAttentionPooling import SelfAttentionPooling
-from livelossplot import PlotLosses
 from root2score.JPAmodel.torch_dataset import loader
-from ipywidgets import Output
-from IPython.display import display
 import gc
 
-import requests
-
-tok="6072568249:AAHd2tum9gWxhCNVXeA_lg2G6DS17_xG764"
-id="266333680"
-url=f"https://api.telegram.org/bot{tok}/sendPhoto"
-data = {"chat_id": id, "caption": "image_caption"}
 
 import os
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
@@ -48,8 +36,6 @@ class JPANet(torch.nn.Module):
         assert post_attention_arch is not None
         assert post_pooling_arch is not None
 
-        self.liveloss = PlotLosses(
-            groups={'Loss': ['train_loss', 'test_loss'], })
         self.log={}
         self.early_stopping = early_stopping
 
@@ -228,158 +214,6 @@ class JPANet(torch.nn.Module):
 
         return total_out
 
-    def train_loop(self, train,test,epochs,train_bunch=1,test_bunch=1,batch_size=1,show_each=False,optim={},loss=None,callback=None,shuffle=False,save_each=None,send_telegram=False,callback_each=10):
-        
-
-        self.optim_dict = optim
-        self.optimizer = torch.optim.RAdam(self.parameters(), **self.optim_dict)
-        assert loss is not None
-        epoch_loop = tqdm(range(epochs), desc="epoch")
-        torch.backends.cudnn.benchmark = True
-        out = Output()
-        display(out)
-        bunch_size = int(np.ceil(len(train)/train_bunch))
-        assert bunch_size>batch_size
-        self.loss_fn=loss
-        for epoch in epoch_loop:
-            if shuffle:
-                train.shuffle()
-            
-            self.epoch+=1
-            self.train()
-            temp_train_loss=[]
-
-            for mu_bunch,nu_bunch,jet_bunch,mass_bunch,secondLept_bunch,y_bunch in (loader(bunch_size,train.data["Lepton"],train.data["MET"],train.data["Jet"],train.data["Masses"],train.data["SecondLept"],train.data["label"])):
-
-                mu_bunch = mu_bunch.to(device,non_blocking=True)
-                nu_bunch = nu_bunch.to(device,non_blocking=True)
-                jet_bunch = jet_bunch.to(device,non_blocking=True)
-                secondLept_bunch = secondLept_bunch.to(device,non_blocking=True)
-                mass_bunch = mass_bunch.to(device,non_blocking=True).squeeze()
-                
-                y_bunch =y_bunch.to(torch.long).to(device,non_blocking=True)
-        
-                n_batch=int(np.ceil(y_bunch.shape[0]/batch_size))
-                for n in range(n_batch):
-                    mu_batch = mu_bunch[n*batch_size:(n+1)*batch_size]
-                    nu_batch = nu_bunch[n*batch_size:(n+1)*batch_size]
-                    jet_batch = jet_bunch[n*batch_size:(n+1)*batch_size]
-                    secondLept_batch = secondLept_bunch[n*batch_size:(n+1)*batch_size]
-                    mass_batch = mass_bunch[n*batch_size:(n+1)*batch_size]
-                    y_batch = y_bunch[n*batch_size:(n+1)*batch_size]
-                    y_logits = self.forward(
-                        mu_batch, nu_batch, jet_batch,mass_batch,secondLept_batch)
-                    
-                    train_loss_step = self.loss_fn(
-                        y_logits, y_batch.squeeze())
-                    
-                    self.optimizer.zero_grad()
-                    train_loss_step.backward()
-                    self.optimizer.step()
-                    temp_train_loss.append(train_loss_step.to(cpu).detach().item())
-
-
-                
-                    
-            del mu_bunch,nu_bunch,jet_bunch,mass_bunch,secondLept_bunch,y_bunch
-            gc.collect()
-            torch.cuda.empty_cache()
-            self.eval()
-            with torch.inference_mode():
-                y_test=test.data["label"].to(torch.long).to(device,non_blocking=True)
-                test_logits = self.predict(
-                    test,bunch=test_bunch)
-
-                test_loss_step = self.loss_fn(
-                    test_logits, y_test.squeeze())
-
-
-                self.test_loss = np.append(
-                    self.test_loss, test_loss_step.to(cpu).numpy())
-
-                self.train_loss = np.append(
-                    self.train_loss,np.mean(np.array(temp_train_loss)))
-
-
-                    
-                    
-                    
-                if(show_each):
-
-                    self.log["train_loss"]=self.train_loss[-1]
-                    self.log["test_loss"]=self.test_loss[-1]
-                    with out:
-                        self.liveloss.update(self.log)
-                        if(epoch%show_each==0):
-                            self.liveloss.send()
-                            self.liveloss.draw()
-                        if callback is not None:
-                            if(epoch%callback_each==0):
-                                callback(self)
-                                
-                            if send_telegram is True:
-                                plt.figure()
-                                plt.plot(self.train_loss,label="train")
-                                plt.plot(self.test_loss,label="test")
-                                plt.legend()
-                                plt.savefig("temp.png")
-                                
-                                
-
-                                files = {'photo':open('temp.png', 'rb')}
-                                #files1 = {'file':open('temp1.png', 'rb')}
-                                ret = requests.post(url, data=data, files=files)
-                                #ret2 = requests.post(url, data=data, files=files1)
-
-
-
-                if save_each is not None:
-                    if(self.epoch%save_each==0 and self.epoch!=0):
-                        torch.save(self.state_dict(),f"state_dict_{self.epoch}.pt")
-                            
-
-            if self.early_stopping is not None:
-                if "Patience" not in self.early_stopping:
-                    raise ValueError(
-                        "early_stopping must be a dictionary with key 'Patience'")
-                patience = self.early_stopping["Patience"]
-                if epoch > patience:
-                    if "RMS" in self.early_stopping:
-                        if np.std(self.test_loss[-patience:]
-                                  ) < self.early_stopping["RMS"]:
-                            print("Early stopping: test loss not changing")
-                            break
-                    if "Mean" in self.early_stopping and self.early_stopping is True:
-                        if np.mean(self.test_loss[-patience:]
-                                   ) > np.mean(self.test_loss[-2*patience:-patience]):
-                            print("Early stopping: test loss increasing")
-                            break
-
-
-
-    def loss_plot(self):
-        plt.figure()
-        plt.plot(self.train_loss, label="train")
-        plt.plot(self.test_loss, label="test")
-        plt.legend()
-        plt.xlabel("Epochs")
-        plt.ylabel("loss")
-
-
-
-    def graph(self,test_dataset,batch_size=10000):
-        mu_test=test_dataset.mu_data.to(device)
-        nu_test=test_dataset.nu_data.to(device)
-        jet_test=test_dataset.jet_data.to(device)
-        model_graph = draw_graph(self, input_data=[
-                                 mu_test[:batch_size],
-                                 nu_test[:batch_size],
-                                 jet_test[:batch_size]],
-                                expand_nested=True,depth=5)
-        return model_graph.visual_graph
-
-    def n_parameters(self):
-        return sum(p.numel() for p in self.parameters() if p.requires_grad)
     
     def predict(self,dataset,bunch=1):
         self.eval()
