@@ -111,20 +111,11 @@ def Cuts(rdf,dataset,syst):
 
 
 def systematics_cutloop(rdf_dict,syst_dict,):
-    rdf_dict["TTsemiLept"]={}
-    rdf_dict["TTsemiLept_Tau"]={}
-    for systematic in (syst_dict):
-        rdf_dict["TTsemiLept"][systematic]=rdf_dict["bkg"][systematic].Filter("Sum(abs(LHEPart_pdgId)==15)==0","NoTaus")
-        rdf_dict["TTsemiLept_Tau"][systematic]=rdf_dict["bkg"][systematic].Filter("Sum(abs(LHEPart_pdgId)==15)>0","Taus")
-    del rdf_dict["bkg"]
-    
-
-    
     rdf_MuE_dict={}
     rdf_MuE_dict["Muons"]={}
     rdf_MuE_dict["Electrons"]={}
     for dataset in (rdf_dict):
-        print(f"###############{dataset}###############")
+        
         
 
         rdf_MuE_dict["Muons"][dataset]={}
@@ -132,6 +123,9 @@ def systematics_cutloop(rdf_dict,syst_dict,):
         
 
         for systematic in (syst_dict):
+            print("")
+            print("--------------------")
+            print(f"Dataset: {dataset}")
             print("Systematic: ", systematic)
             print("--------------------")
             res=Cuts(rdf_dict[dataset][systematic],dataset,systematic)
