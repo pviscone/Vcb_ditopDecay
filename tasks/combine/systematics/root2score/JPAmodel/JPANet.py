@@ -12,15 +12,6 @@ os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
 
 
 
-# enable gpu if available
-if torch.cuda.is_available():
-    dev = "cuda:0"
-else:
-    dev = "cpu"
-
-cpu = torch.device("cpu")
-device = torch.device(dev)
-
 
 class JPANet(torch.nn.Module):
 
@@ -31,11 +22,11 @@ class JPANet(torch.nn.Module):
                  secondLept_arch=None,
                  n_heads=1,
                  n_jet=7,
-                 early_stopping=None, dropout=0.15):
+                 early_stopping=None, dropout=0.15,device=None):
         super().__init__()
         assert post_attention_arch is not None
         assert post_pooling_arch is not None
-
+        self.device=device
         self.log={}
         self.early_stopping = early_stopping
 
@@ -164,7 +155,7 @@ class JPANet(torch.nn.Module):
         #attn_mask=pad_mask[:,:,None]+pad_mask[:,None,:]
 
         jet_mass_mask=self.mass_linear1(out_mass_embed)
-        jet_mass_mask=vec_to_sym(jet_mass_mask)
+        jet_mass_mask=vec_to_sym(jet_mass_mask,self.device)
         #jet_mass_mask[attn_mask]=-torch.inf
         jet_mass_mask=jet_mass_mask.repeat_interleave(self.jet_attention.n_heads,dim=0)
         out_jet = self.jet_attention(out_jet,
@@ -176,7 +167,7 @@ class JPANet(torch.nn.Module):
         total_out = self.all_preattention_mlp(total_out)
         
         pad_mask = torch.cat((torch.zeros((out_ev.shape[0],1),
-                                          device=device,
+                                          device=self.device,
                                           dtype=torch.float32)
                               , pad_mask), dim=1)
         
@@ -185,7 +176,7 @@ class JPANet(torch.nn.Module):
         #attn_mask=pad_mask[:,:,None]+pad_mask[:,None,:]
 
         total_mask=self.mass_linear2(out_mass_embed)
-        total_mask=vec_to_sym(total_mask)
+        total_mask=vec_to_sym(total_mask,self.device)
         #total_mask[attn_mask]=-torch.inf
         total_mask=total_mask.repeat_interleave(self.all_attention.n_heads,dim=0)
         total_out = self.all_attention(total_out,
@@ -219,13 +210,13 @@ class JPANet(torch.nn.Module):
         self.eval()
         with torch.inference_mode():
             bunch_size=int(dataset.data["Lepton"].shape[0]//bunch)
-            res=torch.zeros((1,3),device=device,dtype=torch.float32)
+            res=torch.zeros((1,3),device=self.device,dtype=torch.float32)
             for mu_bunch,nu_bunch,jet_bunch,mass_bunch,secondLept_bunch in loader(bunch_size,dataset.data["Lepton"],dataset.data["MET"],dataset.data["Jet"],dataset.data["Masses"],dataset.data["SecondLept"]):
-                mu_bunch = mu_bunch.to(device,non_blocking=True)
-                nu_bunch = nu_bunch.to(device,non_blocking=True)
-                jet_bunch = jet_bunch.to(device,non_blocking=True)
-                secondLept_bunch = secondLept_bunch.to(device,non_blocking=True)
-                mass_bunch = mass_bunch.to(device,non_blocking=True).squeeze()
+                mu_bunch = mu_bunch.to(self.device,non_blocking=True)
+                nu_bunch = nu_bunch.to(self.device,non_blocking=True)
+                jet_bunch = jet_bunch.to(self.device,non_blocking=True)
+                secondLept_bunch = secondLept_bunch.to(self.device,non_blocking=True)
+                mass_bunch = mass_bunch.to(self.device,non_blocking=True).squeeze()
                 temp_res=self.forward(mu_bunch,nu_bunch,jet_bunch,mass_bunch,secondLept_bunch)
                 res=torch.cat((res,temp_res),dim=0)
         
@@ -236,7 +227,7 @@ class JPANet(torch.nn.Module):
             
 
         
-def vec_to_sym(matrix):
+def vec_to_sym(matrix,device):
     n=int((np.sqrt(1+8*matrix.shape[1])-1)/2)
     tri_idx=torch.triu_indices(n,n)
     z=torch.zeros(matrix.shape[0],n,n,device=device,dtype=torch.float32)

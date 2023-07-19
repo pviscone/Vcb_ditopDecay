@@ -24,6 +24,7 @@ def create_model(weight_path,device=device):
                n_heads=2, dropout=0.02,
                early_stopping=None,
                n_jet=7,
+               device=device,
                )
 
     state_dict=torch.load(weight_path,map_location=torch.device(device))
@@ -33,22 +34,23 @@ def create_model(weight_path,device=device):
     return model
 
 
-def predict(model,dataset,bunch=1,device=device):
+def predict(model,dataset,bunch=1):
     model.eval()
     with torch.inference_mode():
-        score=torch.exp(model.predict(dataset,bunch=bunch)[:,-1]).detach().to(device).numpy().astype("float")
+        score=torch.exp(model.predict(dataset,bunch=bunch)[:,-1]).detach().to(cpu).numpy().astype("float")
     return score
 
 
-def torchdict2score(torch_dict):
-    model={"Muons":create_model("root2score/JPAmodel/state_dict_Muons.pt"),
-            "Electrons":create_model("root2score/JPAmodel/state_dict_Electrons.pt")}
+def torchdict2score(torch_dict,bunch=1,device=device):
+    model={"Muons":create_model("root2score/JPAmodel/state_dict_Muons.pt",device=device),
+            "Electrons":create_model("root2score/JPAmodel/state_dict_Electrons.pt",device=device)}
     score_dict={}
     for cut in torch_dict:
         score_dict[cut]={}
         for dataset in torch_dict[cut]:
             score_dict[cut][dataset]={}
             for syst in torch_dict[cut][dataset]:
-                score_dict[cut][dataset][syst]=predict(model[cut],torch_dict[cut][dataset][syst])
+                print(f"{cut}: {dataset}_{syst}")
+                score_dict[cut][dataset][syst]=predict(model[cut],torch_dict[cut][dataset][syst],bunch=bunch)
                 
     return score_dict
