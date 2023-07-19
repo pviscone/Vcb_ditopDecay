@@ -20,9 +20,9 @@ def build_TH1(score_dict,weight_dict,outfile):
                 weight=weight_dict[cut][dataset]
                 weight_array=np.ones(len(data),dtype="float")*weight/len(data)
                 if syst=="nominal":
-                    name=f"hist_{dataset}"
+                    name=f"{dataset}"
                 else:
-                    name=f"hist_{dataset}_syst_{syst}"
+                    name=f"{dataset}_syst_{syst}"
                 hist=ROOT.TH1F(name,f"{cut}_{dataset}_{syst};DNN score;Counts",len(bins[cut])-1,bins[cut])
                 hist.Sumw2()
                 hist.FillN(len(data),data,weight_array)
