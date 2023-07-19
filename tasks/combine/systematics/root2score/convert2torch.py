@@ -5,9 +5,9 @@ def convert2torch(rdf_dict):
     for cut in rdf_dict:
         torch_dict[cut]={}
         for dataset in rdf_dict[cut]:
-            print(f"{cut}: {dataset}")
             torch_dict[cut][dataset]={}
             for syst in rdf_dict[cut][dataset]:
+                print(f"{cut}: {dataset}_{syst}")
                 if "signal" in dataset:
                     generator="madgraph"
                 else:
