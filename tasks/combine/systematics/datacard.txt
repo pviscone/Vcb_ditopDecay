@@ -2,7 +2,7 @@ imax 2
 jmax 7
 kmax 3
 ---------------
-shapes * * hist2.root $CHANNEL/$PROCESS $CHANNEL/$PROCESS_syst_$SYSTEMATIC
+shapes * * hist.root $CHANNEL/$PROCESS $CHANNEL/$PROCESS_syst_$SYSTEMATIC
 ---------------
 bin		Muons	Electrons
 
