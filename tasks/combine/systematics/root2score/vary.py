@@ -13,12 +13,11 @@ ROOT.gInterpreter.Declare('auto JER= JERC->at("Summer19UL18_JRV2_MC_ScaleFactor_
 def vary(rdf_dict):
     
     #!Remember to add the new systematics to the syst_dict
-    syst_dict={
+    syst_dict={ "nominal":[],
                 "upJES":["Jet_pt","Jet_mass"],
                 "downJES":["Jet_pt","Jet_mass"],
                 "upJER":["Jet_pt","Jet_mass"],
                 "downJER":["Jet_pt","Jet_mass"],
-                "nomJER":["Jet_pt","Jet_mass"],
                 }
 
     res={}
