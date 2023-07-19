@@ -13,7 +13,7 @@ ROOT.gInterpreter.Declare('auto JER= JERC->at("Summer19UL18_JRV2_MC_ScaleFactor_
 def vary(rdf_dict):
     
     #!Remember to add the new systematics to the syst_dict
-    syst_dict={"nominal":[],
+    syst_dict={
                 "upJES":["Jet_pt","Jet_mass"],
                 "downJES":["Jet_pt","Jet_mass"],
                 "upJER":["Jet_pt","Jet_mass"],
@@ -26,8 +26,11 @@ def vary(rdf_dict):
 
     
     for dataset in rdf_dict:
+        #nominal corrections
         rdf_dict[dataset]=(rdf_dict[dataset].Define("JetGen_pt","TakeIdx(GenJet_pt,Jet_genJetIdx)")
                                             .Define("JetGen_mass","TakeIdx(GenJet_mass,Jet_genJetIdx)")
+                                            .Redefine("Jet_pt",'JetGen_pt+(Jet_pt-JetGen_pt)*evaluate(JER,{Jet_eta},"nom")')
+                                            .Redefine("Jet_mass",'JetGen_mass+(Jet_mass-JetGen_mass)*evaluate(JER,{Jet_eta},"nom")')
                            )
 
 
@@ -38,9 +41,6 @@ def vary(rdf_dict):
                             ),
                     "downJES":(rdf_dict[dataset].Redefine("Jet_pt","(1-evaluate(JES,{Jet_eta,Jet_pt}))*Jet_pt")
                                                 .Redefine("Jet_mass","(1-evaluate(JES,{Jet_eta,Jet_pt}))*Jet_mass")
-                            ),
-                    "nomJER":(rdf_dict[dataset].Redefine("Jet_pt",'JetGen_pt+(Jet_pt-JetGen_pt)*evaluate(JER,{Jet_eta},"nom")')
-                                                .Redefine("Jet_mass",'JetGen_mass+(Jet_mass-JetGen_mass)*evaluate(JER,{Jet_eta},"nom")')
                             ),
                     "upJER":(rdf_dict[dataset].Redefine("Jet_pt",'JetGen_pt+(Jet_pt-JetGen_pt)*evaluate(JER,{Jet_eta},"up")')
                                                 .Redefine("Jet_mass",'JetGen_mass+(Jet_mass-JetGen_mass)*evaluate(JER,{Jet_eta},"up")')
