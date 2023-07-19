@@ -1,0 +1,20 @@
+imax 2
+jmax 7
+kmax 3
+---------------
+shapes * * hist2.root $CHANNEL/$PROCESS $CHANNEL/$PROCESS_syst_$SYSTEMATIC
+---------------
+bin		Muons	Electrons
+
+------------------------------
+bin             Muons       Muons       Muons   Muons   Muons	Muons		Muons       Muons          Electrons   Electrons   Electrons   Electrons   Electrons   Electrons    Electrons      Electrons
+process         signalMu    semiLept    diHad	diLept  WJets   signalTau	signalEle   semiLeptTau    signalEle   semiLept    diHad	   diLept      WJets       signalTau	signalMu       semiLeptTau
+process         0           1           2       3       4		5			6           7              -1          8           9           10           11		   12			13             14
+rate            -1          -1          -1      -1      -1      -1			-1          -1             -1          -1          -1          -1          -1		   -1			-1             -1
+------------------------------
+* autoMCStats 0	1 1
+lumiRun2 lnN    1.016       1.016       1.016   1.016   1.016   1.016       1.016       1.016          1.016       1.016       1.016       1.016       1.016       1.016        1.016          1.016
+JES      shape  1           1           1       1       1       1           1           1              1           1           1           1           1           1            1              1
+JER      shape  1           1           1       1       1       1           1           1              1           1           1           1           1           1            1              1
+
+
