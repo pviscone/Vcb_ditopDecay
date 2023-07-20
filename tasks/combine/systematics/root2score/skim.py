@@ -116,8 +116,6 @@ def Cuts(rdf,dataset,syst):
     dfCuts=loop_cuts(rdf,lept_selection)
     dfCuts_Muon=loop_cuts(dfCuts,Muon_selections,dataset,syst)
     dfCuts_Electron=loop_cuts(dfCuts,Electron_selections,dataset,syst)
-    dfCuts_Muon[0].Report().Print()
-    dfCuts_Electron[0].Report().Print()
     return {"Muons":dfCuts_Muon,"Electrons":dfCuts_Electron}
     
     

@@ -52,7 +52,7 @@ def rdf2torch(rdf,cut=None,generator=None):
         var_dict=mu_vars
     else:
         var_dict=ele_var
-    
+    rdf[0].Report().Print()
     ak_arrays=to_ak(rdf,var_dict)
     torch_dict=parse(ak_arrays,var_dict)
     dataset=EventsDataset()
