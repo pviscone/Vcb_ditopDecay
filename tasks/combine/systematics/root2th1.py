@@ -6,9 +6,9 @@ from root2score.JPAmodel.torchdict2score import torchdict2score
 from root2score.th1builder import build_TH1
 import torch
 import json
-
 cuda=torch.device("cuda:0")
 cpu=torch.device("cpu")
+
 
 samples_json="json/samples.json"
 bunch=1
@@ -16,13 +16,15 @@ file_bunch_size=10
 device=cpu
 outfile="hist.root"
 
-sample_dict=json.load(open(samples_json,"r"))
 
+
+sample_dict=json.load(open(samples_json,"r"))
 score_dict={}
 weight_dict={"Muons":{},"Electrons":{}}
 
 #! There is a bug in ak.from_rdataframe. If the RDataFrame is too bit, it will crash.
 #! Create N rdataframes with N/bunch_size files each and concatenate them afterwards.
+i=0
 for sample in sample_dict:
     sample_dict_temp={sample:sample_dict[sample]}
     print(f"\n!!!!!!!!!!!!!!!!!!!!!!!{sample}!!!!!!!!!!!!!!!!!!!!!!!!",flush=True)
@@ -34,12 +36,13 @@ for sample in sample_dict:
     rdf_dict=systematics_cutloop(rdf_dict,syst_dict)
 
     #print("\n--------------Conversion to torch datasets-------------",flush=True)
-    for idx,syst in enumerate(syst_dict):
+    for syst in syst_dict:
         print(f"\n#######################{syst}#########################",flush=True)
         torch_dict=convert2torch(rdf_dict,syst)
         print("\n----------------Starting DNN evaluation----------------",flush=True)
         score_dict_temp=torchdict2score(torch_dict,bunch=bunch,device=device)
-        if idx==0:
+        if i==0:
+            i=i+1
             score_dict=score_dict_temp
         else:
             if sample=="bkg":
@@ -60,7 +63,9 @@ for sample in sample_dict:
     else:
         weight_dict["Muons"][sample]=weight_dict_temp["Muons"][sample]
         weight_dict["Electrons"][sample]=weight_dict_temp["Electrons"][sample]
+        
 
 print("\n----------------------Building TH1---------------------",flush=True)
 build_TH1(score_dict,weight_dict,outfile)
+torch.save({"score_dict":score_dict,"weight_dict":weight_dict},"score_dict.pt")
 print("\n--------------------------Done-------------------------",flush=True)
