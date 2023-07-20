@@ -22,11 +22,15 @@ ROOT::RVec<float> evaluate(T cset, ROOT::RVec<float> const &input, const S &name
     return out;
 }
 
-ROOT::RVec<float> TakeIdx(ROOT::RVec<float> const &input, ROOT::RVec<int> const &idxs) {
+ROOT::RVec<float> TakeIdx(ROOT::RVec<float> const &jetInput, ROOT::RVec<float> const &genInput, ROOT::RVec<int> const &idxs) {
     int size = idxs.size();
     ROOT::RVec<float> out(size);
     for (int i = 0; i < size; i++) {
-        out[i] = input[idxs[i]];
+        if(idxs[i]<0){
+            out[i] = jetInput[i];
+        }else{
+            out[i] = genInput[idxs[i]];
+        }
     }
     return out;
 }
