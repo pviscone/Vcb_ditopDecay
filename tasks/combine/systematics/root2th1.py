@@ -10,7 +10,7 @@ import json
 cuda=torch.device("cuda:0")
 cpu=torch.device("cpu")
 
-samples_json="json/exSamples.json"
+samples_json="json/samples.json"
 bunch=1
 file_bunch_size=10
 device=cpu

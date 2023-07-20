@@ -14,13 +14,13 @@ def build_rdf_dict(sample_dict,bunch_size=10):
         if type(path)==list:
             file=path
         elif path.endswith(".root"):
-            file=path
+            file=[path]
         else:
             file=glob(path+"/*.root")
             
         file_list=[]
         n_bunches=int(np.ceil(len(file)/bunch_size))
-        print(f"Number of bunches: {n_bunches}")
+        print(f"Number of bunches: {n_bunches}",flush=True)
         #! For the semileptonic you have to add the efficiencies directly here and not in the json
         
         if sample=="bkg":
