@@ -19,13 +19,14 @@ outfile="hist.root"
 
 
 sample_dict=json.load(open(samples_json,"r"))
-score_dict={}
+score_dict={"Muons":{},"Electrons":{}}
 weight_dict={"Muons":{},"Electrons":{}}
 
 #! There is a bug in ak.from_rdataframe. If the RDataFrame is too bit, it will crash.
 #! Create N rdataframes with N/bunch_size files each and concatenate them afterwards.
-i=0
+
 for sample in sample_dict:
+
     sample_dict_temp={sample:sample_dict[sample]}
     print(f"\n!!!!!!!!!!!!!!!!!!!!!!!{sample}!!!!!!!!!!!!!!!!!!!!!!!!",flush=True)
     #print("\n---------------------Building RDFs---------------------",flush=True)
@@ -41,19 +42,22 @@ for sample in sample_dict:
         torch_dict=convert2torch(rdf_dict,syst)
         print("\n----------------Starting DNN evaluation----------------",flush=True)
         score_dict_temp=torchdict2score(torch_dict,bunch=bunch,device=device)
-        if i==0:
-            i=i+1
-            score_dict=score_dict_temp
+
+        if sample=="bkg":
+            score_dict["Muons"]["semiLept"]={}
+            score_dict["Electrons"]["semiLept"]={}
+            score_dict["Muons"]["semiLeptTau"]={}
+            score_dict["Electrons"]["semiLeptTau"]={}
+            score_dict["Muons"]["semiLept"][syst]=score_dict_temp["Muons"]["semiLept"][syst]
+            score_dict["Electrons"]["semiLept"][syst]=score_dict_temp["Electrons"]["semiLept"][syst]
+            score_dict["Muons"]["semiLeptTau"][syst]=score_dict_temp["Muons"]["semiLeptTau"][syst]
+            score_dict["Electrons"]["semiLeptTau"][syst]=score_dict_temp["Electrons"]["semiLeptTau"][syst]
         else:
-            if sample=="bkg":
-                score_dict["Muons"]["semiLept"][syst]=score_dict_temp["Muons"]["semiLept"][syst]
-                score_dict["Electrons"]["semiLept"][syst]=score_dict_temp["Electrons"]["semiLept"][syst]
-                score_dict["Muons"]["semiLeptTau"][syst]=score_dict_temp["Muons"]["semiLeptTau"][syst]
-                score_dict["Electrons"]["semiLeptTau"][syst]=score_dict_temp["Electrons"]["semiLeptTau"][syst]
-            else:
-                score_dict["Muons"][sample][syst]=score_dict_temp["Muons"][sample][syst]
-                score_dict["Electrons"][sample][syst]=score_dict_temp["Electrons"][sample][syst]
-    
+            score_dict["Muons"][sample]={}
+            score_dict["Electrons"][sample]={}
+            score_dict["Muons"][sample][syst]=score_dict_temp["Muons"][sample][syst]
+            score_dict["Electrons"][sample][syst]=score_dict_temp["Electrons"][sample][syst]
+
     
     if sample=="bkg":
         weight_dict["Muons"]["semiLept"]=weight_dict_temp["Muons"]["semiLept"]
