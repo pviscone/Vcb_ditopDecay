@@ -8,7 +8,7 @@ ROOT.EnableImplicitMT()
 ROOT.gInterpreter.ProcessLine(f'#include "{include_path}"')
 
 
-def object_selection(rdf):
+def lept_selection(rdf):
     #Muon and electron masks
     dfCuts=(rdf.Define(f"MuonMask",f"Muon_looseId && Muon_pfIsoId>1")
             .Define(f"ElectronMask", f"Electron_mvaFall17V2Iso_WP90")
@@ -27,10 +27,13 @@ def object_selection(rdf):
             .Redefine(f"Electron_phi",f"Electron_phi[ElectronMask]")
             .Redefine(f"nElectron",f"Electron_pt.size()")
         )
-
+    
+    return dfCuts
+    
+def jet_selection(df,lepton):
     #Jet mask
-    dfCuts = (dfCuts.Define(f"JetMask", f"Jet_jetId>0 && Jet_puId>0 && Jet_pt>20 && abs(Jet_eta)<4.8")
-            .Define(f"JetMatchingMask", f"muon_jet_matching(Jet_eta,Jet_phi,Muon_eta[0],Muon_phi[0])")
+    dfCuts = (df.Define(f"JetMask", f"Jet_jetId>0 && Jet_puId>0 && Jet_pt>20 && abs(Jet_eta)<4.8")
+            .Define(f"JetMatchingMask", f"muon_jet_matching(Jet_eta,Jet_phi,{lepton}_eta[0],{lepton}_phi[0])")
         )
 
     #Jet define
@@ -41,7 +44,7 @@ def object_selection(rdf):
             .Redefine(f"Jet_btagDeepFlavB",f"pad_jet(Jet_btagDeepFlavB[JetMask && JetMatchingMask],7)")
             .Redefine(f"Jet_btagDeepFlavCvB",f"pad_jet(Jet_btagDeepFlavCvB[JetMask && JetMatchingMask],7)")
             .Redefine(f"Jet_btagDeepFlavCvL",f"pad_jet(Jet_btagDeepFlavCvL[JetMask && JetMatchingMask],7)")
-            .Redefine(f"nJet",f"Jet_pt.size()")
+            .Redefine(f"nJet",f"Sum(JetMask && JetMatchingMask)")
         )
     
     return dfCuts
@@ -50,8 +53,9 @@ def Muon_selections(rdf,dataset,syst):
     
     #Muon Cuts
     dfCuts=(rdf.Filter(f"nMuon>0",f"{dataset}_Mu_{syst}_Loose nMuon>0")
-            .Filter(f"Muon_pt[0]>26 && abs(Muon_eta[0])<2.4",f"{dataset}_Mu_{syst}_Muon[0]_pt>26 && abs(eta)<2.4")
-            .Filter(f"nJet>=4",f"{dataset}_Mu_{syst}_Clean nJet>=4")
+            .Filter(f"Muon_pt[0]>26 && abs(Muon_eta[0])<2.4",f"{dataset}_Mu_{syst}_Muon[0]_pt>26 && abs(eta)<2.4"))
+    dfCuts=jet_selection(dfCuts,"Muon")
+    dfCuts=(dfCuts.Filter(f"nJet>=4",f"{dataset}_Mu_{syst}_Clean nJet>=4")
             .Filter(f"Max(Jet_btagDeepFlavB)>0.2793",f"{dataset}_Mu_{syst}_Max DeepFlavB>0.2793 (Medium)")
         )
     
@@ -77,8 +81,9 @@ def Electron_selections(rdf,dataset,syst):
     
     #Electron Cuts
     dfCuts=(rdf.Filter(f"nElectron>0",f"{dataset}_Ele_{syst}_Loose nElectron>0")
-            .Filter(f"Electron_pt[0]>30 && abs(Electron_eta[0])<2.4",f"{dataset}_Ele_{syst}_Electron[0]_pt>30 && abs(eta)<2.4")
-            .Filter(f"nJet>=4",f"{dataset}_Ele_{syst}_Clean nJet>=4")
+            .Filter(f"Electron_pt[0]>30 && abs(Electron_eta[0])<2.4",f"{dataset}_Ele_{syst}_Electron[0]_pt>30 && abs(eta)<2.4"))
+    dfCuts=jet_selection(dfCuts,"Electron")
+    dfCuts=(dfCuts.Filter(f"nJet>=4",f"{dataset}_Ele_{syst}_Clean nJet>=4")
             .Filter(f"Max(Jet_btagDeepFlavB)>0.2793",f"{dataset}_Ele_{syst}_Max DeepFlavB>0.2793 (Medium)")
         )
     
@@ -101,7 +106,7 @@ def Electron_selections(rdf,dataset,syst):
 
 
 def Cuts(rdf,dataset,syst):
-    dfCuts=object_selection(rdf)
+    dfCuts=lept_selection(rdf)
     dfCuts_Muon=Muon_selections(dfCuts,dataset,syst)
     dfCuts_Electron=Electron_selections(dfCuts,dataset,syst)
     
