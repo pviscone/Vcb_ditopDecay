@@ -26,10 +26,10 @@ def build_rdf_dict(sample_dict,bunch_size=10):
         if sample=="bkg":
             rdf_dict["semiLept"]=[ROOT.RDataFrame("Events", file[i*bunch_size:(i+1)*bunch_size]).Filter("Sum(abs(LHEPart_pdgId)==15)==0","NoTaus") for i in range(n_bunches)]
             rdf_dict["semiLeptTau"]=[ROOT.RDataFrame("Events", file[i*bunch_size:(i+1)*bunch_size]).Filter("Sum(abs(LHEPart_pdgId)==15)>0","Taus") for i in range(n_bunches)]
-            weight_dict["Muons"]["semiLept"]=sample_dict[sample]["Muons_weight"]*0.193
-            weight_dict["Electrons"]["semiLept"]=sample_dict[sample]["Electrons_weight"]*0.156
-            weight_dict["Muons"]["semiLeptTau"]=sample_dict[sample]["Muons_weight"]*0.0136
-            weight_dict["Electrons"]["semiLeptTau"]=sample_dict[sample]["Electrons_weight"]*0.0095
+            weight_dict["Muons"]["semiLept"]=sample_dict[sample]["Muons_weight"]*0.1669
+            weight_dict["Electrons"]["semiLept"]=sample_dict[sample]["Electrons_weight"]*0.1354
+            weight_dict["Muons"]["semiLeptTau"]=sample_dict[sample]["Muons_weight"]*0.0116
+            weight_dict["Electrons"]["semiLeptTau"]=sample_dict[sample]["Electrons_weight"]*0.0083
         else:
             rdf_dict[sample] = [ROOT.RDataFrame("Events", file[i*bunch_size:(i+1)*bunch_size]) for i in range(n_bunches)]
             weight_dict["Muons"][sample]=sample_dict[sample]["Muons_weight"]
