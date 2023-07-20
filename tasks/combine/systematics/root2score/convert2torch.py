@@ -1,4 +1,5 @@
 from root2score.rdf2torch.rdf2torch import rdf2torch
+import gc
 
 def convert2torch(rdf_dict,syst):
     torch_dict={}
@@ -12,4 +13,6 @@ def convert2torch(rdf_dict,syst):
             else:
                 generator="powheg"
             torch_dict[cut][dataset][syst]=rdf2torch(rdf_dict[cut][dataset][syst],cut=cut,generator=generator)
+            del rdf_dict[cut][dataset][syst]
+            gc.collect()
     return torch_dict
