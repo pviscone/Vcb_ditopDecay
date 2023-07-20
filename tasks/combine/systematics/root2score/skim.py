@@ -71,8 +71,8 @@ def Muon_selections(rdf,dataset,syst):
                  .Define(f"SecondLept_phi", f"SecondLepton(Muon_phi, Electron_phi)")
         )
     
-    report=dfCuts.Report()
-    report.Print()
+    #report=dfCuts.Report()
+    #report.Print()
     
     return dfCuts
 
@@ -99,20 +99,29 @@ def Electron_selections(rdf,dataset,syst):
                  .Define(f"SecondLept_phi", f"SecondLepton(Electron_phi, Muon_phi)")
         )
     
-    report=dfCuts.Report()
-    report.Print()
+    #report=dfCuts.Report()
+    #report.Print()
     
     return dfCuts
 
+import copy
+def loop_cuts(rdf_list,cuts_func,*args):
+    rdf_list=copy.copy(rdf_list)
+    for i in range(len(rdf_list)):
+        rdf_list[i]=cuts_func(rdf_list[i],*args)
+    return rdf_list
+
 
 def Cuts(rdf,dataset,syst):
-    dfCuts=lept_selection(rdf)
-    dfCuts_Muon=Muon_selections(dfCuts,dataset,syst)
-    dfCuts_Electron=Electron_selections(dfCuts,dataset,syst)
-    
+    dfCuts=loop_cuts(rdf,lept_selection)
+    dfCuts_Muon=loop_cuts(dfCuts,Muon_selections,dataset,syst)
+    dfCuts_Electron=loop_cuts(dfCuts,Electron_selections,dataset,syst)
+    dfCuts_Muon[0].Report().Print()
+    dfCuts_Electron[0].Report().Print()
     return {"Muons":dfCuts_Muon,"Electrons":dfCuts_Electron}
     
     
+
 
 
 def systematics_cutloop(rdf_dict,syst_dict,):
@@ -128,14 +137,15 @@ def systematics_cutloop(rdf_dict,syst_dict,):
         
 
         for systematic in (syst_dict):
-            print("")
-            print("--------------------")
-            print(f"Dataset: {dataset}")
-            print("Systematic: ", systematic)
-            print("--------------------")
+            #print("")
+            #print("--------------------")
+            #print(f"Dataset: {dataset}")
+            #print("Systematic: ", systematic)
+            #print("--------------------")
             res=Cuts(rdf_dict[dataset][systematic],dataset,systematic)
             rdf_MuE_dict["Muons"][dataset][systematic]=res["Muons"]
             rdf_MuE_dict["Electrons"][dataset][systematic]=res["Electrons"]
             
     return rdf_MuE_dict
+        
         

@@ -16,8 +16,10 @@ def dict2list(dictionary):
     return l
 
 
-def to_ak(rdf,var_dict):
-    ak_arrays=ak.from_rdataframe(rdf,dict2list(var_dict)+["LHEPart_pdgId"])
+def to_ak(rdf_list,var_dict):
+    ak_arrays=ak.from_rdataframe(rdf_list[0],dict2list(var_dict)+["LHEPart_pdgId"])
+    for rdf in rdf_list[1:]:
+        ak_arrays=ak.concatenate([ak_arrays,ak.from_rdataframe(rdf,dict2list(var_dict)+["LHEPart_pdgId"])])
     return ak_arrays
     
     

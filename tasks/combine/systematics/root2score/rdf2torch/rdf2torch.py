@@ -64,8 +64,8 @@ def rdf2torch(rdf,cut=None,generator=None):
             infos=["WLept"]+["TLept"]*7+["Jet"]+["WHad"]*6+["Jet"]+["WHad"]*5+["Jet"]+["WHad"]*4+["Jet"]+["WHad"]*3+["Jet"]+["WHad"]*2+["Jet"]+["WHad"]*1+["Jet"]
             dataset.add_data(key,torch_dict[key],infos)
             
-    dataset=add_additional_data(dataset,ak_arrays["LHEPart_pdgId"],additional_list=additional,generator=generator)
-    dataset.add_additional_info("generator",generator)
+    #dataset=add_additional_data(dataset,ak_arrays["LHEPart_pdgId"],additional_list=additional,generator=generator)
+    #dataset.add_additional_info("generator",generator)
     return dataset
   
     
