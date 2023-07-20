@@ -1,11 +1,11 @@
 {
     "signalMu":{
-        "path":"/scratchnvme/pviscone/Preselection_Skim/signal/BigMuons.root",
+        "path":"/scratchnvme/pviscone/Preselection_Skim/signal/signal_test.root",
         "Muons_weight":7240.0,
         "Electrons_weight": 22.41
         },
     "signalEle":{
-        "path":"/scratchnvme/pviscone/Preselection_Skim/signal_Electrons/BigElectrons.root",
+        "path":"/scratchnvme/pviscone/Preselection_Skim/signal_Electrons/signal_Electrons_test.root",
         "Muons_weight": 64.42,
         "Electrons_weight":5895.633
         },
