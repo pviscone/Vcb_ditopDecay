@@ -1,7 +1,7 @@
 from root2score.rdf2torch.ak_parser import parse, to_ak
 from root2score.rdf2torch.torch_dataset import EventsDataset
 from root2score.rdf2torch.additional_data import add_additional_data
-
+import numpy as np
 mu_vars={"Jet":["Jet_pt",
                 "Jet_phi",
                 "Jet_eta",
@@ -53,9 +53,10 @@ def rdf2torch(rdf,cut=None,generator=None):
     else:
         var_dict=ele_var
     print("",flush=True)
-    print(f"- - - - - {cut} - - - - -",flush=True)
+    #print(f"- - - - - {cut} - - - - -",flush=True)
     rdf[0].Report().Print()
     ak_arrays=to_ak(rdf,var_dict)
+    print("\nConverting to torch tensors...",flush=True)
     torch_dict=parse(ak_arrays,var_dict)
     dataset=EventsDataset()
     
@@ -68,6 +69,10 @@ def rdf2torch(rdf,cut=None,generator=None):
             
     #dataset=add_additional_data(dataset,ak_arrays["LHEPart_pdgId"],additional_list=additional,generator=generator)
     #dataset.add_additional_info("generator",generator)
-    return dataset
+    
+    weights=ak_arrays["Weights"].to_numpy()
+    weights=weights/np.sum(weights)
+    print(f"Total number of selected events: {len(weights)}",flush=True)
+    return dataset,weights
   
     

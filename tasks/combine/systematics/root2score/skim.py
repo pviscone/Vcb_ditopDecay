@@ -111,39 +111,15 @@ def loop_cuts(rdf_list,cuts_func,*args):
         rdf_list[i]=cuts_func(rdf_list[i],*args)
     return rdf_list
 
-
-def Cuts(rdf,dataset,syst):
+def Cut(rdf_dict,dataset,syst,cut=None):
+    assert cut in ["Muons","Electrons"], "Cut must be either Muons or Electrons"
+    rdf=rdf_dict[dataset][syst]
     dfCuts=loop_cuts(rdf,lept_selection)
-    dfCuts_Muon=loop_cuts(dfCuts,Muon_selections,dataset,syst)
-    dfCuts_Electron=loop_cuts(dfCuts,Electron_selections,dataset,syst)
-    return {"Muons":dfCuts_Muon,"Electrons":dfCuts_Electron}
+    if cut=="Muons":
+        dfCuts=loop_cuts(dfCuts,Muon_selections,dataset,syst)
+    elif cut=="Electrons":
+        dfCuts=loop_cuts(dfCuts,Electron_selections,dataset,syst)
+    return dfCuts
     
-    
 
 
-
-def systematics_cutloop(rdf_dict,syst_dict,):
-    rdf_MuE_dict={}
-    rdf_MuE_dict["Muons"]={}
-    rdf_MuE_dict["Electrons"]={}
-    for dataset in (rdf_dict):
-        
-        
-
-        rdf_MuE_dict["Muons"][dataset]={}
-        rdf_MuE_dict["Electrons"][dataset]={}
-        
-
-        for systematic in (syst_dict):
-            #print("")
-            #print("--------------------")
-            #print(f"Dataset: {dataset}")
-            #print("Systematic: ", systematic)
-            #print("--------------------")
-            res=Cuts(rdf_dict[dataset][systematic],dataset,systematic)
-            rdf_MuE_dict["Muons"][dataset][systematic]=res["Muons"]
-            rdf_MuE_dict["Electrons"][dataset][systematic]=res["Electrons"]
-            
-    return rdf_MuE_dict
-        
-        

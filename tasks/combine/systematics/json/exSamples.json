@@ -1,5 +1,5 @@
 {
-    "bkg":{"path":"/home/pviscone/Desktop/Vcb_ditopDecay/root_files/Skimmed_background/results/TTbarSemileptonic_Nocb_LeptFromT.root",
+    "signal":{"path":["/scratchnvme/pviscone/Preselection_Skim/powheg/root_files/predict/2FAF8EF1-9F46-6E4F-B133-AA1B0D95D1AD.root"],
             "Muons_weight":2000,
             "Electrons_weight":4000
     }

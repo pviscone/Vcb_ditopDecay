@@ -17,8 +17,8 @@ def build_TH1(score_dict,weight_dict,outfile):
         for dataset in score_dict[cut]:
             for syst in score_dict[cut][dataset]:
                 data=np.arctanh(score_dict[cut][dataset][syst])
-                weight=weight_dict[cut][dataset]
-                weight_array=np.ones(len(data),dtype="float")*weight/len(data)
+                weight_array=weight_dict[cut][dataset][syst]
+                
                 if syst=="nominal":
                     name=f"{dataset}"
                 else:

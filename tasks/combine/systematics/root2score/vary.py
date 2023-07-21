@@ -9,6 +9,7 @@ include_path=os.path.join(os.path.dirname(__file__),"vary_utils.h")
 ROOT.gInterpreter.ProcessLine(f'#include "{include_path}"')
 ROOT.gInterpreter.Declare('auto JES = JERC->at("Summer19UL18_V5_MC_Total_AK4PFchs");')
 ROOT.gInterpreter.Declare('auto JER= JERC->at("Summer19UL18_JRV2_MC_ScaleFactor_AK4PFchs");')
+ROOT.gInterpreter.Declare('auto bTag=btagging->at("deepJet_shape");')
 
 import copy
 def loop_redefine(rdf_list,*func_str_lists):
@@ -28,6 +29,8 @@ def vary(rdf_dict):
                                                 .Define("JetGen_mass","TakeIdx(Jet_mass,GenJet_mass,Jet_genJetIdx)")
                                                 .Redefine("Jet_pt",'JetGen_pt+(Jet_pt-JetGen_pt)*evaluate(JER,{Jet_eta},"nom")')
                                                 .Redefine("Jet_mass",'JetGen_mass+(Jet_mass-JetGen_mass)*evaluate(JER,{Jet_eta},"nom")')
+                                                #.Define("Weights",'ROOT::VecOps::Product(evaluate_btag(bTag,"central",Jet_hadronFlavour,{abs(Jet_eta),Jet_pt,Jet_btagDeepFlavB}))')
+                                                .Define("Weights","1.")
                             )
 
 
@@ -46,17 +49,10 @@ def vary(rdf_dict):
                                                 ,("Jet_mass",'JetGen_mass+(Jet_mass-JetGen_mass)*evaluate(JER,{Jet_eta},"down")')
                             ),
                     }
-            
-            
-            
-    #!Remember to add the new systematics to the syst_dict
-    syst_dict={ "nominal":[],
-            "JESUp":["Jet_pt","Jet_mass"],
-            "JESDown":["Jet_pt","Jet_mass"],
-            "JERUp":["Jet_pt","Jet_mass"],
-            "JERDown":["Jet_pt","Jet_mass"],
-            }
+
+    return res
 
 
 
-    return res,syst_dict
+def vary_weights(rdf,syst):
+    pass

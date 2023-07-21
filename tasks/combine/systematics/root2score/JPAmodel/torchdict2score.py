@@ -39,18 +39,3 @@ def predict(model,dataset,bunch=1):
     with torch.inference_mode():
         score=torch.exp(model.predict(dataset,bunch=bunch)[:,-1]).detach().to(cpu).numpy().astype("float")
     return score
-
-
-def torchdict2score(torch_dict,bunch=1,device=device):
-    model={"Muons":create_model("root2score/JPAmodel/state_dict_Muons.pt",device=device),
-            "Electrons":create_model("root2score/JPAmodel/state_dict_Electrons.pt",device=device)}
-    score_dict={}
-    for cut in torch_dict:
-        score_dict[cut]={}
-        for dataset in torch_dict[cut]:
-            score_dict[cut][dataset]={}
-            for syst in torch_dict[cut][dataset]:
-                print(f"{cut}: {dataset}_{syst}")
-                score_dict[cut][dataset][syst]=predict(model[cut],torch_dict[cut][dataset][syst],bunch=bunch)
-                
-    return score_dict
