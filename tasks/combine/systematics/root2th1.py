@@ -26,6 +26,14 @@ weight_dict={"Muons":{},"Electrons":{}}
 #! Create N rdataframes with N/bunch_size files each and concatenate them afterwards.
 
 for sample in sample_dict:
+    if sample=="bkg":
+        score_dict["Muons"]["semiLept"]={}
+        score_dict["Electrons"]["semiLept"]={}
+        score_dict["Muons"]["semiLeptTau"]={}
+        score_dict["Electrons"]["semiLeptTau"]={}
+    else:
+        score_dict["Muons"][sample]={}
+        score_dict["Electrons"][sample]={}
 
     sample_dict_temp={sample:sample_dict[sample]}
     print(f"\n!!!!!!!!!!!!!!!!!!!!!!!{sample}!!!!!!!!!!!!!!!!!!!!!!!!",flush=True)
@@ -44,17 +52,11 @@ for sample in sample_dict:
         score_dict_temp=torchdict2score(torch_dict,bunch=bunch,device=device)
 
         if sample=="bkg":
-            score_dict["Muons"]["semiLept"]={}
-            score_dict["Electrons"]["semiLept"]={}
-            score_dict["Muons"]["semiLeptTau"]={}
-            score_dict["Electrons"]["semiLeptTau"]={}
             score_dict["Muons"]["semiLept"][syst]=score_dict_temp["Muons"]["semiLept"][syst]
             score_dict["Electrons"]["semiLept"][syst]=score_dict_temp["Electrons"]["semiLept"][syst]
             score_dict["Muons"]["semiLeptTau"][syst]=score_dict_temp["Muons"]["semiLeptTau"][syst]
             score_dict["Electrons"]["semiLeptTau"][syst]=score_dict_temp["Electrons"]["semiLeptTau"][syst]
         else:
-            score_dict["Muons"][sample]={}
-            score_dict["Electrons"][sample]={}
             score_dict["Muons"][sample][syst]=score_dict_temp["Muons"][sample][syst]
             score_dict["Electrons"][sample][syst]=score_dict_temp["Electrons"][sample][syst]
 
