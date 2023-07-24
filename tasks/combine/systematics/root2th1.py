@@ -4,6 +4,7 @@ from root2score.skim import Cut
 from root2score.rdf2torch.rdf2torch import rdf2torch
 from root2score.JPAmodel.torchdict2score import predict, create_model
 from root2score.th1builder import build_TH1
+from root2score.build_datacard import build_datacard
 import torch
 import copy
 import json
@@ -121,6 +122,7 @@ for cut in ["Muons","Electrons"]:
 print("\n----------------------Building TH1---------------------",flush=True)
 build_TH1(score_dict,weight_dict,outfile)
 torch.save({"score_dict":score_dict,"weight_dict":weight_dict},"score_dict.pt")
+build_datacard(rdf_dict,syst_dict=syst_list+weight_syst_list,autoMCStats=True)
 print("\n--------------------------Done-------------------------",flush=True)
 
 
