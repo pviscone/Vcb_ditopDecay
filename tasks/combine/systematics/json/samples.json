@@ -31,7 +31,7 @@
         },
     "WJets":{
         "path":"/scratchnvme/pviscone/Preselection_Skim/WJets/root_files",
-        "Muons_weight":2642479200,
-        "Electrons_weight":2642479200
+        "Muons_weight":2642479200.0,
+        "Electrons_weight":2642479200.0
         }
 }
