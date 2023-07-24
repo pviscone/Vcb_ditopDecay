@@ -1,6 +1,10 @@
 
-def build_datacard(sample_dict,syst_dict,autoMCStats=True):
+def build_datacard(sample_dict,syst_list,autoMCStats=True):
     n=len(sample_dict)
+    syst_list.remove("nominal")
+    syst_list=[name.split("Up")[0].split("Down")[0] for name in syst_list]
+    syst_list=list(set(syst_list))
+    
     datacard=open("autodatacard.txt","w")
     datacard.write("imax 2\n")
     datacard.write("jmax *\n")
@@ -44,7 +48,7 @@ def build_datacard(sample_dict,syst_dict,autoMCStats=True):
         datacard.write("1.016\t")
         datacard.write("1.016\t")
     datacard.write("\n")
-    for syst in syst_dict:
+    for syst in syst_list:
         datacard.write(syst+"\tshape\t")
         for i in range(n):
             datacard.write("1\t")
