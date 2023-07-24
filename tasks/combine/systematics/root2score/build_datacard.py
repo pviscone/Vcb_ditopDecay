@@ -6,7 +6,7 @@ def build_datacard(sample_dict,syst_dict,autoMCStats=True):
     datacard.write("jmax *\n")
     datacard.write("kmax *\n")
     datacard.write("---------------\n")
-    datacard.write("shapes * * hist.root $CHANNEL/$PROCESS $CHANNEL/$PROCESS_$SYSTEMATIC\n")
+    datacard.write("shapes * * hist.root $CHANNEL/$PROCESS $CHANNEL/$PROCESS_syst_$SYSTEMATIC\n")
     datacard.write("---------------\n")
     datacard.write("bin\tMuons\tElectrons\n\n---------------\n")
     datacard.write("bin\t")
@@ -24,7 +24,11 @@ def build_datacard(sample_dict,syst_dict,autoMCStats=True):
         if (("signalMu" in sample) or ("signalEle" in sample)):
             datacard.write(str(signal_process)+"\t")
             signal_process-=1
+            datacard.write(str(signal_process)+"\t")
+            signal_process-=1
         else:
+            datacard.write(str(bkg_process)+"\t")
+            bkg_process+=1
             datacard.write(str(bkg_process)+"\t")
             bkg_process+=1
     datacard.write("\nrate\t")
