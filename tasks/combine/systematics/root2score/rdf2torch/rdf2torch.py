@@ -46,8 +46,9 @@ additional=["LeptLabel","HadDecay","AdditionalPartons"]
 
 
 
-def rdf2torch(rdf,cut=None,generator=None):
+def rdf2torch(rdf,cut=None,generator=None, weight_syst_list=None,sum_of_preselection_weights=None):
     assert (cut=="Muons" or cut=="Electrons") #"cut must be Muons or Electrons"
+    assert sum_of_preselection_weights is not None
     if cut=="Muons":
         var_dict=mu_vars
     else:
@@ -55,7 +56,11 @@ def rdf2torch(rdf,cut=None,generator=None):
     print("",flush=True)
     #print(f"- - - - - {cut} - - - - -",flush=True)
     rdf[0].Report().Print()
-    ak_arrays=to_ak(rdf,var_dict)
+    if weight_syst_list is None:
+        ak_arrays=to_ak(rdf,var_dict)
+    else:
+        additional_columns=["Weights_"+syst for syst in weight_syst_list]
+        ak_arrays=to_ak(rdf,var_dict,others=additional_columns)
     print("\nConverting to torch tensors...",flush=True)
     torch_dict=parse(ak_arrays,var_dict)
     dataset=EventsDataset()
@@ -69,10 +74,18 @@ def rdf2torch(rdf,cut=None,generator=None):
             
     #dataset=add_additional_data(dataset,ak_arrays["LHEPart_pdgId"],additional_list=additional,generator=generator)
     #dataset.add_additional_info("generator",generator)
-    
-    weights=ak_arrays["Weights"].to_numpy()
-    weights=weights/np.sum(weights)
-    print(f"Total number of selected events: {len(weights)}",flush=True)
-    return dataset,weights
-  
-    
+    if weight_syst_list is None:
+        weights=ak_arrays["Weights"].to_numpy()/sum_of_preselection_weights
+        print(f"Total number of selected events: {len(weights)}",flush=True)
+        print(f"Total efficiency: {(np.sum(weights))*100:.2f}%",flush=True)
+        return dataset,weights
+
+    else:
+        weights={"nominal":ak_arrays["Weights"].to_numpy()}
+        print(f"Total number of selected events: {len(weights['nominal'])}",flush=True)
+        print(f"\nNominal efficiency: {(np.sum(weights['nominal']/sum_of_preselection_weights))*100:.2f}%",flush=True)
+        for syst in weight_syst_list:
+            weights[syst]=ak_arrays[f"Weights_{syst}"].to_numpy()/sum_of_preselection_weights
+            print(f"{syst} efficiency: {(np.sum(weights[syst])*100):.2f}%",flush=True)
+
+        return dataset,weights

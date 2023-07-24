@@ -23,27 +23,51 @@ ROOT::RVec<float> evaluate(T cset, const ROOT::RVec<float> &input, const S &name
     return out;
 }
 
-template <typename T, typename S>
+template <typename T, typename C>
 ROOT::RVec<float> evaluate_btag(const T &cset,
-                                const S &name,
+                                const std::string &name,
                                 const ROOT::RVec<int> &had_flav,
                                 const ROOT::RVec<float> &abseta,
                                 const ROOT::RVec<float> &pt,
-                                const ROOT::RVec<float> &btag) {
+                                const ROOT::RVec<float> &btag,
+                                const C &ctag,
+                                const ROOT::RVec<float> &CvL,
+                                const ROOT::RVec<float> &CvB) {
 
     int len_ev = had_flav.size();
     ROOT::RVec<float> out(len_ev);
     for (int i = 0; i < len_ev; i++) {
-        std::string name_to_use=name;
-        if ((had_flav[i] == 4 and (name.find("cferr") == std::string::npos)) || (had_flav[i] == 5 and (name.find("cferr") != std::string::npos))) {
-            name_to_use="central";
+
+        if (abseta[i]>=2.5){
+            out[i]=1.;
+        } else{
+            if ((had_flav[i] == 4 and (name.find("cferr") == std::string::npos)) || ((had_flav[i] == 5 || had_flav[i] == 0) and (name.find("cferr") != std::string::npos))) {
+                out[i] = cset->evaluate({"central", had_flav[i], abseta[i], pt[i], btag[i]})*ctag->evaluate({"central", had_flav[i], CvL[i], CvB[i]});
+            } else{
+                out[i]=cset->evaluate({name, had_flav[i], abseta[i], pt[i], btag[i]});
+            }
         }
-        out[i]=cset->evaluate({name_to_use, had_flav[i], abseta[i], pt[i], btag[i]});
         //std::vector < correction::Variable::Type> input;
-    return out;
     }
+    return out;
 }
 
+template <typename T, typename S>
+ROOT::RVec<float> evaluate_ctag(const T &cset,
+                                const S &name,
+                                const ROOT::RVec<int> &had_flav,
+                                const ROOT::RVec<float> &CvL,
+                                const ROOT::RVec<float> &CvB
+                                ) {
+
+    int len_ev = had_flav.size();
+    ROOT::RVec<float> out(len_ev);
+    for (int i = 0; i < len_ev; i++) {
+        out[i] = cset->evaluate({name, had_flav[i], CvL[i], CvB[i]});
+    
+    }
+    return out;
+}
 
 ROOT::RVec<float> TakeIdx(ROOT::RVec<float> const &jetInput, ROOT::RVec<float> const &genInput, ROOT::RVec<int> const &idxs) {
     int size = idxs.size();
