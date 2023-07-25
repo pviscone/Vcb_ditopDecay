@@ -50,11 +50,11 @@ def vary(rdf_dict,weight_syst_list=[]):
 
                 if "btag" in syst:
 
-                    rdf_dict[dataset][i]=rdf_dict[dataset][i].Define(f"Weights_{syst}",f'ROOT::VecOps::Product(evaluate_btag(bTag,"{syst_name}",Jet_hadronFlavour,abs(Jet_eta),Jet_pt,Jet_btagDeepFlavB,cTag,Jet_btagDeepFlavCvL,Jet_btagDeepFlavCvB))')
+                    rdf_dict[dataset][i]=rdf_dict[dataset][i].Define(f"Weights_{syst}",f'(vary_btag(bTag,"{syst_name}",Jet_hadronFlavour,abs(Jet_eta),Jet_pt,Jet_btagDeepFlavB,Weights))')
                 
                 elif "ctag" in syst:
 
-                    rdf_dict[dataset][i]=rdf_dict[dataset][i].Define(f"Weights_{syst}",f'ROOT::VecOps::Product(evaluate_ctag(cTag,"{syst_name}",Jet_hadronFlavour,Jet_btagDeepFlavCvL,Jet_btagDeepFlavCvB))')
+                    rdf_dict[dataset][i]=rdf_dict[dataset][i].Define(f"Weights_{syst}",f'(vary_ctag(cTag,"{syst_name}",Jet_hadronFlavour,Jet_btagDeepFlavCvL,Jet_btagDeepFlavCvB,Weights))')
                 
 
 

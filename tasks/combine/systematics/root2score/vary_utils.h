@@ -12,6 +12,53 @@ ROOT::RVec<float> evaluate(T cset, const std::vector<ROOT::RVec<float>> &inputs)
     return out;
 }
 
+template <typename T>
+float vary_btag(const T &btag,
+                const std::string &name,
+                const ROOT::RVec<int> &had_flav,
+                const ROOT::RVec<float> &abseta,
+                const ROOT::RVec<float> &pt,
+                const ROOT::RVec<float> &deepJetB,
+                const float &weight) {
+    int len_ev = had_flav.size();
+    ROOT::RVec<float> out(len_ev);
+    for (int i = 0; i < len_ev; i++) {
+
+        if (abseta[i] >= 2.5) {
+            out[i] = 1.;
+        } else {
+            if ((had_flav[i] == 4 and (name.find("cferr") == std::string::npos)) || ((had_flav[i] == 5 || had_flav[i] == 0) and (name.find("cferr") != std::string::npos))) {
+                out[i] = 1.;
+            } else {
+                out[i] = btag->evaluate({name, had_flav[i], abseta[i], pt[i], deepJetB[i]}) / btag->evaluate({"central", had_flav[i], abseta[i], pt[i], deepJetB[i]});
+            }
+        }
+    }
+    float new_weight = ROOT::VecOps::Product(out);
+    return weight*new_weight;
+}
+
+template <typename T>
+float vary_ctag(const T &cset,
+                const std::string &name,
+                const ROOT::RVec<int> &had_flav,
+                const ROOT::RVec<float> &CvL,
+                const ROOT::RVec<float> &CvB,
+                const float &weight) {
+
+    int len_ev = had_flav.size();
+    ROOT::RVec<float> out(len_ev);
+    for (int i = 0; i < len_ev; i++) {
+        out[i] = cset->evaluate({name, had_flav[i], CvL[i], CvB[i]}) / cset->evaluate({"central", had_flav[i], CvL[i], CvB[i]});
+    }
+    float new_weight=ROOT::VecOps::Product(out);
+    return weight*new_weight;
+}
+
+
+
+
+
 template <typename T, typename S>
 ROOT::RVec<float> evaluate(T cset, const ROOT::RVec<float> &input, const S &name) {
     int size = input.size();
