@@ -75,10 +75,6 @@ def vary(rdf_dict,weight_syst_list=[]):
                     }
 
         sum_nominal_weights[dataset]=sum([rdf.Sum("Weights").GetValue() for rdf in  rdf_dict[dataset]])
-        n_ev={}
-        n_ev[dataset]=sum([rdf.Count().GetValue() for rdf in  rdf_dict[dataset]])
-        print(f"dataset {dataset}: sum of nominal weights: {sum_nominal_weights[dataset]}",flush=True)
-        print(f"n_events {dataset}: {n_ev[dataset]}\n",flush=True)
     return res,sum_nominal_weights
 
 
