@@ -94,7 +94,7 @@ for cut in ["Muons","Electrons"]:
 
             rdf=Cut(rdf_dict,sample,syst,cut)
             if syst=="nominal":
-                torch_dataset,weight_syst_dict=rdf2torch(rdf,cut=cut,weight_syst_list=weight_syst_list,sum_of_preselection_weights=sum_nominal_weights_dict[sample])
+                torch_dataset,weight_syst_dict=rdf2torch(rdf,cut=cut,weight_syst_list=weight_syst_list,sum_of_preselection_weights=sum_nominal_weights_dict[sample],real_nevent=weight_dict_temp[cut][sample])
                 weight_dict[cut][sample]["nominal"]=weight_syst_dict["nominal"]*weight_dict_temp[cut][sample]
                 for weight_syst in weight_syst_list:
                     weight_dict[cut][sample][weight_syst]=weight_syst_dict[weight_syst]*weight_dict_temp[cut][sample]
