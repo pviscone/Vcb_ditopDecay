@@ -34,7 +34,8 @@ def vary(rdf_dict,weight_syst_list=[]):
                                                 .Define("JetGen_mass","TakeIdx(Jet_mass,GenJet_mass,Jet_genJetIdx)")
                                                 .Redefine("Jet_pt",'JetGen_pt+(Jet_pt-JetGen_pt)*evaluate(JER,{Jet_eta},"nom")')
                                                 .Redefine("Jet_mass",'JetGen_mass+(Jet_mass-JetGen_mass)*evaluate(JER,{Jet_eta},"nom")')
-                                                .Define("Weights",'ROOT::VecOps::Product(evaluate_ctag(cTag,"central",Jet_hadronFlavour,Jet_btagDeepFlavCvL,Jet_btagDeepFlavCvB))')
+                                                .Define("Weights","genWeight/abs(genWeight)")
+                                                .Redefine("Weights",'Weights*ROOT::VecOps::Product(evaluate_ctag(cTag,"central",Jet_hadronFlavour,Jet_btagDeepFlavCvL,Jet_btagDeepFlavCvB))')
                                                 .Redefine("Weights",'Weights*ROOT::VecOps::Product(evaluate_btag(bTag,"central",Jet_hadronFlavour,abs(Jet_eta),Jet_pt,Jet_btagDeepFlavB,cTag,Jet_btagDeepFlavCvL,Jet_btagDeepFlavCvB))')
                                                 #.Define("Weights","1.")
                             )
@@ -74,6 +75,10 @@ def vary(rdf_dict,weight_syst_list=[]):
                     }
 
         sum_nominal_weights[dataset]=sum([rdf.Sum("Weights").GetValue() for rdf in  rdf_dict[dataset]])
+        n_ev={}
+        n_ev[dataset]=sum([rdf.Count().GetValue() for rdf in  rdf_dict[dataset]])
+        print(f"dataset {dataset}: sum of nominal weights: {sum_nominal_weights[dataset]}",flush=True)
+        print(f"n_events {dataset}: {n_ev[dataset]}\n",flush=True)
     return res,sum_nominal_weights
 
 
