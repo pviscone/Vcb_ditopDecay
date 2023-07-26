@@ -1,5 +1,6 @@
 MetPhi_check.py
 *.pyc
+/**/higgsCombine*
 *.gz
 *.ipynb
 /**/check.py
