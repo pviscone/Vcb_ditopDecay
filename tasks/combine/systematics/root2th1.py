@@ -101,7 +101,6 @@ for cut in ["Muons","Electrons"]:
             else:
                 torch_dataset,weight_arr=rdf2torch(rdf,cut=cut,sum_of_preselection_weights=sum_nominal_weights_dict[sample])
                 weight_dict[cut][sample][syst]=weight_arr*weight_dict_temp[cut][sample]
-            
 
             del rdf
             gc.collect()
