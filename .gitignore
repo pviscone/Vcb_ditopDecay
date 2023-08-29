@@ -15,3 +15,5 @@ tasks/generateCbEvents/genproductions
 *.tar.xz
 .envs/*
 root_files/*/
+/**/img_old/*
+/**/try.py
