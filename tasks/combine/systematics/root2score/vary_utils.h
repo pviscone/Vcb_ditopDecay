@@ -13,13 +13,13 @@ ROOT::RVec<float> evaluate(T cset, const std::vector<ROOT::RVec<float>> &inputs)
 }
 
 template <typename T>
-float vary_btag(const T &btag,
-                const std::string &name,
-                const ROOT::RVec<int> &had_flav,
-                const ROOT::RVec<float> &abseta,
-                const ROOT::RVec<float> &pt,
-                const ROOT::RVec<float> &deepJetB,
-                const float &weight) {
+ROOT::RVec<float> vary_btag(const T &btag,
+                            const std::string &name,
+                            const ROOT::RVec<int> &had_flav,
+                            const ROOT::RVec<float> &abseta,
+                            const ROOT::RVec<float> &pt,
+                            const ROOT::RVec<float> &deepJetB,
+                            const ROOT::RVec<float> &weight) {
     int len_ev = had_flav.size();
     ROOT::RVec<float> out(len_ev);
     for (int i = 0; i < len_ev; i++) {
@@ -34,30 +34,24 @@ float vary_btag(const T &btag,
             }
         }
     }
-    float new_weight = ROOT::VecOps::Product(out);
-    return weight*new_weight;
+    return weight*out;
 }
 
 template <typename T>
-float vary_ctag(const T &cset,
-                const std::string &name,
-                const ROOT::RVec<int> &had_flav,
-                const ROOT::RVec<float> &CvL,
-                const ROOT::RVec<float> &CvB,
-                const float &weight) {
+ROOT::RVec<float> vary_ctag(const T &cset,
+                            const std::string &name,
+                            const ROOT::RVec<int> &had_flav,
+                            const ROOT::RVec<float> &CvL,
+                            const ROOT::RVec<float> &CvB,
+                            const ROOT::RVec<float> &weight) {
 
     int len_ev = had_flav.size();
     ROOT::RVec<float> out(len_ev);
     for (int i = 0; i < len_ev; i++) {
         out[i] = cset->evaluate({name, had_flav[i], CvL[i], CvB[i]}) / cset->evaluate({"central", had_flav[i], CvL[i], CvB[i]});
     }
-    float new_weight=ROOT::VecOps::Product(out);
-    return weight*new_weight;
+    return weight*out;
 }
-
-
-
-
 
 template <typename T, typename S>
 ROOT::RVec<float> evaluate(T cset, const ROOT::RVec<float> &input, const S &name) {

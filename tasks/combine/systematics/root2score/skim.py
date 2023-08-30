@@ -30,12 +30,13 @@ def lept_selection(rdf):
     
     return dfCuts
     
-def jet_selection(df,lepton):
+def jet_selection(df,lepton,weight_syst_list):
     #Jet mask
     dfCuts = (df.Define(f"JetMask", f"Jet_jetId>0 && Jet_puId>0 && Jet_pt>20 && abs(Jet_eta)<4.8")
             .Define(f"JetMatchingMask", f"muon_jet_matching(Jet_eta,Jet_phi,{lepton}_eta[0],{lepton}_phi[0])")
         )
 
+    #!WEIGHTS
     #Jet define
     dfCuts=(dfCuts.Redefine(f"Jet_pt",f"pad_jet(Jet_pt[JetMask && JetMatchingMask],7)")
             .Redefine(f"Jet_eta",f"pad_jet(Jet_eta[JetMask && JetMatchingMask],7)")
@@ -45,8 +46,17 @@ def jet_selection(df,lepton):
             .Redefine(f"Jet_btagDeepFlavCvB",f"pad_jet(Jet_btagDeepFlavCvB[JetMask && JetMatchingMask],7)")
             .Redefine(f"Jet_btagDeepFlavCvL",f"pad_jet(Jet_btagDeepFlavCvL[JetMask && JetMatchingMask],7)")
             .Redefine(f"nJet",f"Sum(JetMask && JetMatchingMask)")
+            #.Redefine(f"JetWeights",f"pad_jet(JetWeights[JetMask && JetMatchingMask],7)")
+            .Define("Weights","GenWeights*ROOT::VecOps::Product(JetWeights)")
+
+            
         )
-    
+    for syst in weight_syst_list:
+        #dfCuts=dfCuts.Define(f"Weights_{syst}",f"GenWeights*ROOT::VecOps::Product(pad_jet(JetWeights_{syst}[JetMask && JetMatchingMask],7))")
+        dfCuts=dfCuts.Define(f"Weights_{syst}",f"GenWeights*ROOT::VecOps::Product(JetWeights_{syst})")
+        
+    #print(dfCuts.Mean('Weights').GetValue(),flush=True)
+
     return dfCuts
 
 def Muon_selections(rdf,dataset,syst):
@@ -54,7 +64,7 @@ def Muon_selections(rdf,dataset,syst):
     #Muon Cuts
     dfCuts=(rdf.Filter(f"nMuon>0",f"{dataset}_Mu_{syst}_Loose nMuon>0")
             .Filter(f"Muon_pt[0]>26 && abs(Muon_eta[0])<2.4",f"{dataset}_Mu_{syst}_Muon[0]_pt>26 && abs(eta)<2.4"))
-    dfCuts=jet_selection(dfCuts,"Muon")
+    
     dfCuts=(dfCuts.Filter(f"nJet>=4",f"{dataset}_Mu_{syst}_Clean nJet>=4")
             .Filter(f"Max(Jet_btagDeepFlavB)>0.2793",f"{dataset}_Mu_{syst}_Max DeepFlavB>0.2793 (Medium)")
         )
@@ -82,7 +92,7 @@ def Electron_selections(rdf,dataset,syst):
     #Electron Cuts
     dfCuts=(rdf.Filter(f"nElectron>0",f"{dataset}_Ele_{syst}_Loose nElectron>0")
             .Filter(f"Electron_pt[0]>30 && abs(Electron_eta[0])<2.4",f"{dataset}_Ele_{syst}_Electron[0]_pt>30 && abs(eta)<2.4"))
-    dfCuts=jet_selection(dfCuts,"Electron")
+    
     dfCuts=(dfCuts.Filter(f"nJet>=4",f"{dataset}_Ele_{syst}_Clean nJet>=4")
             .Filter(f"Max(Jet_btagDeepFlavB)>0.2793",f"{dataset}_Ele_{syst}_Max DeepFlavB>0.2793 (Medium)")
         )
@@ -111,15 +121,29 @@ def loop_cuts(rdf_list,cuts_func,*args):
         rdf_list[i]=cuts_func(rdf_list[i],*args)
     return rdf_list
 
-def Cut(rdf_dict,dataset,syst,cut=None):
+def Cut(rdf_dict,dataset,syst,weight_syst_list,cut=None):
     assert cut in ["Muons","Electrons"], "Cut must be either Muons or Electrons"
-    rdf=rdf_dict[dataset][syst]
+    rdf=copy.copy(rdf_dict[dataset][syst])
     dfCuts=loop_cuts(rdf,lept_selection)
+    dfCuts=loop_cuts(dfCuts,jet_selection,cut.split("s")[0],weight_syst_list)
+    
     if cut=="Muons":
         dfCuts=loop_cuts(dfCuts,Muon_selections,dataset,syst)
     elif cut=="Electrons":
         dfCuts=loop_cuts(dfCuts,Electron_selections,dataset,syst)
+        
     return dfCuts
     
+
+
+def compute_sum_nominal_weights(rdf_dict,cut):
+    sum_nominal_weights_dict={}
+    rdf_dict=copy.copy(rdf_dict)
+    for dataset in rdf_dict:
+        rdf_list=loop_cuts(rdf_dict[dataset]["nominal"],jet_selection,cut.split("s")[0],[])
+        sum_nominal_weights_dict[dataset]=sum([rdf.Sum("Weights").GetValue() for rdf in rdf_list])
+    
+    return sum_nominal_weights_dict
+
 
 

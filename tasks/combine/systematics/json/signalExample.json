@@ -1,0 +1,7 @@
+{
+    "signalMu":{
+        "path":"/scratchnvme/pviscone/Preselection_Skim/signal/signal_test.root",
+        "Muons_weight":14003.87,
+        "Electrons_weight": 14003.87
+        }
+}

@@ -1,6 +1,6 @@
 from root2score.open_rdf import build_rdf_dict
 from root2score.vary import vary
-from root2score.skim import Cut
+from root2score.skim import Cut,compute_sum_nominal_weights
 from root2score.rdf2torch.rdf2torch import rdf2torch
 from root2score.JPAmodel.torchdict2score import predict, create_model
 from root2score.th1builder import build_TH1
@@ -13,7 +13,7 @@ import gc
 cuda=torch.device("cuda:0")
 cpu=torch.device("cpu")
 
-samples_json="json/samples.json"
+samples_json="json/signalExample.json"
 bunch=1
 file_bunch_size=10
 device=cpu
@@ -77,11 +77,13 @@ syst_list=["nominal"]+var_syst_list
 rdf_dict,weight_dict_temp=build_rdf_dict(sample_dict,bunch_size=file_bunch_size)
 
 #rdf_dict {sample:{syst:rdf_list}},sum_nominal_weights_dict {sample:sum_nominal_weights(before selection)}
-rdf_dict,sum_nominal_weights_dict=vary(rdf_dict,weight_syst_list=weight_syst_list)
-
+rdf_dict=vary(rdf_dict,weight_syst_list=weight_syst_list)
+sum_nominal_weights_dict={}
 #! print also the weight efficiency
 for cut in ["Muons","Electrons"]:
     print(f"\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Cut: {cut} $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$",flush=True)
+    
+    sum_nominal_weights_dict[cut]=compute_sum_nominal_weights(rdf_dict,cut)
     for sample in rdf_dict:
         print(f"\n##################################### {sample} ######################################",flush=True)
         print(f"\n Number of bunches: {len(rdf_dict[sample]['nominal'])}")
@@ -92,14 +94,14 @@ for cut in ["Muons","Electrons"]:
         for syst in syst_list:
             print(f"\n------------------------------------- {syst} -------------------------------------",flush=True)
 
-            rdf=Cut(rdf_dict,sample,syst,cut)
+            rdf=Cut(rdf_dict,sample,syst,weight_syst_list,cut)
             if syst=="nominal":
-                torch_dataset,weight_syst_dict=rdf2torch(rdf,cut=cut,weight_syst_list=weight_syst_list,sum_of_preselection_weights=sum_nominal_weights_dict[sample],real_nevent=weight_dict_temp[cut][sample])
+                torch_dataset,weight_syst_dict=rdf2torch(rdf,cut=cut,weight_syst_list=weight_syst_list,sum_of_preselection_weights=sum_nominal_weights_dict[cut][sample],real_nevent=weight_dict_temp[cut][sample])
                 weight_dict[cut][sample]["nominal"]=weight_syst_dict["nominal"]*weight_dict_temp[cut][sample]
                 for weight_syst in weight_syst_list:
                     weight_dict[cut][sample][weight_syst]=weight_syst_dict[weight_syst]*weight_dict_temp[cut][sample]
             else:
-                torch_dataset,weight_arr=rdf2torch(rdf,cut=cut,sum_of_preselection_weights=sum_nominal_weights_dict[sample])
+                torch_dataset,weight_arr=rdf2torch(rdf,cut=cut,sum_of_preselection_weights=sum_nominal_weights_dict[cut][sample])
                 weight_dict[cut][sample][syst]=weight_arr*weight_dict_temp[cut][sample]
 
             del rdf

@@ -43,10 +43,10 @@ ele_var={"Jet":["Jet_pt",
 additional=["LeptLabel","HadDecay","AdditionalPartons"]
 
 def print_log(weights,sum_of_preselection_weights):
-    print(f"Total efficiency: {(np.sum(weights))*100:.2f}%\n",flush=True) # type: ignore
+    print(f"Total efficiency: {(np.sum(weights)/sum_of_preselection_weights)*100:.2f}%\n",flush=True) # type: ignore
     print(f"len_events: {len(weights)}",flush=True)
-    print(f"Sum weights: {(np.sum(weights)*sum_of_preselection_weights):.2f}",flush=True) # type: ignore
-    print(f"Sum weights/len_events: {(np.sum(weights)*sum_of_preselection_weights/len(weights))*100:.2f}%\n",flush=True) # type: ignore
+    print(f"Sum weights: {(np.sum(weights)):.2f}",flush=True) # type: ignore
+    print(f"Sum weights/len_events: {(np.sum(weights)/len(weights))*100:.2f}%\n",flush=True) # type: ignore
 
 
 
@@ -80,14 +80,16 @@ def rdf2torch(rdf,cut=None,generator=None, weight_syst_list=None,sum_of_preselec
     #dataset=add_additional_data(dataset,ak_arrays["LHEPart_pdgId"],additional_list=additional,generator=generator)
     #dataset.add_additional_info("generator",generator)
     if weight_syst_list is None:
-        weights=ak_arrays["Weights"].to_numpy()/sum_of_preselection_weights
+        weights=ak_arrays["Weights"].to_numpy()
         print_log(weights,sum_of_preselection_weights)
-        
+        weights=weights/sum_of_preselection_weights
 
     else:
-        weights={"nominal":ak_arrays["Weights"].to_numpy()/sum_of_preselection_weights}
-        print(f"\nN_MC/N_Run2: {(sum_of_preselection_weights/real_nevent):.2f}",flush=True)
+        weights={"nominal":ak_arrays["Weights"].to_numpy()}
         print_log(weights["nominal"],sum_of_preselection_weights)
+        weights={"nominal":weights["nominal"]/sum_of_preselection_weights}
+        print(f"\nN_MC/N_Run2: {(sum_of_preselection_weights/real_nevent):.2f}",flush=True)
+        
         for syst in weight_syst_list:
             weights[syst]=ak_arrays[f"Weights_{syst}"].to_numpy()/sum_of_preselection_weights
             print(f"{syst} efficiency: {(np.sum(weights[syst])*100):.2f}%",flush=True) # type: ignore

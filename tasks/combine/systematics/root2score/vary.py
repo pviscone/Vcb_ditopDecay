@@ -36,9 +36,9 @@ def vary(rdf_dict,weight_syst_list=[]):
                                                 .Define("originalJet_mass","Jet_mass")
                                                 .Redefine("Jet_pt",'JetGen_pt+(Jet_pt-JetGen_pt)*evaluate(JER,{Jet_eta},"nom")')
                                                 .Redefine("Jet_mass",'JetGen_mass+(Jet_mass-JetGen_mass)*evaluate(JER,{Jet_eta},"nom")')
-                                                .Define("Weights","genWeight/abs(genWeight)")
-                                                .Redefine("Weights",'Weights*ROOT::VecOps::Product(evaluate_ctag(cTag,"central",Jet_hadronFlavour,Jet_btagDeepFlavCvL,Jet_btagDeepFlavCvB))')
-                                                .Redefine("Weights",'Weights*ROOT::VecOps::Product(evaluate_btag(bTag,"central",Jet_hadronFlavour,abs(Jet_eta),Jet_pt,Jet_btagDeepFlavB,cTag,Jet_btagDeepFlavCvL,Jet_btagDeepFlavCvB))')
+                                                .Define("GenWeights","genWeight/abs(genWeight)")
+                                                .Define("JetWeights",'(evaluate_ctag(cTag,"central",Jet_hadronFlavour,Jet_btagDeepFlavCvL,Jet_btagDeepFlavCvB))')
+                                                .Redefine("JetWeights",'JetWeights*(evaluate_btag(bTag,"central",Jet_hadronFlavour,abs(Jet_eta),Jet_pt,Jet_btagDeepFlavB,cTag,Jet_btagDeepFlavCvL,Jet_btagDeepFlavCvB))')
                                                 #.Define("Weights","1.")
                             )
             
@@ -52,11 +52,11 @@ def vary(rdf_dict,weight_syst_list=[]):
 
                 if "btag" in syst:
 
-                    rdf_dict[dataset][i]=rdf_dict[dataset][i].Define(f"Weights_{syst}",f'(vary_btag(bTag,"{syst_name}",Jet_hadronFlavour,abs(Jet_eta),Jet_pt,Jet_btagDeepFlavB,Weights))')
+                    rdf_dict[dataset][i]=rdf_dict[dataset][i].Define(f"JetWeights_{syst}",f'(vary_btag(bTag,"{syst_name}",Jet_hadronFlavour,abs(Jet_eta),Jet_pt,Jet_btagDeepFlavB,JetWeights))')
                 
                 elif "ctag" in syst:
 
-                    rdf_dict[dataset][i]=rdf_dict[dataset][i].Define(f"Weights_{syst}",f'(vary_ctag(cTag,"{syst_name}",Jet_hadronFlavour,Jet_btagDeepFlavCvL,Jet_btagDeepFlavCvB,Weights))')
+                    rdf_dict[dataset][i]=rdf_dict[dataset][i].Define(f"JetWeights_{syst}",f'(vary_ctag(cTag,"{syst_name}",Jet_hadronFlavour,Jet_btagDeepFlavCvL,Jet_btagDeepFlavCvB,JetWeights))')
                 
 
 
@@ -76,8 +76,8 @@ def vary(rdf_dict,weight_syst_list=[]):
                             ),
                     }
 
-        sum_nominal_weights[dataset]=sum([rdf.Sum("Weights").GetValue() for rdf in  rdf_dict[dataset]])
-    return res,sum_nominal_weights
+
+    return res
 
 
 
