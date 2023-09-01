@@ -139,8 +139,10 @@ def plot(sample,syst,region):
     up_ratio_unc=ratio_uncertainty(up_array,array)
     down_ratio_unc=ratio_uncertainty(down_array,array)
     
-    a1.errorbar(bins_array,up_ratio,up_ratio_unc,label=syst+"Up",fmt="--r.",elinewidth=1,markersize=9)
-    a1.errorbar(bins_array+0.03,down_ratio,down_ratio_unc,label=syst+"Down",color="dodgerblue",fmt="--b.",elinewidth=1,markersize=9)
+    #a1.errorbar(bins_array,up_ratio,up_ratio_unc,label=syst+"Up",fmt="--r.",elinewidth=1,markersize=9)
+    #a1.errorbar(bins_array+0.03,down_ratio,down_ratio_unc,label=syst+"Down",color="dodgerblue",fmt="--b.",elinewidth=1,markersize=9)
+    a1.errorbar(bins_array,up_ratio,label=syst+"Up",fmt="--r.",elinewidth=1,markersize=9)
+    a1.errorbar(bins_array+0.03,down_ratio,label=syst+"Down",color="dodgerblue",fmt="--b.",elinewidth=1,markersize=9)
     a1.plot([h.to_numpy()[1][0],h.to_numpy()[1][-1]],[1,1],color="black")
     
     #a1.bar(bins_array,up_array/array,width=1,histtye="step")
@@ -155,7 +157,7 @@ def plot(sample,syst,region):
 
 
 
-    a1.set_ylim(np.min(concat[concat_unc<0.15])*0.9,np.max(concat[concat_unc<0.15])*1.1)
+    a1.set_ylim(np.min(concat[concat_unc<0.15])*0.975,np.max(concat[concat_unc<0.15])*1.025)
     
 
     a0.grid()

@@ -46,14 +46,12 @@ def jet_selection(df,lepton,weight_syst_list):
             .Redefine(f"Jet_btagDeepFlavCvB",f"pad_jet(Jet_btagDeepFlavCvB[JetMask && JetMatchingMask],7)")
             .Redefine(f"Jet_btagDeepFlavCvL",f"pad_jet(Jet_btagDeepFlavCvL[JetMask && JetMatchingMask],7)")
             .Redefine(f"nJet",f"Sum(JetMask && JetMatchingMask)")
-            #.Redefine(f"JetWeights",f"pad_jet(JetWeights[JetMask && JetMatchingMask],7)")
-            .Define("Weights","GenWeights*ROOT::VecOps::Product(JetWeights)")
-
+            .Define(f"Weights",f"GenWeights*ROOT::VecOps::Product(JetWeights[JetMask && JetMatchingMask])")
             
         )
     for syst in weight_syst_list:
-        #dfCuts=dfCuts.Define(f"Weights_{syst}",f"GenWeights*ROOT::VecOps::Product(pad_jet(JetWeights_{syst}[JetMask && JetMatchingMask],7))")
-        dfCuts=dfCuts.Define(f"Weights_{syst}",f"GenWeights*ROOT::VecOps::Product(JetWeights_{syst})")
+        dfCuts=dfCuts.Define(f"Weights_{syst}",f"GenWeights*ROOT::VecOps::Product(JetWeights_{syst}[JetMask && JetMatchingMask])")
+        #dfCuts=dfCuts.Define(f"Weights_{syst}",f"GenWeights*ROOT::VecOps::Product(JetWeights_{syst})")
         
     #print(dfCuts.Mean('Weights').GetValue(),flush=True)
 
@@ -66,7 +64,7 @@ def Muon_selections(rdf,dataset,syst):
             .Filter(f"Muon_pt[0]>26 && abs(Muon_eta[0])<2.4",f"{dataset}_Mu_{syst}_Muon[0]_pt>26 && abs(eta)<2.4"))
     
     dfCuts=(dfCuts.Filter(f"nJet>=4",f"{dataset}_Mu_{syst}_Clean nJet>=4")
-            .Filter(f"Max(Jet_btagDeepFlavB)>0.2793",f"{dataset}_Mu_{syst}_Max DeepFlavB>0.2793 (Medium)")
+            #.Filter(f"Max(Jet_btagDeepFlavB)>0.2793",f"{dataset}_Mu_{syst}_Max DeepFlavB>0.2793 (Medium)")
         )
     
     #Define new objects
@@ -121,29 +119,47 @@ def loop_cuts(rdf_list,cuts_func,*args):
         rdf_list[i]=cuts_func(rdf_list[i],*args)
     return rdf_list
 
-def Cut(rdf_dict,dataset,syst,weight_syst_list,cut=None):
-    assert cut in ["Muons","Electrons"], "Cut must be either Muons or Electrons"
+
+
+region_cut_dict={"Muons":Muon_selections,
+                "Electrons":Electron_selections}
+
+
+def Cut(rdf_dict,
+        region=None,
+        dataset=None,
+        syst=None,
+        weight_syst_list=None,
+        eff_dict=None):
+    
     rdf=copy.copy(rdf_dict[dataset][syst])
     dfCuts=loop_cuts(rdf,lept_selection)
-    dfCuts=loop_cuts(dfCuts,jet_selection,cut.split("s")[0],weight_syst_list)
     
-    if cut=="Muons":
-        dfCuts=loop_cuts(dfCuts,Muon_selections,dataset,syst)
-    elif cut=="Electrons":
-        dfCuts=loop_cuts(dfCuts,Electron_selections,dataset,syst)
-        
-    return dfCuts
+    if syst!="nominal":
+        weight_syst_list=[]
+    dfCuts=loop_cuts(dfCuts,jet_selection,region.split("s")[0],weight_syst_list)
     
-
-
-def compute_sum_nominal_weights(rdf_dict,cut):
-    sum_nominal_weights_dict={}
-    rdf_dict=copy.copy(rdf_dict)
-    for dataset in rdf_dict:
-        rdf_list=loop_cuts(rdf_dict[dataset]["nominal"],jet_selection,cut.split("s")[0],[])
-        sum_nominal_weights_dict[dataset]=sum([rdf.Sum("Weights").GetValue() for rdf in rdf_list])
+    sum_preWeights=sum([df.Sum("Weights").GetValue() for df in dfCuts])
     
-    return sum_nominal_weights_dict
+    dfCuts=loop_cuts(dfCuts,region_cut_dict[region],dataset,syst)
 
+    sum_weights=sum([df.Sum("Weights").GetValue() for df in dfCuts])
+    
+    eff=sum_weights/sum_preWeights
+    eff_dict[region][dataset][syst]=eff
+    
+    print(f"Sum preWeights: {sum_preWeights:.2f}",flush=True)
+    print(f"Sum postWeights: {sum_weights:.2f}",flush=True)
+    print(f"Total efficiency: {eff*100:.2f}%\n",flush=True)
+    
+    if syst=="nominal":
+        for weight_syst in weight_syst_list:
+            sum_systWeights=sum([df.Sum(f"Weights_{weight_syst}").GetValue() for df in dfCuts])
+            eff=sum_systWeights/sum_preWeights
+            eff_dict[region][dataset][weight_syst]=eff
+            print(f"{weight_syst} efficiency: {eff*100:.2f}%",flush=True)
+
+    return dfCuts,eff_dict
+    
 
 

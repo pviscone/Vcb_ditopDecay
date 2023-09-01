@@ -25,22 +25,23 @@ def loop_redefine(rdf_list,*func_str_lists):
 
 def vary(rdf_dict,weight_syst_list=[]):
     res={}
-    sum_nominal_weights={}
+    sum_preWeights={}
     for dataset in rdf_dict:
         #nominal corrections
         rdf_list=copy.copy(rdf_dict[dataset])
         for i in range(len(rdf_dict[dataset])):
-            rdf_dict[dataset][i]=(rdf_list[i].Define("JetGen_pt","TakeIdx(Jet_pt,GenJet_pt,Jet_genJetIdx)")
-                                                .Define("JetGen_mass","TakeIdx(Jet_mass,GenJet_mass,Jet_genJetIdx)")
-                                                .Define("originalJet_pt","Jet_pt")
-                                                .Define("originalJet_mass","Jet_mass")
-                                                .Redefine("Jet_pt",'JetGen_pt+(Jet_pt-JetGen_pt)*evaluate(JER,{Jet_eta},"nom")')
-                                                .Redefine("Jet_mass",'JetGen_mass+(Jet_mass-JetGen_mass)*evaluate(JER,{Jet_eta},"nom")')
-                                                .Define("GenWeights","genWeight/abs(genWeight)")
-                                                .Define("JetWeights",'(evaluate_ctag(cTag,"central",Jet_hadronFlavour,Jet_btagDeepFlavCvL,Jet_btagDeepFlavCvB))')
-                                                .Redefine("JetWeights",'JetWeights*(evaluate_btag(bTag,"central",Jet_hadronFlavour,abs(Jet_eta),Jet_pt,Jet_btagDeepFlavB,cTag,Jet_btagDeepFlavCvL,Jet_btagDeepFlavCvB))')
-                                                #.Define("Weights","1.")
-                            )
+            rdf_dict[dataset][i]=(rdf_list[i]
+                .Define("JetGen_pt","TakeIdx(Jet_pt,GenJet_pt,Jet_genJetIdx)")
+                .Define("JetGen_mass","TakeIdx(Jet_mass,GenJet_mass,Jet_genJetIdx)")
+                .Define("originalJet_pt","Jet_pt")
+                .Define("originalJet_mass","Jet_mass")
+                .Redefine("Jet_pt",'JetGen_pt+(Jet_pt-JetGen_pt)*evaluate(JER,{Jet_eta},"nom")')
+                .Redefine("Jet_mass",'JetGen_mass+(Jet_mass-JetGen_mass)*evaluate(JER,{Jet_eta},"nom")')
+                .Define("GenWeights","genWeight/abs(genWeight)")
+                .Define("JetWeights",'(evaluate_btag(bTag,Jet_hadronFlavour,abs(Jet_eta),Jet_pt,Jet_btagDeepFlavB))')
+                .Redefine("JetWeights",'JetWeights*(evaluate_ctag(cTag,Jet_hadronFlavour,Jet_btagDeepFlavCvL,Jet_btagDeepFlavCvB))')
+                )
+
             
             for syst in weight_syst_list:
                 syst_name=""
@@ -57,6 +58,9 @@ def vary(rdf_dict,weight_syst_list=[]):
                 elif "ctag" in syst:
 
                     rdf_dict[dataset][i]=rdf_dict[dataset][i].Define(f"JetWeights_{syst}",f'(vary_ctag(cTag,"{syst_name}",Jet_hadronFlavour,Jet_btagDeepFlavCvL,Jet_btagDeepFlavCvB,JetWeights))')
+
+    
+
                 
 
 
@@ -76,7 +80,7 @@ def vary(rdf_dict,weight_syst_list=[]):
                             ),
                     }
 
-
+        
     return res
 
 
