@@ -1,6 +1,6 @@
 import ROOT
 import os
-
+import numpy as np
 
 include_path=os.path.join(os.path.dirname(__file__),"RDF_utils.h")
 
@@ -46,15 +46,17 @@ def jet_selection(df,lepton,weight_syst_list):
             .Redefine(f"Jet_btagDeepFlavCvB",f"pad_jet(Jet_btagDeepFlavCvB[JetMask && JetMatchingMask],7)")
             .Redefine(f"Jet_btagDeepFlavCvL",f"pad_jet(Jet_btagDeepFlavCvL[JetMask && JetMatchingMask],7)")
             .Redefine(f"nJet",f"Sum(JetMask && JetMatchingMask)")
-            .Define(f"Weights",f"GenWeights*ROOT::VecOps::Product(JetWeights[JetMask && JetMatchingMask])")
+            .Define(f"EvWeights",f"ROOT::VecOps::Product(JetWeights[JetMask && JetMatchingMask])")
+            .Define(f"Weights",f"GenWeights*EvWeights")
             
         )
+    
+    
     for syst in weight_syst_list:
-        dfCuts=dfCuts.Define(f"Weights_{syst}",f"GenWeights*ROOT::VecOps::Product(JetWeights_{syst}[JetMask && JetMatchingMask])")
-        #dfCuts=dfCuts.Define(f"Weights_{syst}",f"GenWeights*ROOT::VecOps::Product(JetWeights_{syst})")
+        dfCuts=(dfCuts.Define(f"EvWeights_{syst}",f"ROOT::VecOps::Product(JetWeights_{syst}[JetMask && JetMatchingMask])")
+                .Define(f"Weights_{syst}",f"GenWeights*EvWeights_{syst}")
+                )
         
-    #print(dfCuts.Mean('Weights').GetValue(),flush=True)
-
     return dfCuts
 
 def Muon_selections(rdf,dataset,syst):
@@ -64,8 +66,7 @@ def Muon_selections(rdf,dataset,syst):
             .Filter(f"Muon_pt[0]>26 && abs(Muon_eta[0])<2.4",f"{dataset}_Mu_{syst}_Muon[0]_pt>26 && abs(eta)<2.4"))
     
     dfCuts=(dfCuts.Filter(f"nJet>=4",f"{dataset}_Mu_{syst}_Clean nJet>=4")
-            #.Filter(f"Max(Jet_btagDeepFlavB)>0.2793",f"{dataset}_Mu_{syst}_Max DeepFlavB>0.2793 (Medium)")
-        )
+            )
     
     #Define new objects
     dfCuts = (dfCuts.Define(f"MET_eta", f"Met_eta(Muon_pt, Muon_eta, Muon_phi, MET_pt, MET_phi)")
@@ -92,7 +93,6 @@ def Electron_selections(rdf,dataset,syst):
             .Filter(f"Electron_pt[0]>30 && abs(Electron_eta[0])<2.4",f"{dataset}_Ele_{syst}_Electron[0]_pt>30 && abs(eta)<2.4"))
     
     dfCuts=(dfCuts.Filter(f"nJet>=4",f"{dataset}_Ele_{syst}_Clean nJet>=4")
-            .Filter(f"Max(Jet_btagDeepFlavB)>0.2793",f"{dataset}_Ele_{syst}_Max DeepFlavB>0.2793 (Medium)")
         )
     
     #Define new objects
@@ -111,6 +111,12 @@ def Electron_selections(rdf,dataset,syst):
     #report.Print()
     
     return dfCuts
+
+def btag_cuts(rdf):
+    dfCuts=(rdf.Filter(f"Max(Jet_btagDeepFlavB)>0.2793",f"Max(Jet_btagDeepFlavB)>0.2793 (Medium)")
+        )
+    return dfCuts
+
 
 import copy
 def loop_cuts(rdf_list,cuts_func,*args):
@@ -137,14 +143,34 @@ def Cut(rdf_dict,
     
     if syst!="nominal":
         weight_syst_list=[]
+        
+    
     dfCuts=loop_cuts(dfCuts,jet_selection,region.split("s")[0],weight_syst_list)
     
     sum_preWeights=sum([df.Sum("Weights").GetValue() for df in dfCuts])
-    
+
     dfCuts=loop_cuts(dfCuts,region_cut_dict[region],dataset,syst)
 
+    #!Compute weight means before btag selection
+    count=np.array([df.Count().GetValue() for df in dfCuts])
+    mu_w=np.array([df.Mean("EvWeights").GetValue() for df in dfCuts])
+    mu_w=sum(mu_w*count)/sum(count)
+    for i in range(len(dfCuts)):
+        dfCuts[i]=(dfCuts[i].Redefine("EvWeights",f"EvWeights/{mu_w}")
+                   .Redefine(f"Weights",f"GenWeights*EvWeights"))
+    sum_preWeights=sum_preWeights/mu_w
+    if syst=="nominal":
+        for weight_syst in weight_syst_list:
+            mu_wsyst=np.array([df.Mean(f"EvWeights_{weight_syst}").GetValue() for df in dfCuts])
+            mu_wsyst=sum(mu_wsyst*count)/sum(count)
+            for i in range(len(dfCuts)):
+                dfCuts[i]=(dfCuts[i].Redefine(f"EvWeights_{weight_syst}",f"EvWeights_{weight_syst}/{mu_wsyst}")
+                           .Redefine(f"Weights_{weight_syst}",f"GenWeights*EvWeights_{weight_syst}")
+                        )
+
+    dfCuts=loop_cuts(dfCuts,btag_cuts)
     sum_weights=sum([df.Sum("Weights").GetValue() for df in dfCuts])
-    
+
     eff=sum_weights/sum_preWeights
     eff_dict[region][dataset][syst]=eff
     
@@ -154,7 +180,9 @@ def Cut(rdf_dict,
     
     if syst=="nominal":
         for weight_syst in weight_syst_list:
+            
             sum_systWeights=sum([df.Sum(f"Weights_{weight_syst}").GetValue() for df in dfCuts])
+            
             eff=sum_systWeights/sum_preWeights
             eff_dict[region][dataset][weight_syst]=eff
             print(f"{weight_syst} efficiency: {eff*100:.2f}%",flush=True)

@@ -15,7 +15,7 @@ import gc
 cuda=torch.device("cuda:0")
 cpu=torch.device("cpu")
 
-samples_json="json/signalExample.json"
+samples_json="json/samples.json"
 bunch=1
 file_bunch_size=10
 device=cpu
@@ -29,7 +29,8 @@ sample_dict=json.load(open(samples_json,"r"))
 #! Create N rdataframes with N/bunch_size files each and concatenate them afterwards.
 
 regions=["Muons",
-         "Electrons"]
+         "Electrons"
+        ]
 
 weight_syst_list=[
            "btag_hf",

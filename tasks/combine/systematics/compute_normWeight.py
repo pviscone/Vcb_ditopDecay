@@ -31,22 +31,46 @@ def np_or(*args):
 
     
 
+
+
 f=uproot.open("/scratchnvme/pviscone/Preselection_Skim/powheg/root_files/predict/3A361FB1-E533-1C4D-9EA7-ACFA17F05B69.root")
 
 arrays=f["Events"].arrays(["Jet_pt","Jet_eta","Jet_btagDeepFlavB","Jet_btagDeepFlavCvL","Jet_btagDeepFlavCvB","Jet_hadronFlavour","Jet_jetId","Jet_puId"])
-
+mu_arrays=f["Events"].arrays(["Muon_looseId","Muon_pfIsoId","Muon_pt","Muon_eta"])
 
 arrays=arrays[np_and(
                     arrays["Jet_pt"]>20,
                     np.abs(arrays["Jet_eta"])<2.5,
                     arrays["Jet_jetId"]>0,
-                    arrays["Jet_puId"]>0
+                    arrays["Jet_puId"]>0,
                     )
               ]
-n_ev=1300000
+
+mu_arrays=mu_arrays[np_and(mu_arrays["Muon_looseId"],
+                    mu_arrays["Muon_pfIsoId"]>1,
+                    np.abs(mu_arrays["Muon_eta"])<2.4,)
+]
+
+#arrays=arrays[ak.num(mu_arrays["Muon_pt"])>=1]
+#mu_arrays=mu_arrays[ak.num(mu_arrays["Muon_pt"])>=1]
+#arrays=arrays[mu_arrays["Muon_pt"][:,0]>26]
+#mu_arrays=mu_arrays[mu_arrays["Muon_pt"][:,0]>26]
+
+#arrays=arrays[ak.num(arrays["Jet_pt"])>=4]
+#arrays=arrays[ak.max(arrays["Jet_btagDeepFlavB"],axis=1)>0.27]
+
+n_ev=284000
 arrays=arrays[:n_ev,:7]
+mu_arrays=mu_arrays[:n_ev]
 assert len(arrays)==n_ev
 arrays=ak.pad_none(arrays,7,clip=True,axis=1)
+mu_arrays=ak.pad_none(mu_arrays,1,clip=True,axis=1)
+cuts=ak.fill_none(np_and(ak.num(mu_arrays["Muon_pt"])>=1,
+       mu_arrays["Muon_pt"][:,0]>26,
+       ak.num(arrays["Jet_pt"])>=4
+       ),False)
+
+cuts=ak.fill_none(cuts,False).to_numpy()
 arrays=ak.fill_none(arrays,-1)
 
 
@@ -83,6 +107,7 @@ def evaluate_ctag(array,name):
 
 
 # %%
+#!btag corrections
 b_sources=["hf","lf","hfstats1","hfstats2","lfstats1","lfstats2","cferr1","cferr2"]
 b_systs=[]
 
@@ -129,6 +154,7 @@ print(f"\n\nbTag mean on events (normalized): {mean_prod_b}")
 
 
 #%%
+#!ctag corrections
 c_sources=["Extrap", "Interp", "LHEScaleWeight_muF", "LHEScaleWeight_muR", "PSWeightFSR", "PSWeightISR", "PUWeight", "Stat", "XSec_BRUnc_DYJets_b", "XSec_BRUnc_DYJets_c", "XSec_BRUnc_WJets_c", "jer", "jesTotal"]
 
 c_systs=[]
@@ -146,12 +172,12 @@ for c_syst in c_systs:
 
 ctag_df=ak.to_dataframe(arrays)
 c_systs=["c_"+c_syst for c_syst in c_systs]
-cdf=ctag_df[c_systs+["c_central","Jet_hadronFlavour","Jet_btagDeepFlavB"]]
+cdf=ctag_df[c_systs+["c_central","Jet_hadronFlavour","Jet_btagDeepFlavB","Jet_btagDeepFlavCvB","Jet_btagDeepFlavCvL"]]
 
 
 
 
-
+o_cdf=copy.copy(cdf)
 cdf=cdf[cdf["Jet_hadronFlavour"]!=-1]
 c_cdf=cdf[cdf["Jet_hadronFlavour"]==4]
 b_cdf=cdf[(cdf["Jet_hadronFlavour"]==5)]
@@ -171,7 +197,7 @@ print("\n")
 #%%
 
 print(f"cTag mean on events (not normalized):\n{cdf.groupby(level=0).prod().mean()}")
-
+original_cdf=copy.copy(cdf)
 c_cmu=c_cdf.mean()
 b_cmu=b_cdf.mean()
 l_cmu=l_cdf.mean()
@@ -185,7 +211,7 @@ print(f"\n\ncTag mean on events (normalized): {mean_prod_c}")
 
 
 #%%
-
+#!Plotting
 
 mplhep.style.use("CMS")
 
