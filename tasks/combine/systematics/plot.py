@@ -6,9 +6,11 @@ import json
 import mplhep
 import hist
 from matplotlib import gridspec
+import os
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
 import numpy as np
 from scipy import stats
-import multiprocessing as mp
+
 
 
 def poisson_interval(
@@ -172,15 +174,31 @@ def plot_sample(sample,systs,region):
         plot(sample,syst,region)
 
 processes=[]
+
+parallel=True
+if parallel:
+    import multiprocessing as mp
+
+
 for region in regions:
-    os.makedirs(f"img/{region}",exist_ok=True)
-    root_folder=f[region]
-    for sample in samples:
-        os.makedirs(f"img/{region}/{sample}",exist_ok=True)
-        #for syst in systs:
-        process=mp.Process(target=plot_sample,args=(sample,systs,region))
-        processes.append(process)
-        process.start()
+    try:
+        os.makedirs(f"img/{region}",exist_ok=True)
+        sample=""
+        root_folder=f[region]
+        for sample in samples:
         
-for process in processes:
-    process.join()
+                os.makedirs(f"img/{region}/{sample}",exist_ok=True)
+                #for syst in systs:
+                if parallel:
+                    process=mp.Process(target=plot_sample,args=(sample,systs,region))
+                    processes.append(process)
+                    process.start()
+                else:
+                    plot_sample(sample,systs,region)
+    except:
+        print(f"Passing {region}/{sample}")
+        pass
+        
+if parallel:
+    for process in processes:
+        process.join()
