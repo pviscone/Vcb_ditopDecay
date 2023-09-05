@@ -1,6 +1,6 @@
 {
-    "signalEle":{
-        "path":"/scratchnvme/pviscone/Preselection_Skim/signal_Electrons/signal_Electrons_test.root",
+    "signalMu":{
+        "path":"/scratchnvme/pviscone/Preselection_Skim/signal/signal_test.root",
         "nEv_lumi":14003.87
         }
 }

@@ -63,7 +63,8 @@ mu_arrays=mu_arrays[np_and(mu_arrays["Muon_looseId"],
 
 cuts=ak.fill_none(np_and(ak.num(mu_arrays["Muon_pt"])>=1,
        ak.max(mu_arrays["Muon_pt"],axis=1)>26,
-       ak.num(arrays["Jet_pt"])>=4
+       ak.num(arrays["Jet_pt"])>=4,
+       ak.max(arrays["Jet_btagDeepFlavB"],axis=1)>0.2770,
        ),False)
 
 arrays=arrays[cuts]
@@ -92,8 +93,8 @@ for had_flav in [0,4,5]:
         had_mask=np.asarray(ak.flatten(arrays["Jet_hadronFlavour"]))==had_flav
         np.asarray(ak.flatten(arrays[c_syst]))[had_mask]=np.asarray(ak.flatten(arrays[c_syst]))[had_mask]/m_value
         
-#%%
 
+#%%
 for c_syst in c_systs:
     m=np.mean(ak.prod(arrays[c_syst],axis=1))
     print(f"syst:{c_syst} \t {m}")

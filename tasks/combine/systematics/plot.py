@@ -160,7 +160,8 @@ def plot(sample,syst,region):
 
 
     a1.set_ylim(np.min(concat[concat_unc<0.15])*0.975,np.max(concat[concat_unc<0.15])*1.025)
-    
+    a1.set_xlabel("DNN score")
+    a1.set_ylabel("Ratio")
 
     a0.grid()
     a1.grid()
