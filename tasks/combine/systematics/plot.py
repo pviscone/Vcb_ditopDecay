@@ -7,7 +7,7 @@ import mplhep
 import hist
 from matplotlib import gridspec
 import os
-os.environ['OPENBLAS_NUM_THREADS'] = '1'
+#os.environ['OPENBLAS_NUM_THREADS'] = '1'
 import numpy as np
 from scipy import stats
 
