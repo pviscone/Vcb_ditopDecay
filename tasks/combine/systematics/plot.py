@@ -99,7 +99,7 @@ systs=["JES",
         "ctag_jesTotal",
         ]
 
-f=uproot.open("hist.root")
+f=uproot.open("smooth.root")
 
 def plot(sample,syst,region):
     plt.figure(figsize=(10,10))
@@ -203,3 +203,4 @@ for region in regions:
 if parallel:
     for process in processes:
         process.join()
+
