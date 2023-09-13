@@ -41,6 +41,8 @@ weight_syst_list=[
            "btag_lfstats2",
            "btag_cferr1",
            "btag_cferr2",
+            ]    
+'''
            "ctag_Extrap",
            "ctag_Interp",
            "ctag_LHEScaleWeight_muF",
@@ -53,7 +55,7 @@ weight_syst_list=[
            "ctag_XSec_BRUnc_DYJets_c",
            "ctag_jer",
            "ctag_jesTotal",
-            ]         
+'''     
 
 var_syst_list=["JES",
               "JER"]
