@@ -41,24 +41,21 @@ weight_syst_list=[
            "btag_lfstats2",
            "btag_cferr1",
            "btag_cferr2",
-
-            ]
-           
+            ]    
 '''
-            "ctag_Extrap",
-            "ctag_Interp",
-            "ctag_LHEScaleWeight_muF",
-            "ctag_LHEScaleWeight_muR",
-            "ctag_PSWeightFSR",
-            "ctag_PSWeightISR",
-            "ctag_PUWeight",
-            "ctag_Stat",
-            "ctag_XSec_BRUnc_DYJets_b",
-            "ctag_XSec_BRUnc_DYJets_c",
-            "ctag_jer",
-            "ctag_jesTotal",
-'''
-           
+           "ctag_Extrap",
+           "ctag_Interp",
+           "ctag_LHEScaleWeight_muF",
+           "ctag_LHEScaleWeight_muR",
+           "ctag_PSWeightFSR",
+           "ctag_PSWeightISR",
+           "ctag_PUWeight",
+           "ctag_Stat",
+           "ctag_XSec_BRUnc_DYJets_b",
+           "ctag_XSec_BRUnc_DYJets_c",
+           "ctag_jer",
+           "ctag_jesTotal",
+'''     
 
 var_syst_list=["JES",
               "JER"]
@@ -126,7 +123,7 @@ for region in regions:
 
 print("\n----------------------Building TH1---------------------",flush=True)
 build_TH1(score_dict,weight_dict,outfile)
-#torch.save({"score_dict":score_dict,"weight_dict":weight_dict},"score_dict.pt")
+torch.save({"score_dict":score_dict,"weight_dict":weight_dict},"score_dict.pt")
 build_datacard(rdf_dict,
                regions=regions,
                syst_list=syst_list+weight_syst_list,
