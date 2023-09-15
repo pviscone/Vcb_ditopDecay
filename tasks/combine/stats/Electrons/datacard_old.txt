@@ -1,0 +1,17 @@
+imax 1
+jmax *
+kmax 0
+---------------
+shapes * * old.root $CHANNEL/$PROCESS
+---------------
+bin		Electrons
+
+------------------------------
+bin             Electrons   Electrons   Electrons   Electrons   Electrons	Electrons		Electrons
+process         signal  bkg     diHad	diLept  WJets   signalTaus	signalMuons
+process         0       1       2       3       4		5			6
+rate            -1      -1      -1      -1      -1      -1			-1
+------------------------------
+
+
+

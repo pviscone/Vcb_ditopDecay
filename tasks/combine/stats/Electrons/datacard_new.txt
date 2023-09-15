@@ -1,0 +1,17 @@
+imax *
+jmax *
+kmax *
+---------------
+shapes * * new.root $CHANNEL/$PROCESS
+---------------
+bin		Electrons
+
+------------------------------
+bin      Electrons     Electrons        Electrons   Electrons   Electrons
+process  signalEle  semiLeptEle   diHad	diLept  WJets
+process  0         1            2       3       4
+rate     -1       -1            -1      -1      -1
+------------------------------
+
+
+
