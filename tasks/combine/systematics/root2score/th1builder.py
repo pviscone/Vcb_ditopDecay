@@ -3,8 +3,8 @@ import numpy as np
 
 
 bins={}
-bins["Muons"]=np.concatenate((np.linspace(0,3.588,22),np.array([3.914,4.3,6.5])))
-bins["Electrons"]=np.concatenate((np.linspace(0,2.851,14),np.array([3.289,3.728,5.5])))
+bins["Muons"]=np.concatenate((np.linspace(0,4.6,40),np.array([6.5])))
+bins["Electrons"]=np.concatenate((np.linspace(0,2.851,25),np.array([3.,5.5])))
 
 
 def build_TH1(score_dict,weight_dict,outfile):
