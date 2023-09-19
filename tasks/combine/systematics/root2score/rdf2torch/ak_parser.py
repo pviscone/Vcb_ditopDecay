@@ -2,6 +2,7 @@ import numpy as np
 import torch
 import awkward as ak
 import ROOT
+import os
 
 
 n_thread=os.environ["ROOT_nTHREAD"]

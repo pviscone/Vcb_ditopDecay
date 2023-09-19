@@ -1,6 +1,7 @@
 import ROOT
 from glob import glob
 import numpy as np
+import os
 
 n_thread=os.environ["ROOT_nTHREAD"]
 ROOT.EnableImplicitMT(n_thread)
