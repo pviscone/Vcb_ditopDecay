@@ -32,10 +32,14 @@ def np_or(*args):
 
 def evaluate_ctag(array,name):
     array[name]=ak.ones_like(array["Jet_pt"])
-    array[name]=ctag(name,
+    array[name]=(ctag(name,
                     array["Jet_hadronFlavour"],
                     array["Jet_btagDeepFlavCvL"],
-                    array["Jet_btagDeepFlavCvB"])
+                    array["Jet_btagDeepFlavCvB"])/
+                ctag("central",
+                    array["Jet_hadronFlavour"],
+                    array["Jet_btagDeepFlavCvL"],
+                    array["Jet_btagDeepFlavCvB"]))
     return array
 
 
@@ -80,7 +84,6 @@ for c_source in c_sources:
     
 for c_syst in c_systs:
     arrays=evaluate_ctag(arrays,c_syst)
-
 #%%
 #! Compute means on hadron flavours
 corr_dict={}
@@ -98,3 +101,64 @@ for had_flav in [0,4,5]:
 for c_syst in c_systs:
     m=np.mean(ak.prod(arrays[c_syst],axis=1))
     print(f"syst:{c_syst} \t {m}")
+    
+    
+#%%
+#!!!!!!!!!!!!!!!!!!!!!
+#!BTAG CORRECTIONS
+#!!!! DONT WORK WHY?
+
+
+def evaluate_btag(array,name):
+    array[f"b_{name}"]=ak.ones_like(array["Jet_pt"])
+    mask=np.asarray(ak.flatten(array["Jet_hadronFlavour"]))>-1
+    if name=="central":
+        pass
+    elif name.split("_")[1]=="cferr1" or name.split("_")[1]=="cferr2":
+        mask=np_and(mask,np.asarray(ak.flatten(array["Jet_hadronFlavour"]))==4)
+    else:
+        mask=np_and(mask,np.asarray(ak.flatten(array["Jet_hadronFlavour"]))!=4)
+
+    #mask=np_and(mask,np.asarray(ak.flatten(np.abs(array["Jet_eta"])))<2.5)
+    
+    np.asarray(ak.flatten(array["b_"+name]))[mask]=(btag(name,
+                                                    np.asarray(ak.flatten(array["Jet_hadronFlavour"]))[mask],
+                                                    np.asarray(ak.flatten(np.abs(array["Jet_eta"])))[mask],
+                                                    np.asarray(ak.flatten(array["Jet_pt"]))[mask],
+                                                    np.asarray(ak.flatten(array["Jet_btagDeepFlavB"]))[mask])/
+                                                    btag("central",
+                                                    np.asarray(ak.flatten(array["Jet_hadronFlavour"]))[mask],
+                                                    np.asarray(ak.flatten(np.abs(array["Jet_eta"])))[mask],
+                                                    np.asarray(ak.flatten(array["Jet_pt"]))[mask],
+                                                    np.asarray(ak.flatten(array["Jet_btagDeepFlavB"]))[mask]))
+    
+    
+    
+    return array
+
+#%%
+b_sources=["hf","lf","hfstats1","hfstats2","lfstats1","lfstats2","cferr1","cferr2"]
+b_systs=["central"]
+for b_source in b_sources:
+    b_systs.append("up_"+b_source)
+    b_systs.append("down_"+b_source)
+    
+for b_syst in b_systs:
+    arrays=evaluate_btag(arrays,b_syst)
+
+#! Compute means on hadron flavours
+corr_dict={}
+for had_flav in [0,4,5]:
+    corr_dict[str(had_flav)]={}
+    for b_syst in b_systs:
+        m_value=np.mean(arrays[arrays["Jet_hadronFlavour"]==had_flav][f"b_{b_syst}"])
+        print(m_value)
+        corr_dict[str(had_flav)][f"b_{b_syst}"]=m_value
+        
+        had_mask=np.asarray(ak.flatten(arrays["Jet_hadronFlavour"]))==had_flav
+        np.asarray(ak.flatten(arrays[f"b_{b_syst}"]))[had_mask]=np.asarray(ak.flatten(arrays[f"b_{b_syst}"]))[had_mask]/m_value
+        
+for b_syst in b_systs:
+    m=np.mean(ak.prod(arrays[f"b_{b_syst}"],axis=1))
+    print(f"syst:{b_syst} \t {m}")
+    

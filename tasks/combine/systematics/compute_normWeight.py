@@ -87,11 +87,16 @@ def evaluate_btag(array,name):
 
     #mask=np_and(mask,np.asarray(ak.flatten(np.abs(array["Jet_eta"])))<2.5)
     
-    np.asarray(ak.flatten(array["b_"+name]))[mask]=btag(name,
+    np.asarray(ak.flatten(array["b_"+name]))[mask]=(btag(name,
                                                     np.asarray(ak.flatten(array["Jet_hadronFlavour"]))[mask],
                                                     np.asarray(ak.flatten(np.abs(array["Jet_eta"])))[mask],
                                                     np.asarray(ak.flatten(array["Jet_pt"]))[mask],
-                                                    np.asarray(ak.flatten(array["Jet_btagDeepFlavB"]))[mask])
+                                                    np.asarray(ak.flatten(array["Jet_btagDeepFlavB"]))[mask])/
+                                                    btag("central",
+                                                    np.asarray(ak.flatten(array["Jet_hadronFlavour"]))[mask],
+                                                    np.asarray(ak.flatten(np.abs(array["Jet_eta"])))[mask],
+                                                    np.asarray(ak.flatten(array["Jet_pt"]))[mask],
+                                                    np.asarray(ak.flatten(array["Jet_btagDeepFlavB"]))[mask]))
     
     return array
 
