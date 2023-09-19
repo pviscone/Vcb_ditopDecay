@@ -5,7 +5,7 @@ import ROOT
 import os
 
 
-n_thread=os.environ["ROOT_nTHREAD"]
+n_thread=int(os.environ["ROOT_nTHREAD"])
 ROOT.EnableImplicitMT(n_thread)
 
 

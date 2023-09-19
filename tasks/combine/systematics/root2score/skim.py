@@ -4,7 +4,7 @@ import numpy as np
 
 include_path=os.path.join(os.path.dirname(__file__),"RDF_utils.h")
 
-n_thread=os.environ["ROOT_nTHREAD"]
+n_thread=int(os.environ["ROOT_nTHREAD"])
 ROOT.EnableImplicitMT(n_thread)
 ROOT.gInterpreter.ProcessLine(f'#include "{include_path}"')
 

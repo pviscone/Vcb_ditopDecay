@@ -1,4 +1,9 @@
 #%%
+
+#set how many thread to use
+import os
+os.environ["ROOT_nTHREAD"]="220"
+
 from root2score.open_rdf import build_rdf_dict
 from root2score.vary import vary
 from root2score.skim import Cut
@@ -11,10 +16,9 @@ import torch
 import copy
 import json
 import gc
-import os
 
-#set how many thread to use
-os.environ["ROOT_nTHREAD"]=220
+
+
 
 cuda=torch.device("cuda:0")
 cpu=torch.device("cpu")

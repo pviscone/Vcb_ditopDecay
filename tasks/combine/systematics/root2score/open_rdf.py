@@ -3,7 +3,7 @@ from glob import glob
 import numpy as np
 import os
 
-n_thread=os.environ["ROOT_nTHREAD"]
+n_thread=int(os.environ["ROOT_nTHREAD"])
 ROOT.EnableImplicitMT(n_thread)
 
 def build_rdf_dict(sample_dict,bunch_size=10):

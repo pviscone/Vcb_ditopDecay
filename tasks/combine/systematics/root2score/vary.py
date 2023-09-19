@@ -5,7 +5,7 @@ import ROOT
 import correctionlib
 correctionlib.register_pyroot_binding()
 
-n_thread=os.environ["ROOT_nTHREAD"]
+n_thread=int(os.environ["ROOT_nTHREAD"])
 ROOT.EnableImplicitMT(n_thread)
 include_path=os.path.join(os.path.dirname(__file__),"vary_utils.h")
 
