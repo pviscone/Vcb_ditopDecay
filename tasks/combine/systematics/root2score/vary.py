@@ -5,7 +5,8 @@ import ROOT
 import correctionlib
 correctionlib.register_pyroot_binding()
 
-ROOT.EnableImplicitMT()
+n_thread=os.environ["ROOT_nTHREAD"]
+ROOT.EnableImplicitMT(n_thread)
 include_path=os.path.join(os.path.dirname(__file__),"vary_utils.h")
 
 ROOT.gInterpreter.ProcessLine(f'#include "{include_path}"')
@@ -35,11 +36,13 @@ def vary(rdf_dict,weight_syst_list=[]):
                 .Define("JetGen_mass","TakeIdx(Jet_mass,GenJet_mass,Jet_genJetIdx)")
                 .Define("originalJet_pt","Jet_pt")
                 .Define("originalJet_mass","Jet_mass")
-                .Redefine("Jet_pt",'JetGen_pt+(Jet_pt-JetGen_pt)*evaluate(JER,{Jet_eta},"nom")')
-                .Redefine("Jet_mass",'JetGen_mass+(Jet_mass-JetGen_mass)*evaluate(JER,{Jet_eta},"nom")')
+                #.Redefine("Jet_pt",'JetGen_pt+(Jet_pt-JetGen_pt)*evaluate(JER,{Jet_eta},"nom")')
+                #.Redefine("Jet_mass",'JetGen_mass+(Jet_mass-JetGen_mass)*evaluate(JER,{Jet_eta},"nom")')
                 .Define("GenWeights","genWeight/abs(genWeight)")
-                .Define("JetWeights",'(evaluate_btag(bTag,Jet_hadronFlavour,abs(Jet_eta),Jet_pt,Jet_btagDeepFlavB))')
-                .Redefine("JetWeights",'JetWeights*(evaluate_ctag(cTag,Jet_hadronFlavour,Jet_btagDeepFlavCvL,Jet_btagDeepFlavCvB))')
+                #.Define("JetWeights",'(evaluate_btag(bTag,Jet_hadronFlavour,abs(Jet_eta),Jet_pt,Jet_btagDeepFlavB))')
+                #.Redefine("JetWeights",'JetWeights*(evaluate_ctag(cTag,Jet_hadronFlavour,Jet_btagDeepFlavCvL,Jet_btagDeepFlavCvB))')
+                .Define("btagW","ROOT::RVec<float>(Jet_pt.size(),1.f)")
+                .Define("ctagW","ROOT::RVec<float>(Jet_pt.size(),1.f)")
                 )
 
             
@@ -52,12 +55,10 @@ def vary(rdf_dict,weight_syst_list=[]):
                 
 
                 if "btag" in syst:
-
-                    rdf_dict[dataset][i]=rdf_dict[dataset][i].Define(f"JetWeights_{syst}",f'(vary_btag(bTag,"{syst_name}",Jet_hadronFlavour,abs(Jet_eta),Jet_pt,Jet_btagDeepFlavB,JetWeights))')
+                    rdf_dict[dataset][i]=rdf_dict[dataset][i].Define(f"btagW_{syst}",f'(vary_btag(bTag,"{syst_name}",Jet_hadronFlavour,abs(Jet_eta),Jet_pt,Jet_btagDeepFlavB,btagW))')
                 
                 elif "ctag" in syst:
-
-                    rdf_dict[dataset][i]=rdf_dict[dataset][i].Define(f"JetWeights_{syst}",f'(vary_ctag(cTag,"{syst_name}",Jet_hadronFlavour,Jet_btagDeepFlavCvL,Jet_btagDeepFlavCvB,JetWeights))')
+                    rdf_dict[dataset][i]=rdf_dict[dataset][i].Define(f"ctagW_{syst}",f'(vary_ctag(cTag,"{syst_name}",Jet_hadronFlavour,Jet_btagDeepFlavCvL,Jet_btagDeepFlavCvB,ctagW))')
 
     
 
@@ -72,11 +73,11 @@ def vary(rdf_dict,weight_syst_list=[]):
                     "JESDown":loop_redefine(rdf_dict[dataset],("Jet_pt","(1-evaluate(JES,{Jet_eta,Jet_pt}))*Jet_pt")
                                                 ,("Jet_mass","(1-evaluate(JES,{Jet_eta,Jet_pt}))*Jet_mass")
                             ),
-                    "JERUp":loop_redefine(rdf_dict[dataset],("Jet_pt",'JetGen_pt+(originalJet_pt-JetGen_pt)*evaluate(JER,{Jet_eta},"up")')
-                                                ,("Jet_mass",'JetGen_mass+(originalJet_mass-JetGen_mass)*evaluate(JER,{Jet_eta},"up")')
+                    "JERUp":loop_redefine(rdf_dict[dataset],("Jet_pt",'JetGen_pt+(originalJet_pt-JetGen_pt)*evaluate(JER,{Jet_eta},"up")/evaluate(JER,{Jet_eta},"nom")')
+                                                ,("Jet_mass",'JetGen_mass+(originalJet_mass-JetGen_mass)*evaluate(JER,{Jet_eta},"up")/evaluate(JER,{Jet_eta},"nom")')
                             ),
-                    "JERDown":loop_redefine(rdf_dict[dataset],("Jet_pt",'JetGen_pt+(originalJet_pt-JetGen_pt)*evaluate(JER,{Jet_eta},"down")')
-                                                ,("Jet_mass",'JetGen_mass+(originalJet_mass-JetGen_mass)*evaluate(JER,{Jet_eta},"down")')
+                    "JERDown":loop_redefine(rdf_dict[dataset],("Jet_pt",'JetGen_pt+(originalJet_pt-JetGen_pt)*evaluate(JER,{Jet_eta},"down")/evaluate(JER,{Jet_eta},"nom")')
+                                                ,("Jet_mass",'JetGen_mass+(originalJet_mass-JetGen_mass)*evaluate(JER,{Jet_eta},"down")/evaluate(JER,{Jet_eta},"nom")')
                             ),
                     }
 

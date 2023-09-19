@@ -11,6 +11,10 @@ import torch
 import copy
 import json
 import gc
+import os
+
+#set how many thread to use
+os.environ["ROOT_nTHREAD"]=220
 
 cuda=torch.device("cuda:0")
 cpu=torch.device("cpu")
@@ -33,29 +37,27 @@ regions=["Muons",
         ]
 
 weight_syst_list=[
-           "btag_hf",
-           "btag_lf",
-           "btag_hfstats1",
-           "btag_hfstats2",
-           "btag_lfstats1",
-           "btag_lfstats2",
-           "btag_cferr1",
-           "btag_cferr2",
-            ]    
-'''
-           "ctag_Extrap",
-           "ctag_Interp",
-           "ctag_LHEScaleWeight_muF",
-           "ctag_LHEScaleWeight_muR",
-           "ctag_PSWeightFSR",
-           "ctag_PSWeightISR",
-           "ctag_PUWeight",
-           "ctag_Stat",
-           "ctag_XSec_BRUnc_DYJets_b",
-           "ctag_XSec_BRUnc_DYJets_c",
-           "ctag_jer",
-           "ctag_jesTotal",
-'''     
+            "btag_hf",
+            "btag_lf",
+            "btag_hfstats1",
+            "btag_hfstats2",
+            "btag_lfstats1",
+            "btag_lfstats2",
+            "btag_cferr1",
+            "btag_cferr2",
+            "ctag_Extrap",
+            "ctag_Interp",
+            "ctag_LHEScaleWeight_muF",
+            "ctag_LHEScaleWeight_muR",
+            "ctag_PSWeightFSR",
+            "ctag_PSWeightISR",
+            "ctag_PUWeight",
+            "ctag_Stat",
+            "ctag_XSec_BRUnc_DYJets_b",
+            "ctag_XSec_BRUnc_DYJets_c",
+            "ctag_jer",
+            "ctag_jesTotal",
+            ]
 
 var_syst_list=["JES",
               "JER"]

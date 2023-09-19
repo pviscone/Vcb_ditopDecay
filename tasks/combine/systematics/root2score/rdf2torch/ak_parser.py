@@ -3,7 +3,9 @@ import torch
 import awkward as ak
 import ROOT
 
-ROOT.EnableImplicitMT()
+
+n_thread=os.environ["ROOT_nTHREAD"]
+ROOT.EnableImplicitMT(n_thread)
 
 
 

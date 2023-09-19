@@ -2,7 +2,8 @@ import ROOT
 from glob import glob
 import numpy as np
 
-ROOT.EnableImplicitMT()
+n_thread=os.environ["ROOT_nTHREAD"]
+ROOT.EnableImplicitMT(n_thread)
 
 def build_rdf_dict(sample_dict,bunch_size=10):
 

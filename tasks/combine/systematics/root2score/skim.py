@@ -4,7 +4,8 @@ import numpy as np
 
 include_path=os.path.join(os.path.dirname(__file__),"RDF_utils.h")
 
-ROOT.EnableImplicitMT()
+n_thread=os.environ["ROOT_nTHREAD"]
+ROOT.EnableImplicitMT(n_thread)
 ROOT.gInterpreter.ProcessLine(f'#include "{include_path}"')
 
 
@@ -46,17 +47,25 @@ def jet_selection(df,lepton,weight_syst_list):
             .Redefine(f"Jet_btagDeepFlavCvB",f"pad_jet(Jet_btagDeepFlavCvB[JetMask && JetMatchingMask],7)")
             .Redefine(f"Jet_btagDeepFlavCvL",f"pad_jet(Jet_btagDeepFlavCvL[JetMask && JetMatchingMask],7)")
             .Redefine(f"nJet",f"Sum(JetMask && JetMatchingMask)")
-            .Define(f"EvWeights",f"ROOT::VecOps::Product(JetWeights[JetMask && JetMatchingMask])")
-            .Define(f"Weights",f"GenWeights*EvWeights")
+            .Redefine("btagW","btagW[JetMask && JetMatchingMask]")
+            .Redefine("ctagW","ctagW[JetMask && JetMatchingMask]")
+            .Define(f"TempEvWeights",f"ROOT::VecOps::Product(ctagW*btagW)")
+            .Define(f"TempWeights",f"GenWeights*TempEvWeights")
             
         )
     
     
     for syst in weight_syst_list:
-        dfCuts=(dfCuts.Define(f"EvWeights_{syst}",f"ROOT::VecOps::Product(JetWeights_{syst}[JetMask && JetMatchingMask])")
-                .Define(f"Weights_{syst}",f"GenWeights*EvWeights_{syst}")
-                )
-        
+        if "btag" in syst:
+            dfCuts=(dfCuts.Redefine(f"btagW_{syst}",f"btagW_{syst}[JetMask && JetMatchingMask]")
+                        .Define(f"TempEvWeights_{syst}",f"ROOT::VecOps::Product(btagW_{syst})")
+                        .Define(f"TempWeights_{syst}",f"GenWeights*TempEvWeights_{syst}"))
+        elif "ctag" in syst:
+            dfCuts=(dfCuts.Redefine(f"ctagW_{syst}",f"ctagW_{syst}[JetMask && JetMatchingMask]")
+                            .Define(f"TempEvWeights_{syst}",f"ROOT::VecOps::Product(ctagW_{syst})")
+                            .Define(f"TempWeights_{syst}",f"GenWeights*TempEvWeights_{syst}"))
+                    
+
     return dfCuts
 
 def Muon_selections(rdf,dataset,syst):
@@ -130,6 +139,35 @@ def loop_cuts(rdf_list,cuts_func,*args):
 region_cut_dict={"Muons":Muon_selections,
                 "Electrons":Electron_selections}
 
+def normalize_weights(dfCuts,
+                      syst=None,
+                      weight_syst_list=None,
+                      sum_preWeights=None,
+                      flav=None,
+                      just_weights=False):
+    
+    assert flav in ["btag","ctag"]
+    wname=f"{flav}W"
+    
+    #!Normalize btag weights before btag selection
+    count=np.array([df.Count().GetValue() for df in dfCuts])
+    if not just_weights:
+        mu_w=np.array([df.Mean(f"{wname}").GetValue() for df in dfCuts])
+        mu_w=sum(mu_w*count)/sum(count)
+        for i in range(len(dfCuts)):
+            dfCuts[i]=(dfCuts[i].Redefine(f"{wname}",f"{wname}/{mu_w}"))
+        sum_preWeights=sum_preWeights/mu_w
+    if syst=="nominal":
+        for weight_syst in weight_syst_list:
+            if flav in weight_syst:
+                mu_wsyst=np.array([df.Mean(f"{wname}_{weight_syst}").GetValue() for df in dfCuts])
+                mu_wsyst=sum(mu_wsyst*count)/sum(count)
+                for i in range(len(dfCuts)):
+                    dfCuts[i]=(dfCuts[i].Redefine(f"{wname}_{weight_syst}",f"{wname}_{weight_syst}/{mu_wsyst}"))
+    if not just_weights:
+        return dfCuts,sum_preWeights
+    else:
+        return dfCuts
 
 def Cut(rdf_dict,
         region=None,
@@ -147,28 +185,40 @@ def Cut(rdf_dict,
     
     dfCuts=loop_cuts(dfCuts,jet_selection,region.split("s")[0],weight_syst_list)
     
-    sum_preWeights=sum([df.Sum("Weights").GetValue() for df in dfCuts])
+    sum_preWeights=sum([df.Sum("TempWeights").GetValue() for df in dfCuts])
 
     dfCuts=loop_cuts(dfCuts,region_cut_dict[region],dataset,syst)
 
-    #!Compute weight means before btag selection
-    count=np.array([df.Count().GetValue() for df in dfCuts])
-    mu_w=np.array([df.Mean("EvWeights").GetValue() for df in dfCuts])
-    mu_w=sum(mu_w*count)/sum(count)
+    #!normalize btag weight before btag selection
+    dfCuts,sum_preWeights=normalize_weights(dfCuts,
+                                            syst=syst,
+                                            weight_syst_list=weight_syst_list,
+                                            sum_preWeights=sum_preWeights,
+                                            flav="btag")
+    dfCuts=loop_cuts(dfCuts,btag_cuts)
+    
+    
+    #!normalize ctag weight after btag selection
+    dfCuts=normalize_weights(dfCuts,
+                            syst=syst,
+                            weight_syst_list=weight_syst_list,
+                            sum_preWeights=sum_preWeights,
+                            flav="ctag",
+                            just_weights=True)
+    
+    #!Define event weights
     for i in range(len(dfCuts)):
-        dfCuts[i]=(dfCuts[i].Redefine("EvWeights",f"EvWeights/{mu_w}")
-                   .Redefine(f"Weights",f"GenWeights*EvWeights"))
-    sum_preWeights=sum_preWeights/mu_w
+        dfCuts[i]=(dfCuts[i].Define("Weights",f"GenWeights*ROOT::VecOps::Product(btagW*ctagW)"))
+        
     if syst=="nominal":
         for weight_syst in weight_syst_list:
-            mu_wsyst=np.array([df.Mean(f"EvWeights_{weight_syst}").GetValue() for df in dfCuts])
-            mu_wsyst=sum(mu_wsyst*count)/sum(count)
             for i in range(len(dfCuts)):
-                dfCuts[i]=(dfCuts[i].Redefine(f"EvWeights_{weight_syst}",f"EvWeights_{weight_syst}/{mu_wsyst}")
-                           .Redefine(f"Weights_{weight_syst}",f"GenWeights*EvWeights_{weight_syst}")
-                        )
-
-    dfCuts=loop_cuts(dfCuts,btag_cuts)
+                if "btag" in weight_syst:
+                    dfCuts[i]=(dfCuts[i].Define(f"Weights_{weight_syst}",f"GenWeights*ROOT::VecOps::Product(btagW_{weight_syst})"))
+                elif "ctag" in weight_syst:
+                    dfCuts[i]=(dfCuts[i].Define(f"Weights_{weight_syst}",f"GenWeights*ROOT::VecOps::Product(ctagW_{weight_syst})"))
+    
+    
     sum_weights=sum([df.Sum("Weights").GetValue() for df in dfCuts])
 
     eff=sum_weights/sum_preWeights

@@ -55,14 +55,14 @@ ROOT::RVec<float> vary_btag(const T &btag,
     for (int i = 0; i < len_ev; i++) {
         std::string flav = std::to_string(had_flav[i]);
         float w=j_b[flav][name];
-        float w_central = j_b[flav]["central"];
         if (abseta[i] >= 2.5) {
             out[i] = 1.;
         } else {
             if ((had_flav[i] == 4 and (name.find("cferr") == std::string::npos)) || ((had_flav[i] == 5 || had_flav[i] == 0) and (name.find("cferr") != std::string::npos))) {
                 out[i] = 1.;
             } else {
-                out[i] = (btag->evaluate({name, had_flav[i], abseta[i], pt[i], deepJetB[i]})/w) / (btag->evaluate({"central", had_flav[i], abseta[i], pt[i], deepJetB[i]})/w_central);
+                out[i] = (btag->evaluate({name, had_flav[i], abseta[i], pt[i], deepJetB[i]})/
+                          btag->evaluate({"central", had_flav[i], abseta[i], pt[i], deepJetB[i]}))/w;
             }
         }
     }
@@ -82,8 +82,8 @@ ROOT::RVec<float> vary_ctag(const T &cset,
     for (int i = 0; i < len_ev; i++) {
         std::string flav = std::to_string(had_flav[i]);
         float w=j_c[flav][name];
-        float w_central=j_c[flav]["central"];
-        out[i] = (cset->evaluate({name, had_flav[i], CvL[i], CvB[i]})/w)/(cset->evaluate({"central", had_flav[i], CvL[i], CvB[i]})/w_central);
+        out[i] = (cset->evaluate({name, had_flav[i], CvL[i], CvB[i]})/
+                  cset->evaluate({"central", had_flav[i], CvL[i], CvB[i]}))/w;
     }
     return weight*out;
 }
