@@ -119,9 +119,9 @@ systs_to_smooth=[
 
 
 
-input_file="hist2.root"
+input_file="hist.root"
 out="smooth.root"
-frac=0.55
+frac=0.35
 symm=True
 plot=True
 
@@ -133,6 +133,10 @@ out=uproot.recreate(out)
 regions=[key.split(";1")[0] for key in f.keys() if "/" not in key]
 samples=[key.split("/")[1].split(";1")[0] for key in f.keys() if (f"{regions[0]}/" in key and "_syst_" not in key)]
 systs=[key.split("_syst_")[1].split(";")[0].split("Up")[0].split("Down")[0] for key in f.keys() if (f"{regions[0]}/{samples[0]}_syst_" in key and "Up" in key)]
+
+
+#!Smooth everything
+systs_to_smooth=systs
 
 for region in regions:
     for sample in samples:
