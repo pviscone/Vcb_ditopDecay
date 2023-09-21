@@ -61,7 +61,9 @@ weight_syst_list=[
             "ctag_XSec_BRUnc_DYJets_c",
             "ctag_jer",
             "ctag_jesTotal",
+            "XSec_BRUnc_WJets_c"
             ]
+
 
 var_syst_list=["JES",
               "JER"]
