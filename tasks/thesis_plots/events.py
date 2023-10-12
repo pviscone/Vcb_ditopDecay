@@ -24,7 +24,7 @@ TTJets_diLept = NanoEventsFactory.from_root(
 
 
 TTJets_diHad = NanoEventsFactory.from_root(
-    "root://cms-xrd-global.cern.ch//store/mc/RunIIAutumn18NanoAODv7/TTJets_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/110000/3EC0AD49-F86C-9649-BDC4-E9217904FCC0.root",
+    "root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv7/TTJets_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/110000/3EC0AD49-F86C-9649-BDC4-E9217904FCC0.root",
     schemaclass=NanoAODSchema
 ).events()
 
@@ -139,3 +139,54 @@ def ev_weight(event,n_ev):
 
 for key in datasets.keys():
     weights[key]=ev_weight(datasets[key],n_ev[key])
+    
+    
+    
+def obj_selection(events):
+    #Muons
+    events["Muon"]=ak.mask(events.Muon,np_and(events.Muon.pt>26,
+                                      events.Muon.looseId,
+                                      events.Muon.pfIsoId > 1,
+                                      np.abs(events.Muon.eta)<2.4))
+    
+    #Electrons
+    events["Electron"]=ak.mask(events.Electron,np_and(events.Electron.pt>30,
+                                              events.Electron.mvaFall17V2Iso_WP90,
+                                              np.abs(events.Electron.eta)<2.4))
+    
+    
+    #Jets
+    events["Jet"]=ak.mask(events.Jet,np_and(events.Jet.pt>20,
+                                    np.abs(events.Jet.eta)<4.8,
+                                    events.Jet.jetId>0,
+                                    events.Jet.puId > 0))
+    
+    lept=ak.concatenate([events.Electron,events.Muon],axis=1)
+    lept_argsort=ak.argsort(lept.pt,axis=1,ascending=False)
+    lept=lept[lept_argsort]
+    lept=ak.pad_none(lept,1)
+    jet_lept_dR=events.Jet.delta_r(lept[:,0])
+    
+    events["Jet"]=events.Jet[jet_lept_dR>0.4]
+    return events
+
+
+
+def event_selection(events, region):
+    assert region in ["Muon","Electron"]
+    
+    n_ev_before=len(events)
+    if region=="Muon":
+        events=ak.mask(events,ak.num(events.Muon)>=1)
+        events["Muon"]=events.Muon[:,0]
+    else:
+        events=ak.mask(events,ak.num(events.Electron)>=1)
+        events["Electron"]=events.Electron[:,0]
+    
+    events=ak.mask(events,np_and(ak.num(events.Jet)>=4,
+                         ak.max(events.Jet.btagDeepFlavB,axis=1)>=0.2793))
+    n_ev_after=len(events)
+    return events,n_ev_after/n_ev_before
+
+
+
