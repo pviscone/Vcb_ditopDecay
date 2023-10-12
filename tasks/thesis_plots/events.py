@@ -64,7 +64,7 @@ TT_semilept_cb_Tau=NanoEventsFactory.from_root(
     schemaclass=NanoAODSchema
 ).events()
 
-signal=ak.concatenate([TT_semilept_cb_Electron,TT_semilept_cb_Muon,TT_semilept_cb_Tau])
+signal=ak.concatenate([TT_semilept_cb_Electron[:20000],TT_semilept_cb_Muon[:20000],TT_semilept_cb_Tau[:20000],TT_semilept_cb_Electron[-20000:],TT_semilept_cb_Muon[-20000:],TT_semilept_cb_Tau[-20000:]])
 
 
 TT_Jets_LNuQQ_NoCKM=NanoEventsFactory.from_root(
