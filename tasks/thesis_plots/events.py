@@ -167,7 +167,7 @@ def obj_selection(events):
     lept=ak.pad_none(lept,1)
     jet_lept_dR=events.Jet.delta_r(lept[:,0])
     
-    events["Jet"]=events.Jet[jet_lept_dR>0.4]
+    events["Jet"]=ak.mask(events.Jet,jet_lept_dR>0.4)
     return events
 
 

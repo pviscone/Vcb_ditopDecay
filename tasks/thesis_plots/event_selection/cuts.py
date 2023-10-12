@@ -178,6 +178,7 @@ plot_func(datasets,plots,"plots/no_selections/")
 #!OBJECT SELECTIONS
 selected_obj={}
 for proc in procs:
+    print("Skimming for",proc,"...")
     selected_obj[proc]=obj_selection(datasets[proc])
     selected_obj[proc]["JetB"]=ak.pad_none(ak.sort(selected_obj[proc].Jet.btagDeepFlavB,ascending=False),4)
     if proc not in ["tq","TTdiHad"]:
