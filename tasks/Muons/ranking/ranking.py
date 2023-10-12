@@ -3,25 +3,49 @@ import uproot
 import matplotlib.pyplot as plt
 import re
 import numpy as np
+import awkward as ak
+import mplhep
 
-signal = uproot.open(
-    "../TTbarSemileptonic_cbOnly_pruned_optimized_MuonSelection.root")["Events"]
+mplhep.style.use("CMS")
+
+signal = uproot.open("/scratchnvme/pviscone/Preselection_Skim/NN/predict/root/signal_predict_MuonCuts.root")["Events"]
 background = uproot.open(
-    "../TTbarSemileptonic_Nocb_MuonSelection.root")["Events"]
+    "/scratchnvme/pviscone/Preselection_Skim/NN/predict/root/TTSemiLept_predict_MuonCuts.root")["Events"]
 
 
 def rank(key):
     if bool(re.match("Muon_*", key)):
         key = f"{key}[:,0]"
-    signal_array = signal.arrays(key, library="pd")
-    background_array = background.arrays(key, library="pd")
-    if signal_array[key].dtype != np.bool_:
-        signal_hist = np.histogram(signal_array[key], bins=60, range=(
-            np.min(signal_array[key]), np.max(signal_array[key])))[0]
-        signal_hist = signal_hist/signal_hist.sum()
-        background_hist = np.histogram(background_array[key], bins=60, range=(
-            np.min(signal_array[key]), np.max(signal_array[key])))[0]
-        background_hist = background_hist/background_hist.sum()
+    print(key)
+    signal_array =(signal.arrays(key)[key])
+    background_array =(background.arrays(key)[key])
+    signal
+    try:
+        signal_array=ak.flatten(signal_array)
+        background_array=ak.flatten(background_array)
+    except:
+        pass
+    
+    np.asarray(signal_array)[np.asarray(signal_array)==0]=None
+    np.asarray(background_array)[np.asarray(background_array)==0]=None
+    
+    if True:
+        plt.figure()
+        fig,ax=plt.subplots(1,1)
+        ax.set_title(key)
+        signal_hist = ax.hist(signal_array, bins=60, range=(
+            np.min(signal_array), np.max(signal_array)),density=True,color="red",histtype="step",label="signalMu")[0]
+        signal_hist = signal_hist/np.sum(signal_hist)
+        background_hist = ax.hist(background_array, bins=60, range=(
+            np.min(signal_array), np.max(signal_array)),density=True,histtype="step",label="semileptMu")[0]
+        background_hist = background_hist/np.sum(background_hist)
+        plt.legend()
+        ax.set_yscale("log")
+        ax.set_xlabel(key)
+        ax.set_ylabel("Density")
+        ax.grid()
+        fig.text(0.48,0.85,rf"$d={np.sum(np.abs(signal_hist-background_hist))*0.5:.2f}$")
+        plt.show()
         return np.sum(np.abs(signal_hist-background_hist))*0.5
     else:
         return -1

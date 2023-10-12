@@ -44,29 +44,27 @@ WWJets_LNuQQ=NanoEventsFactory.from_root(
     schemaclass=NanoAODSchema
 ).events()
 
-TT_semilept_cb=NanoEventsFactory.from_root(
-    "../../../root_files/generated_signal/TTbarSemileptonic_cbOnly_pruned_optimized.root",
+
+
+TT_semilept_cb_Electron=NanoEventsFactory.from_root(
+    "/scratchnvme/pviscone/Preselection_Skim/signal_Electrons/signal_Electrons_test.root",
+    schemaclass=NanoAODSchema
+).events()
+
+TT_semilept_cb_Muon=NanoEventsFactory.from_root(
+    "/scratchnvme/pviscone/Preselection_Skim/signal/signal_test.root",
+    schemaclass=NanoAODSchema
+).events()
+
+TT_semilept_cb_Tau=NanoEventsFactory.from_root(
+    "/scratchnvme/pviscone/Preselection_Skim/signal_Tau/signal_tau.root",
     schemaclass=NanoAODSchema
 ).events()
 
 
-TT_semilept_cb_Electron=TT_semilept_cb[
-    np_or(np.abs(TT_semilept_cb.LHEPart.pdgId[:,3]==11),
-          np.abs(TT_semilept_cb.LHEPart.pdgId[:,6]==11))
-    ]
-TT_semilept_cb_Muon=TT_semilept_cb[
-    np_or(np.abs(TT_semilept_cb.LHEPart.pdgId[:,3]==13),
-          np.abs(TT_semilept_cb.LHEPart.pdgId[:,6]==13))
-    ]
-TT_semilept_cb_Tau=TT_semilept_cb[
-    np_or(np.abs(TT_semilept_cb.LHEPart.pdgId[:,3]==15),
-          np.abs(TT_semilept_cb.LHEPart.pdgId[:,6]==15))
-    ]
-
-del TT_semilept_cb
 
 TT_Jets_LNuQQ_NoCKM=NanoEventsFactory.from_root(
-    "../../../root_files/Skimmed_background/results/TTbarSemileptonic_Nocb.root",
+    "/scratchnvme/pviscone/Preselection_Skim/powheg/root_files/others/C702A2B0-292B-854F-96F5-CAF931254A40.root",
     schemaclass=NanoAODSchema
 ).events()
 
