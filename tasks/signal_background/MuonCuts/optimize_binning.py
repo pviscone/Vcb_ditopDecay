@@ -20,8 +20,8 @@ device = torch.device(dev)
 
 path="/scratchnvme/pviscone/Preselection_Skim/NN/predict/torch/"
 signal=torch.load(path+"signal_predict_MuonCuts.pt")
-signal_Electrons=torch.load(path+"signalElectrons_predict_MuonCuts.pt")
-signal_Taus=torch.load(path+"signalTaus_predict_MuonCuts.pt")
+signal_Electrons=torch.load(path+"signal_Electrons_predict_MuonCuts.pt")
+signal_Taus=torch.load(path+"signal_Taus_predict_MuonCuts.pt")
 semiLept=torch.load(path+"TTSemiLept_predict_MuonCuts.pt")
 diLept=torch.load(path+"TTdiLept_predict_MuonCuts.pt")
 diHad=torch.load(path+"TTdiHad_predict_MuonCuts.pt")
@@ -62,7 +62,7 @@ with torch.inference_mode():
     diHad_score=torch.exp(model.predict(diHad,bunch=1)[:,-1]).detach().to(cpu).numpy()
     WJets_score=torch.exp(model.predict(WJets,bunch=1)[:,-1]).detach().to(cpu).numpy()
 
-
+#%%
 save_path="/scratchnvme/pviscone/Preselection_Skim/NN/scores/"
 torch.save(signal_score,save_path+"/signal_score_Muons.pt")
 torch.save(signal_Electrons_score,save_path+"/signal_Electrons_score_Muons.pt")
@@ -111,42 +111,27 @@ hist_dict = {
                 "data":sig_score,
                 "color":"red",
                 "weight":ttbar_1lept*0.518*0.33*8.4e-4,
-                "histtype":"errorbar",
+                "histtype":"step",
                 "stack":False,},
-            "$t\\bar{t} j \\to b\\bar{b} cb e \\nu$":{
-                "data":signal_Electrons_score,
-                "color":"darkorange",
-                "weight":ttbar_1lept*0.0046*0.33*8.4e-4,
-                "stack":True,},
-            "$t\\bar{t} j \\to b\\bar{b} cb \\tau \\nu$":{
-                "data":signal_Taus_score,
-                "color":"chocolate",
-                "weight":ttbar_1lept*0.038*0.33*8.4e-4,
-                "stack":True,},
             "$t\\bar{t}+b$":{
                 "data":ttb,
-                "color":"cornflowerblue",
+                "color":"palegreen",
                 "weight":ttbar_1lept*0.178*(1-8.4e-4)*torch.sum(additional_b)/len(additional_b),
                 "stack":True,},
             "$t\\bar{t}+c$":{
                 "data":ttc,
-                "color":"lightsteelblue",
+                "color":"cornflowerblue",
                 "weight":ttbar_1lept*0.178*(1-8.4e-4)*torch.sum(additional_c)/len(additional_c),
                 "stack":True,},
             "$t\\bar{t} j \\to b\\bar{b} uql \\nu$":{
                 "data":tt_up,
-                "color":"plum",
+                "color":"pink",
                 "weight":ttbar_1lept*0.178*(1-8.4e-4)*torch.sum(up)/len(up),
                 "stack":True,},
             "$t\\bar{t} j \\to b\\bar{b} cql \\nu$":{
                 "data":tt_charmed,
-                "color":"lightcoral",
+                "color":"lavender",
                 "weight":ttbar_1lept*0.178*(1-8.4e-4)*torch.sum(charmed)/len(charmed),
-                "stack":True,},
-            "$t\\bar{t} j \\to b\\bar{b} q \\bar{q} \\tau \\nu_{\\tau}$":{
-                "data":tt_tau,
-                "color":"cadetblue",
-                "weight":ttbar_1lept*(1-8.4e-4)*0.178*torch.sum(tau_mask)/len(tau_mask),
                 "stack":True,},
             "$Wj \\to l \\nu$":{
                 "data":WJets_bkg,
@@ -155,7 +140,7 @@ hist_dict = {
                 "stack":True,},
             "$t\\bar{t} j \\to b\\bar{b} q \\bar{q} q \\bar{q}$":{
                 "data":TTdiHad,
-                "color":"orange",
+                "color":"gold",
                 "weight":ttbar_2had,
                 "stack":True,},
             "$t\\bar{t} j \\to b\\bar{b} l \\nu l \\nu$":{
@@ -163,13 +148,12 @@ hist_dict = {
                 "color":"orange",
                 "weight":ttbar_2lept,
                 "stack":True,},
-
-            
         }
 
 
 
 ax1,ax2=significance.make_hist(hist_dict,xlim=(0,6),bins=60,log=True,ylim=(1e-1,1e7))
+ax2.set_ylim(1e-4,2e1)
 
 # %%
 hist_kwargs = { "bins":50, "density":True, "log":True, "range":(0,5),"histtype":"step", "linewidth":2}
