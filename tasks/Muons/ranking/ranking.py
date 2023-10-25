@@ -30,13 +30,15 @@ def rank(key):
     np.asarray(background_array)[np.asarray(background_array)==0]=None
     
     if True:
+        bins=25
         plt.figure()
         fig,ax=plt.subplots(1,1)
-        ax.set_title(key)
-        signal_hist = ax.hist(signal_array, bins=60, range=(
-            np.min(signal_array), np.max(signal_array)),density=True,color="red",histtype="step",label="signalMu")[0]
+        #ax.set_title(key)
+        signal_not_nan=signal_array[~np.isnan(signal_array)]
+        range_bin=(np.min(signal_not_nan), np.max(signal_not_nan))
+        signal_hist = ax.hist(signal_array, bins=bins, range=range_bin,density=True,color="red",histtype="step",label="signalMu")[0]
         signal_hist = signal_hist/np.sum(signal_hist)
-        background_hist = ax.hist(background_array, bins=60, range=(
+        background_hist = ax.hist(background_array, bins=bins, range=(
             np.min(signal_array), np.max(signal_array)),density=True,histtype="step",label="semileptMu")[0]
         background_hist = background_hist/np.sum(background_hist)
         plt.legend()
@@ -56,6 +58,8 @@ def rank(key):
 rank_dict = {}
 for key in signal.keys():
     if bool(re.match("(Jet|Muon|MET)_*", key)):
+        if bool(re.match("(Jet|Muon|MET)_phi", key)):
+            continue
         ranking = rank(key)
         if ranking != -1:
             rank_dict[key] = ranking

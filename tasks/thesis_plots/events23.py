@@ -8,55 +8,69 @@ import numpy as np
 import awkward as ak
 
 sys.path.append("../../utils/coffea_utils")
-from coffea_utils import Electron_cuts, Muon_cuts, Jet_parton_matching,np_and,np_or
+from coffea_utils import np_and,np_or
 
+NanoAODSchema.error_missing_event_ids=False
 #%%
 
+dask=True
 
-
-#! REMEMBER TO VOMS-PROXY-INIT BEFORE RUNNING THIS SCRIPT
 TTJets_diLept = NanoEventsFactory.from_root(
-    "/scratchnvme/pviscone/Preselection_Skim/diLept/root_files/predict/diLept.root",
-    schemaclass=NanoAODSchema
+    {"/scratchnvme/pviscone/Preselection_Skim/diLept/root_files/predict/44619117-40F2-C148-AC16-04C23A3AACB9.root":"Events"},
+    schemaclass=NanoAODSchema,
+    metadata={"dataset": "diLept"},
+    permit_dask=True
 ).events()
 
 
 TTJets_diHad = NanoEventsFactory.from_root(
-    "/scratchnvme/pviscone/Preselection_Skim/diHad/root_files/diHad.root",
-    schemaclass=NanoAODSchema
+    {"/scratchnvme/pviscone/Preselection_Skim/diHad/root_files/AFF89EED-F093-B24B-8398-9E60E3795811.root":"Events"},
+    schemaclass=NanoAODSchema,
+    metadata={"dataset": "diHad"},
+    permit_dask=True
 ).events()
 
 
 
 
 WJets_toLNu=NanoEventsFactory.from_root(
-    "/scratchnvme/pviscone/Preselection_Skim/WJets/root_files/WJets.root",
-    schemaclass=NanoAODSchema
+    {"/scratchnvme/pviscone/Preselection_Skim/WJets/root_files/FBBF98D8-B84A-EA46-A19F-4554279E49B7.root":"Events"},
+    schemaclass=NanoAODSchema,
+    metadata={"dataset": "WJets"},
+    permit_dask=True
 ).events()
 
 
 WWJets_LNuQQ=NanoEventsFactory.from_root(
-    "/scratchnvme/pviscone/Preselection_Skim/others/WWJets/43340426-80F1-534C-9D61-5F0D90AD57B3.root",
-    schemaclass=NanoAODSchema
+    {"/scratchnvme/pviscone/Preselection_Skim/others/WWJets/43340426-80F1-534C-9D61-5F0D90AD57B3.root":"Events"},
+    schemaclass=NanoAODSchema,
+    metadata={"dataset": "WWJets"},
+    permit_dask=True
 ).events()
 
 
 
 signal=NanoEventsFactory.from_root(
-    "/scratchnvme/pviscone/Preselection_Skim/dummy_signal/signal.root",
-    schemaclass=NanoAODSchema
+    {"/scratchnvme/pviscone/Preselection_Skim/dummy_signal/signal.root":"Events"},
+    schemaclass=NanoAODSchema,
+    metadata={"dataset": "signal"},
+    permit_dask=True
 ).events()
 
 semiLept=NanoEventsFactory.from_root(
-    "/scratchnvme/pviscone/Preselection_Skim/powheg/root_files/others/powheg.root",
-    schemaclass=NanoAODSchema
+    {"/scratchnvme/pviscone/Preselection_Skim/powheg/root_files/others/C702A2B0-292B-854F-96F5-CAF931254A40.root":"Events"},
+    schemaclass=NanoAODSchema,
+    metadata={"dataset": "semiLept"},
+    permit_dask=True
 ).events()
 
 
 
 tW=NanoEventsFactory.from_root(
-    "/scratchnvme/pviscone/Preselection_Skim/others/tW/69896C66-7F8E-904A-B3DF-A3E82970B6EE.root",
-    schemaclass=NanoAODSchema
+    {"/scratchnvme/pviscone/Preselection_Skim/others/tW/69896C66-7F8E-904A-B3DF-A3E82970B6EE.root":"Events"},
+    schemaclass=NanoAODSchema,
+    metadata={"dataset": "tW"},
+    permit_dask=True
 ).events()
 
 SL_mask=ak.num(tW.LHEPart.pdgId[np_and(np.abs(tW.LHEPart.pdgId)>=11,
@@ -65,8 +79,10 @@ SL_mask=ak.num(tW.LHEPart.pdgId[np_and(np.abs(tW.LHEPart.pdgId)>=11,
 tW=tW[SL_mask]
 
 tQ=NanoEventsFactory.from_root(
-    "/scratchnvme/pviscone/Preselection_Skim/others/tq/788061AB-FE17-D340-A686-E8F125F5A28F.root",
-    schemaclass=NanoAODSchema
+    {"/scratchnvme/pviscone/Preselection_Skim/others/tq/788061AB-FE17-D340-A686-E8F125F5A28F.root":"Events"},
+    schemaclass=NanoAODSchema,
+    metadata={"dataset": "tq"},
+    permit_dask=True
 ).events()
 
 
@@ -100,7 +116,8 @@ weights={}
 
 
 def ev_weight(event,n_ev):
-    return (event.genWeight)*n_ev/np.sum(event.genWeight)
+    sw=ak.sum(event.genWeight).compute()
+    return (event.genWeight)*n_ev/sw
 
 
 for key in datasets.keys():

@@ -16,32 +16,25 @@ sample_dict=json.load(open("../combine/systematics/json/samples.json","r"))
 #%%
 #! REMEMBER TO VOMS-PROXY-INIT BEFORE RUNNING THIS SCRIPT
 TTJets_diLept = NanoEventsFactory.from_root(
-    "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/2820000/C6DC1D11-72BB-8C45-8625-0B874FB177C2.root",
+    "/scratchnvme/pviscone/Preselection_Skim/diLept/root_files/predict/diLept.root",
     schemaclass=NanoAODSchema
 ).events()
 
 
 TTJets_diHad = NanoEventsFactory.from_root(
-    "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/TTJets_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/2520000/3D7C0328-DC6C-C046-8DF4-C7024E774FBA.root",
+    "/scratchnvme/pviscone/Preselection_Skim/diHad/root_files/diHad.root",
     schemaclass=NanoAODSchema
 ).events()
-
-TTJets_diHad = TTJets_diHad[
-    np_and(
-        np.abs(TTJets_diHad.GenPart[TTJets_diHad.GenPart.pdgId==-24][:,-1].children.pdgId[:,0])<6,
-        np.abs(TTJets_diHad.GenPart[TTJets_diHad.GenPart.pdgId==24][:,-1].children.pdgId[:,0])<6
-    )
-]
 
 
 WJets_toLNu=NanoEventsFactory.from_root(
-    "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv2/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v15_L1v1-v1/230000/87A6BF8E-A6CC-0549-ADC0-260011EE2894.root",
+    "/scratchnvme/pviscone/Preselection_Skim/WJets/root_files/WJets.root",
     schemaclass=NanoAODSchema
 ).events()
 
-#!There are negative genweights in this sample
-WWJets_LNuQQ=NanoEventsFactory.from_root(
-    "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/WWTo1L1Nu2Q_4f_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/60000/43340426-80F1-534C-9D61-5F0D90AD57B3.root",
+
+WWJets=NanoEventsFactory.from_root(
+    "/scratchnvme/pviscone/Preselection_Skim/others/WWJets/43340426-80F1-534C-9D61-5F0D90AD57B3.root",
     schemaclass=NanoAODSchema
 ).events()
 
@@ -65,7 +58,7 @@ TT_semilept_cb_Tau=NanoEventsFactory.from_root(
 
 
 TT_Jets_LNuQQ_NoCKM=NanoEventsFactory.from_root(
-    "/scratchnvme/pviscone/Preselection_Skim/powheg/root_files/others/C702A2B0-292B-854F-96F5-CAF931254A40.root",
+    "/scratchnvme/pviscone/Preselection_Skim/powheg/root_files/others/powheg.root",
     schemaclass=NanoAODSchema
 ).events()
 
@@ -80,6 +73,23 @@ TT_Jets_LNuQQ_NoCKM_Tau=TT_Jets_LNuQQ_NoCKM[
     ]
 
 
+tW=NanoEventsFactory.from_root(
+    "/scratchnvme/pviscone/Preselection_Skim/others/tW/69896C66-7F8E-904A-B3DF-A3E82970B6EE.root",
+    schemaclass=NanoAODSchema
+).events()
+
+SL_mask=ak.num(tW.LHEPart.pdgId[np_and(np.abs(tW.LHEPart.pdgId)>=11,
+            np.abs(tW.LHEPart.pdgId)<21)])<=2
+
+tW=tW[SL_mask]
+
+tQ=NanoEventsFactory.from_root(
+    "/scratchnvme/pviscone/Preselection_Skim/others/tq/788061AB-FE17-D340-A686-E8F125F5A28F.root",
+    schemaclass=NanoAODSchema
+).events()
+
+
+
 
 datasets = {
     "signalEle": TT_semilept_cb_Electron,
@@ -91,20 +101,22 @@ datasets = {
     "diLept": TTJets_diLept,
     "diHad": TTJets_diHad,
     "WJets": WJets_toLNu,
-    #"WWJets_LNuQQ":WWJets_LNuQQ
+    "WWJets":WWJets,
+    "tW":tW,
+    "tq":tQ
 }
 
 
 
 def Muon_cuts(events):
-    n_tot=len(events)
+    n_tot=ak.sum(events.genWeight)
     events["Muon"]=events.Muon[events.Muon.looseId & (events.Muon.pfIsoId>=1)]
     events=events[ak.num(events.Muon)>=1]
     events["Muon"]=events.Muon[:,0]
     cut1=events[np_and(events.Muon.pt>=26,
                         events.Muon.eta<2.4,)]
     
-    cut1_n=len(cut1)
+    cut1_n=ak.sum(cut1.genWeight)
     cut2=copy.copy(cut1)
     cut2["Jet"]=cut2.Jet[np_and(
                                     cut2.Jet.jetId>0,
@@ -114,26 +126,26 @@ def Muon_cuts(events):
                                     cut2.Jet.delta_r(cut2.Muon)>0.4)]
 
     cut2=cut2[ak.num(cut2.Jet)>=4]
-    cut2_n=len(cut2)
+    cut2_n=ak.sum(cut2.genWeight)
     cut3=copy.copy(cut2)
-    cut3=cut3[(ak.max(cut3.Jet.btagDeepFlavCvL,axis=1)>0.2793)]
-    cut3_n=len(cut3)
+    cut3=cut3[(ak.max(cut3.Jet.btagDeepFlavB,axis=1)>0.2793)]
+    cut3_n=ak.sum(cut3.genWeight)
     return {
-            "1 Loose $\mu $ \n $ p_{T}>26, |\eta|<2.4$":cut1_n/n_tot,
-            "4 Jets \n $ p_{T}>20, |\eta|<4.8$":cut2_n/n_tot,
-            "1 Medium bTag":cut3_n/n_tot}
+            "$\geq 1\mu $ \nLoose\n $ p_{T}>26$\n$|\eta|<2.4$":cut1_n/n_tot,
+            "$\geq 4$ Jets\n$ p_{T}>20$\n$|\eta|<4.8$":cut2_n/n_tot,
+            "1 Medium\nbTag":cut3_n/n_tot}
         
     
 
 def Electron_cuts(events):
-    n_tot=len(events)
+    n_tot=ak.sum(events.genWeight)
     events["Electron"]=events.Electron[events.Electron.mvaFall17V2noIso_WP90]
     events=events[ak.num(events.Electron)>=1]
     events["Electron"]=events.Electron[:,0]
     cut1=events[np_and(events.Electron.pt>=30,
                         events.Electron.eta<2.4,)]
     
-    cut1_n=len(cut1)
+    cut1_n=ak.sum(cut1.genWeight)
     cut2=copy.copy(cut1)
     cut2["Jet"]=cut2.Jet[np_and(
                                     cut2.Jet.jetId>0,
@@ -143,28 +155,28 @@ def Electron_cuts(events):
                                     cut2.Jet.delta_r(cut2.Electron)>0.4)]
 
     cut2=cut2[ak.num(cut2.Jet)>=4]
-    cut2_n=len(cut2)
+    cut2_n=ak.sum(cut2.genWeight)
     cut3=copy.copy(cut2)
-    cut3=cut3[(ak.max(cut3.Jet.btagDeepFlavCvL,axis=1)>0.2793)]
-    cut3_n=len(cut3)
+    cut3=cut3[(ak.max(cut3.Jet.btagDeepFlavB,axis=1)>0.2793)]
+    cut3_n=ak.sum(cut3.genWeight)
     return {
-            "1 Medium $e$ \n $ p_{T}>30, |\eta|<2.4$":cut1_n/n_tot,
-            "4 Jets \n$ p_{T}>20, |\eta|<4.8$":cut2_n/n_tot,
-            "1 Medium bTag":cut3_n/n_tot}
+            "$\geq 1e$\nMedium\n$ p_{T}>30$\n$|\eta|<2.4$":cut1_n/n_tot,
+            "$\geq 4$ Jets\n$ p_{T}>20$\n$|\eta|<4.8$":cut2_n/n_tot,
+            "1 Medium\nbTag":cut3_n/n_tot}
     
     
     
     
 eff_dict={
     "Muons":{
-        "1 Loose $\mu $ \n $ p_{T}>26, |\eta|<2.4$":{},
-        "4 Jets \n $ p_{T}>20, |\eta|<4.8$":{},
-        "1 Medium bTag":{}
+        "$\geq 1\mu $ \nLoose\n $ p_{T}>26$\n$|\eta|<2.4$":{},
+        "$\geq 4$ Jets\n$ p_{T}>20$\n$|\eta|<4.8$":{},
+        "1 Medium\nbTag":{}
         },
     "Electrons":{
-        "1 Medium $e$ \n $ p_{T}>30, |\eta|<2.4$":{},
-        "4 Jets \n$ p_{T}>20, |\eta|<4.8$":{},
-        "1 Medium bTag":{}
+        "$\geq 1e$\nMedium\n$ p_{T}>30$\n$|\eta|<2.4$":{},
+        "$\geq 4$ Jets\n$ p_{T}>20$\n$|\eta|<4.8$":{},
+        "1 Medium\nbTag":{}
         }
     }
 
@@ -175,6 +187,14 @@ for dataset in datasets:
     eff_ele=Electron_cuts(datasets[dataset])
     if "semiLept" in dataset:
         lumi=sample_dict["bkg"]["nEv_lumi"]*0.33
+    elif dataset=="tW":
+        lumi=4.8e6
+    elif dataset=="tq":
+        lumi=9.6e6
+    elif dataset=="WWJets":
+        lumi=7.1e6
+    elif dataset=="WJets":
+        lumi=8.5e9
     else:
         lumi=sample_dict[dataset]["nEv_lumi"]
         
@@ -196,7 +216,9 @@ colors = {
     "diLept":"darkblue",
     "diHad": "pink",
     "WJets": "orange",
-    #"WWJets_LNuQQ":WWJets_LNuQQ
+    "WWJets":"#4376c9",
+    "tW":"plum",
+    "tq":"#91d36e"
 }
 
 
@@ -204,7 +226,7 @@ colors = {
 
 mplhep.style.use("CMS")
 for region in ["Muons","Electrons"]:
-    fig,ax=plt.subplots(1,1)
+    fig,ax=plt.subplots(1,1,figsize=(16,9))
     ax.set_xlabel("Events")
     ax.grid()
     lab=None
@@ -225,4 +247,6 @@ for region in ["Muons","Electrons"]:
     ax.set_xlim(1e2,1e14)
     ax.set_axisbelow(True)
     mplhep.cms.text("Private Work",loc=0,ax=ax)
-    mplhep.cms.lumitext("137 fb$^{-1}$ (13 TeV)",ax=ax)
+    mplhep.cms.lumitext("138 fb$^{-1}$ (13 TeV)",ax=ax)
+
+# %%
