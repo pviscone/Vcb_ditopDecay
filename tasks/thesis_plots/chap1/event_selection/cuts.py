@@ -13,7 +13,7 @@ sys.path.append("../../")
 sys.path.append("../../../../utils/coffea_utils")
 
 from events import *
-procs= list(reversed(sorted(n_ev.keys(), key=lambda k: n_ev[k])))
+procs= list(x(sorted(n_ev.keys(), key=lambda k: n_ev[k])))
 
 
 #%%
@@ -37,12 +37,19 @@ def plot_func(datasets,plots,savepath,weights):
         plots[plot]["figax"]=(fig,ax)
         fun=plots[plot]["fun"]
         bins=plots[plot]["bins"]
-        for proc in procs:
+        
+        to_plot=[]
+        w_list=[]
+        color_list=[]
+        label_list=[]
+        for proc in reversed(procs):
             print(proc)
-            to_plot=fun(datasets[proc],proc)
-            w=weights[proc]
+            to_plot.append(fun(datasets[proc],proc))
+            w_list.append(weights[proc])
+            color_list.append(colors[proc])
+            label_list.append(proc)
 
-            ax.hist(to_plot,bins=bins,stacked=True,histtype="stepfilled",label=proc,color=colors[proc],weights=w)
+        ax.hist(to_plot,bins=bins,stacked=True,histtype="stepfilled",label=label_list,color=color_list,weights=w_list)
 
         ax.grid()
         ax.set_yscale("log")
@@ -67,7 +74,7 @@ mplhep.style.use("CMS")
 colors={"signal": "#011993",
         "TTsemiLept": "gold",
         "TTdiLept": "plum",
-        "TTdiHad": "limegreen",
+        "TTdiHad": "#5f9b8c",
         "WJets": "lightcoral",
         "WWJets":"#4376c9",
         "tW":"#00cccc",

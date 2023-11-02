@@ -8,7 +8,7 @@ import sys
 xkcd_yellow = mcolors.XKCD_COLORS["xkcd:golden yellow"]
 #plt.style.use(mplhep.style.CMS)
 class Histogrammer():
-    def __init__(self, xlabel="", ylabel="Counts", title="", cmsText="Preliminary", legendloc="best",
+    def __init__(self, xlabel="", ylabel="Counts", title="", cmsText="Private Work", legendloc="best",
                  fontsize=30,legend_fontsize=21,
                  histrange=None,histtype="stepfilled",linewidth=2,
                  legend=True, mean=True, rms=True, N=False, total_stats=False, score=None,
@@ -171,7 +171,7 @@ class Histogrammer():
                 if len(hist1_normalized)!=len(hist2_normalized):
                     raise ValueError("Score can only be calculated only for 2 histograms of the same length")
                 d=0.5*np.sum(np.abs(hist1_normalized-hist2_normalized))
-                plt.text(self.score[0],self.score[1],f"$\\frac{{1}}{{2}} \int |h_1-h_2|$ = {d:.2f}",fontsize=20)
+                plt.text(self.score[0],self.score[1],f"$\\frac{{1}}{{2}} \int |h_1-h_2|$ = {d:.2f}",fontsize=20, transform=plt.gca().transAxes)
                 
         
 

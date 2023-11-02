@@ -128,7 +128,7 @@ N_tot_muons=len(deltaR_muons)
 deltaRMu_mask=deltaR_muons < 0.4
 N_04_muons=np.sum(deltaRMu_mask)
 plt.text(0.63,6000,f"$N_{{tot}}$   = {N_tot_muons}\n$N_{{<0.4}}=$ {N_04_muons} ({(N_04_muons/N_tot_muons):.2f})",fontsize=20)
-plt.savefig("images/deltaR_Mu_LHE.png")
+plt.savefig("images/deltaR_Mu_LHE.png",bbox_inches='tight')
 # %% Rmin
 
 deltaRmin_jet_leptB = bJet_4Vect.delta_r(LeptB_LHE_4Vect)
@@ -148,7 +148,7 @@ mu_4Vect_leq04=mu_4Vect[deltaR_mask]
 
 N_04=np.sum(deltaR_mask)
 plt.text(0.63,6000,f"$N_{{tot}}$   = {N_tot}\n$N_{{<0.4}}=$ {N_04} ({(N_04/N_tot):.2f})",fontsize=20)
-plt.savefig("images/deltaRmin_jet_leptB.png")
+plt.savefig("images/deltaRmin_jet_leptB.png",bbox_inches='tight')
 
 
 
@@ -166,7 +166,7 @@ h.add_hist(Tmass_good, label="$Bjet_{Lept}^{\Delta R_{LHE}\leq 0.4}$ + $W_{lept}
 h.add_hist(Tmass_bad, label="Other Jets + $W_{lept}$", color=xkcd_yellow,edgecolor="goldenrod", linewidth=2.5,alpha=0.7)
 h.plot()
 plt.ticklabel_format(axis="y", style="scientific", scilimits=(0, 0))
-plt.savefig("images/Tmass_jets.png")
+plt.savefig("images/Tmass_jets.png",bbox_inches='tight')
 
 #%%btag
 # _good =right b jet (t->b(W->lv)) (+ <0.4 deltaR cut)
@@ -185,7 +185,7 @@ h.add_hist(btag_bad, label="Others",color=xkcd_yellow,alpha=0.7,edgecolor="golde
 
 h.plot()
 plt.xlim(-0.03,1.03)
-plt.savefig("images/btag_jets.png")
+plt.savefig("images/btag_jets.png",bbox_inches='tight')
 
 
 # %% ctag
@@ -206,7 +206,7 @@ h.add_hist(CvBtag_bad, label="Others", color=xkcd_yellow,
 
 h.plot()
 plt.xlim(-0.03, 1.03)
-plt.savefig("images/CvBtag_jets.png")
+plt.savefig("images/CvBtag_jets.png",bbox_inches='tight')
 
 #%% CvLtag
 
@@ -227,7 +227,7 @@ h.add_hist(CvLtag_bad, label="Others", color=xkcd_yellow,
 
 h.plot()
 plt.xlim(-0.03, 1.03)
-plt.savefig("images/CvLtag_jets.png")
+plt.savefig("images/CvLtag_jets.png",bbox_inches='tight')
 
 # %% dphi mu-jet
 
@@ -236,7 +236,7 @@ h = Histogrammer(xlabel="$\Delta \phi$", bins=100, histrange=(-3.14,3.14), legen
 h.add_hist(mu_4Vect_leq04.delta_phi(bJet_4Vect_leq04), label="$\mu-Bjet_{Lept}^{\Delta R_{LHE}\leq 0.4}$", color="dodgerblue",edgecolor="black", linewidth=1.5, alpha=1)
 h.add_hist(ak.flatten(mu_4Vect.delta_phi(otherJet_4Vect)), label="$\mu-$Other Jets", color=xkcd_yellow,alpha=0.7,edgecolor="goldenrod",linewidth=2.5)
 h.plot()
-plt.savefig("images/dphi_mu_jets.png")
+plt.savefig("images/dphi_mu_jets.png",bbox_inches='tight')
 
 #%%deta mu-jet
 h = Histogrammer(xlabel="$\Delta \eta$", bins=100, histrange=(-6,6), legend_fontsize=20,
@@ -247,7 +247,7 @@ h.add_hist(mu_4Vect_leq04.eta-bJet_4Vect_leq04.eta,
 h.add_hist(ak.flatten(mu_4Vect.eta-otherJet_4Vect.eta), label="$\mu-$Other Jets",
            color=xkcd_yellow, alpha=0.7, edgecolor="goldenrod", linewidth=2.5)
 h.plot()
-plt.savefig("images/deta_mu_jets.png")
+plt.savefig("images/deta_mu_jets.png",bbox_inches='tight')
 
 # %%dphi met-jet
 h = Histogrammer(xlabel="$\Delta \phi$", bins=100, histrange=(-3.14, 3.14), legend_fontsize=20,
@@ -258,7 +258,7 @@ h.add_hist(events.MET[deltaR_mask].delta_phi(bJet_4Vect_leq04),
 h.add_hist(ak.flatten(events.MET.delta_phi(otherJet_4Vect)), label="$MET-$Other Jets",
            color=xkcd_yellow, alpha=0.7, edgecolor="goldenrod", linewidth=2.5)
 h.plot()
-plt.savefig("images/dphi_MET_jets.png")
+plt.savefig("images/dphi_MET_jets.png",bbox_inches='tight')
 
 #%% min dphi
 otherJet_4Vect_leq04=otherJet_4Vect[deltaR_mask]
@@ -293,7 +293,7 @@ h.add_hist(min_deltaphi_from_b,
 
 h.add_hist(min_deltaphi_from_others, label="Others-Others",color=xkcd_yellow, alpha=0.7, edgecolor="goldenrod", linewidth=2.5)
 h.plot()
-plt.savefig("./images/min_deltaphi_jets.png")
+plt.savefig("./images/min_deltaphi_jets.png",bbox_inches='tight')
 
 # %% maxdphi
 
@@ -328,7 +328,7 @@ h.add_hist(max_deltaphi_from_b,
 h.add_hist(max_deltaphi_from_others, label="Others-Others",
            color=xkcd_yellow, alpha=0.7, edgecolor="goldenrod", linewidth=2.5)
 h.plot()
-plt.savefig("./images/max_deltaphi_jets.png")
+plt.savefig("./images/max_deltaphi_jets.png",bbox_inches='tight')
 
 #%%maxeta jets
 
@@ -361,7 +361,7 @@ h.add_hist(max_deltaeta_from_b,
 h.add_hist(max_deltaeta_from_others, label="Others-Others",
            color=xkcd_yellow, alpha=0.7, edgecolor="goldenrod", linewidth=2.5)
 h.plot()
-plt.savefig("./images/max_deltaeta_jets.png")
+plt.savefig("./images/max_deltaeta_jets.png",bbox_inches='tight')
 
 # %%mineta jets
 
@@ -395,7 +395,7 @@ h.add_hist(min_deltaeta_from_b,
 h.add_hist(min_deltaeta_from_others, label="Others-Others",
            color=xkcd_yellow, alpha=0.7, edgecolor="goldenrod", linewidth=2.5)
 h.plot()
-plt.savefig("./images/min_deltaeta_jets.png")
+plt.savefig("./images/min_deltaeta_jets.png",bbox_inches='tight')
 
 #%% Save the features in a numpy matrix
 
