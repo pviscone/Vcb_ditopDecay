@@ -1,0 +1,14 @@
+{
+    "tq":{
+        "path":"/scratchnvme/pviscone/Preselection_Skim/others/tq/tq.root",
+        "nEv_lumi":9.6e6
+        },
+    "tW":{
+        "path":"/scratchnvme/pviscone/Preselection_Skim/others/tW/tW.root",
+        "nEv_lumi":4.8e6
+        },
+    "WWJets":{
+        "path":"/scratchnvme/pviscone/Preselection_Skim/others/WWJets/WWJets.root",
+        "nEv_lumi":7.1e6
+        }
+}

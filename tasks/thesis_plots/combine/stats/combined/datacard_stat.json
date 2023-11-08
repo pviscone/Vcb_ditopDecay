@@ -1,0 +1,45 @@
+{
+    "hist_name":"hist.root",
+    "channels":{
+        "Muons":{
+            "signal":[
+            ],
+            "bkg":[
+            ]
+        },
+        "Electrons":{
+            "signal":[
+            ],
+            "bkg":[
+            ]
+        }
+    },
+    "commonSig":[
+        "signalMu",
+        "signalEle",
+        "signalTau"
+    ],
+    "commonBkg":[
+        "semiLeptMu",
+        "semiLeptEle",
+        "semiLeptTau",
+        "diLept",
+        "WJets",
+        "diHad",
+        "tW",
+        "tq",
+        "WWJets"
+    ],
+    "autoMCStats":false,
+    "systs":{
+        "notuse":{
+        
+        }
+    }
+        
+}
+
+
+
+
+

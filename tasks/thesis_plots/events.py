@@ -36,7 +36,7 @@ WJets_toLNu=NanoEventsFactory.from_root(
 
 
 WWJets_LNuQQ=NanoEventsFactory.from_root(
-    "/scratchnvme/pviscone/Preselection_Skim/others/WWJets/43340426-80F1-534C-9D61-5F0D90AD57B3.root",
+    "/scratchnvme/pviscone/Preselection_Skim/others/WWJets/WWJets.root",
     schemaclass=NanoAODSchema
 ).events()
 
@@ -55,17 +55,16 @@ semiLept=NanoEventsFactory.from_root(
 
 
 tW=NanoEventsFactory.from_root(
-    "/scratchnvme/pviscone/Preselection_Skim/others/tW/69896C66-7F8E-904A-B3DF-A3E82970B6EE.root",
+    "/scratchnvme/pviscone/Preselection_Skim/others/tW/tw.root",
     schemaclass=NanoAODSchema
 ).events()
 
-SL_mask=ak.num(tW.LHEPart.pdgId[np_and(np.abs(tW.LHEPart.pdgId)>=11,
-            np.abs(tW.LHEPart.pdgId)<21)])<=2
+#SL_mask=ak.num(tW.LHEPart.pdgId[np_and(np.abs(tW.LHEPart.pdgId)>=11,np.abs(tW.LHEPart.pdgId)<21)])<=2
 
-tW=tW[SL_mask]
+#tW=tW[SL_mask]
 
 tQ=NanoEventsFactory.from_root(
-    "/scratchnvme/pviscone/Preselection_Skim/others/tq/788061AB-FE17-D340-A686-E8F125F5A28F.root",
+    "/scratchnvme/pviscone/Preselection_Skim/others/tq/tq.root",
     schemaclass=NanoAODSchema
 ).events()
 

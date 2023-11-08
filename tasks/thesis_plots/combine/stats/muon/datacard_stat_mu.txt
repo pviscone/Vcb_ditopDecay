@@ -1,0 +1,11 @@
+imax *
+jmax *
+kmax *
+---------------
+shapes * * hist.root $CHANNEL/$PROCESS $CHANNEL/$PROCESS_syst_$SYSTEMATIC
+---------------
+bin	Muons	Muons	Muons	Muons	Muons	Muons	Muons	Muons	Muons	Muons	Muons	Muons	
+process	signalMu	signalEle	signalTau	semiLeptMu	semiLeptEle	semiLeptTau	diLept	WJets	diHad	tW	tq	WWJets	
+process	0	-1	-2	1	2	3	4	5	6	7	8	9	
+rate	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	
+---------------

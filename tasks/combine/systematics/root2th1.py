@@ -23,11 +23,11 @@ import gc
 cuda=torch.device("cuda:0")
 cpu=torch.device("cpu")
 
-samples_json="json/samples.json"
+samples_json="json/others.json"
 bunch=1
 file_bunch_size=10
 device=cpu
-outfile="hist.root"
+outfile="hist_others.root"
 
 model={"Muons":create_model("root2score/JPAmodel/state_dict_Muons.pt",device=device),
         "Electrons":create_model("root2score/JPAmodel/state_dict_Electrons.pt",device=device)}
@@ -61,7 +61,7 @@ weight_syst_list=[
             "ctag_XSec_BRUnc_DYJets_c",
             "ctag_jer",
             "ctag_jesTotal",
-            "XSec_BRUnc_WJets_c"
+            #"XSec_BRUnc_WJets_c"
             ]
 
 
@@ -131,7 +131,7 @@ for region in regions:
 
 print("\n----------------------Building TH1---------------------",flush=True)
 build_TH1(score_dict,weight_dict,outfile)
-torch.save({"score_dict":score_dict,"weight_dict":weight_dict},"score_dict.pt")
+torch.save({"score_dict":score_dict,"weight_dict":weight_dict},"score_dict_others.pt")
 build_datacard(rdf_dict,
                regions=regions,
                syst_list=syst_list+weight_syst_list,

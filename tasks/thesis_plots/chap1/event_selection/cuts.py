@@ -13,7 +13,7 @@ sys.path.append("../../")
 sys.path.append("../../../../utils/coffea_utils")
 
 from events import *
-procs= list(x(sorted(n_ev.keys(), key=lambda k: n_ev[k])))
+procs= list(reversed(sorted(n_ev.keys(), key=lambda k: n_ev[k])))
 
 
 #%%
