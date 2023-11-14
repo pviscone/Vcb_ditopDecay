@@ -23,11 +23,11 @@ import gc
 cuda=torch.device("cuda:0")
 cpu=torch.device("cpu")
 
-samples_json="json/others.json"
+samples_json="json/samples.json"
 bunch=1
 file_bunch_size=10
 device=cpu
-outfile="hist_others.root"
+outfile="hist.root"
 
 model={"Muons":create_model("root2score/JPAmodel/state_dict_Muons.pt",device=device),
         "Electrons":create_model("root2score/JPAmodel/state_dict_Electrons.pt",device=device)}
@@ -61,12 +61,23 @@ weight_syst_list=[
             "ctag_XSec_BRUnc_DYJets_c",
             "ctag_jer",
             "ctag_jesTotal",
-            #"XSec_BRUnc_WJets_c"
+            "ctag_XSec_BRUnc_WJets_c"
             ]
 
 
-var_syst_list=["JES",
-              "JER"]
+var_syst_list=["JESFlavorQCD",
+            "JESRelativeBal",
+            "JESHF",
+            "JESBBEC1",
+            "JESEC2",
+            "JESAbsolute",
+            "JESAbsolute2018",
+            "JESHF2018",
+            "JESEC22018",
+            "JESRelativeSample2018",
+            "JESBBEC12018",
+            "JESTotal",
+            "JER"]
 
 var_syst_list=list2updown(var_syst_list)
 weight_syst_list=list2updown(weight_syst_list)

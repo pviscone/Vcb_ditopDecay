@@ -1,0 +1,722 @@
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Region: Muons $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+##################################### tq ######################################
+
+ Number of bunches: 1
+
+------------------------------------- nominal -------------------------------------
+Sum preWeights: 4008517.00
+Sum postWeights: 217269.00
+Total efficiency: 5.42%
+
+btag_hfUp efficiency: 5.42%
+btag_hfDown efficiency: 5.42%
+btag_lfUp efficiency: 5.50%
+btag_lfDown efficiency: 5.33%
+btag_hfstats1Up efficiency: 5.41%
+btag_hfstats1Down efficiency: 5.43%
+btag_hfstats2Up efficiency: 5.42%
+btag_hfstats2Down efficiency: 5.42%
+btag_lfstats1Up efficiency: 5.42%
+btag_lfstats1Down efficiency: 5.42%
+btag_lfstats2Up efficiency: 5.42%
+btag_lfstats2Down efficiency: 5.42%
+btag_cferr1Up efficiency: 5.41%
+btag_cferr1Down efficiency: 5.43%
+btag_cferr2Up efficiency: 5.42%
+btag_cferr2Down efficiency: 5.43%
+ctag_ExtrapUp efficiency: 5.42%
+ctag_ExtrapDown efficiency: 5.42%
+ctag_InterpUp efficiency: 5.42%
+ctag_InterpDown efficiency: 5.42%
+ctag_LHEScaleWeight_muFUp efficiency: 5.42%
+ctag_LHEScaleWeight_muFDown efficiency: 5.42%
+ctag_LHEScaleWeight_muRUp efficiency: 5.42%
+ctag_LHEScaleWeight_muRDown efficiency: 5.42%
+ctag_PSWeightFSRUp efficiency: 5.42%
+ctag_PSWeightFSRDown efficiency: 5.42%
+ctag_PSWeightISRUp efficiency: 5.42%
+ctag_PSWeightISRDown efficiency: 5.42%
+ctag_PUWeightUp efficiency: 5.42%
+ctag_PUWeightDown efficiency: 5.42%
+ctag_StatUp efficiency: 5.42%
+ctag_StatDown efficiency: 5.42%
+ctag_XSec_BRUnc_DYJets_bUp efficiency: 5.42%
+ctag_XSec_BRUnc_DYJets_bDown efficiency: 5.42%
+ctag_XSec_BRUnc_DYJets_cUp efficiency: 5.42%
+ctag_XSec_BRUnc_DYJets_cDown efficiency: 5.42%
+ctag_jerUp efficiency: 5.42%
+ctag_jerDown efficiency: 5.42%
+ctag_jesTotalUp efficiency: 5.42%
+ctag_jesTotalDown efficiency: 5.42%
+
+tq_Mu_nominal_Loose nMuon>0: pass=1380473    all=4008517    -- eff=34.44 % cumulative eff=34.44 %
+tq_Mu_nominal_Muon[0]_pt>26 && abs(eta)<2.4: pass=869220     all=1380473    -- eff=62.97 % cumulative eff=21.68 %
+tq_Mu_nominal_Clean nJet>=4: pass=249657     all=869220     -- eff=28.72 % cumulative eff=6.23 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=217269     all=249657     -- eff=87.03 % cumulative eff=5.42 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JESUp -------------------------------------
+Sum preWeights: 4008517.00
+Sum postWeights: 251356.00
+Total efficiency: 6.27%
+
+
+tq_Mu_JESUp_Loose nMuon>0: pass=1380473    all=4008517    -- eff=34.44 % cumulative eff=34.44 %
+tq_Mu_JESUp_Muon[0]_pt>26 && abs(eta)<2.4: pass=869220     all=1380473    -- eff=62.97 % cumulative eff=21.68 %
+tq_Mu_JESUp_Clean nJet>=4: pass=291597     all=869220     -- eff=33.55 % cumulative eff=7.27 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=251356     all=291597     -- eff=86.20 % cumulative eff=6.27 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JESDown -------------------------------------
+Sum preWeights: 4008517.00
+Sum postWeights: 190612.00
+Total efficiency: 4.76%
+
+
+tq_Mu_JESDown_Loose nMuon>0: pass=1380473    all=4008517    -- eff=34.44 % cumulative eff=34.44 %
+tq_Mu_JESDown_Muon[0]_pt>26 && abs(eta)<2.4: pass=869220     all=1380473    -- eff=62.97 % cumulative eff=21.68 %
+tq_Mu_JESDown_Clean nJet>=4: pass=217373     all=869220     -- eff=25.01 % cumulative eff=5.42 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=190612     all=217373     -- eff=87.69 % cumulative eff=4.76 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JERUp -------------------------------------
+Sum preWeights: 4008517.00
+Sum postWeights: 218325.00
+Total efficiency: 5.45%
+
+
+tq_Mu_JERUp_Loose nMuon>0: pass=1380473    all=4008517    -- eff=34.44 % cumulative eff=34.44 %
+tq_Mu_JERUp_Muon[0]_pt>26 && abs(eta)<2.4: pass=869220     all=1380473    -- eff=62.97 % cumulative eff=21.68 %
+tq_Mu_JERUp_Clean nJet>=4: pass=251011     all=869220     -- eff=28.88 % cumulative eff=6.26 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=218333     all=251011     -- eff=86.98 % cumulative eff=5.45 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JERDown -------------------------------------
+Sum preWeights: 4008517.00
+Sum postWeights: 216582.00
+Total efficiency: 5.40%
+
+
+tq_Mu_JERDown_Loose nMuon>0: pass=1380473    all=4008517    -- eff=34.44 % cumulative eff=34.44 %
+tq_Mu_JERDown_Muon[0]_pt>26 && abs(eta)<2.4: pass=869220     all=1380473    -- eff=62.97 % cumulative eff=21.68 %
+tq_Mu_JERDown_Clean nJet>=4: pass=248789     all=869220     -- eff=28.62 % cumulative eff=6.21 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=216587     all=248789     -- eff=87.06 % cumulative eff=5.40 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+##################################### tW ######################################
+
+ Number of bunches: 1
+
+------------------------------------- nominal -------------------------------------
+Sum preWeights: 2774802.00
+Sum postWeights: 313457.00
+Total efficiency: 11.30%
+
+btag_hfUp efficiency: 11.28%
+btag_hfDown efficiency: 11.31%
+btag_lfUp efficiency: 11.49%
+btag_lfDown efficiency: 11.09%
+btag_hfstats1Up efficiency: 11.27%
+btag_hfstats1Down efficiency: 11.33%
+btag_hfstats2Up efficiency: 11.29%
+btag_hfstats2Down efficiency: 11.30%
+btag_lfstats1Up efficiency: 11.30%
+btag_lfstats1Down efficiency: 11.29%
+btag_lfstats2Up efficiency: 11.30%
+btag_lfstats2Down efficiency: 11.29%
+btag_cferr1Up efficiency: 11.25%
+btag_cferr1Down efficiency: 11.37%
+btag_cferr2Up efficiency: 11.26%
+btag_cferr2Down efficiency: 11.34%
+ctag_ExtrapUp efficiency: 11.30%
+ctag_ExtrapDown efficiency: 11.30%
+ctag_InterpUp efficiency: 11.30%
+ctag_InterpDown efficiency: 11.30%
+ctag_LHEScaleWeight_muFUp efficiency: 11.29%
+ctag_LHEScaleWeight_muFDown efficiency: 11.29%
+ctag_LHEScaleWeight_muRUp efficiency: 11.29%
+ctag_LHEScaleWeight_muRDown efficiency: 11.29%
+ctag_PSWeightFSRUp efficiency: 11.29%
+ctag_PSWeightFSRDown efficiency: 11.30%
+ctag_PSWeightISRUp efficiency: 11.29%
+ctag_PSWeightISRDown efficiency: 11.29%
+ctag_PUWeightUp efficiency: 11.29%
+ctag_PUWeightDown efficiency: 11.29%
+ctag_StatUp efficiency: 11.30%
+ctag_StatDown efficiency: 11.30%
+ctag_XSec_BRUnc_DYJets_bUp efficiency: 11.29%
+ctag_XSec_BRUnc_DYJets_bDown efficiency: 11.29%
+ctag_XSec_BRUnc_DYJets_cUp efficiency: 11.29%
+ctag_XSec_BRUnc_DYJets_cDown efficiency: 11.29%
+ctag_jerUp efficiency: 11.30%
+ctag_jerDown efficiency: 11.29%
+ctag_jesTotalUp efficiency: 11.29%
+ctag_jesTotalDown efficiency: 11.29%
+
+tW_Mu_nominal_Loose nMuon>0: pass=945876     all=2805534    -- eff=33.71 % cumulative eff=33.71 %
+tW_Mu_nominal_Muon[0]_pt>26 && abs(eta)<2.4: pass=662474     all=945876     -- eff=70.04 % cumulative eff=23.61 %
+tW_Mu_nominal_Clean nJet>=4: pass=380255     all=662474     -- eff=57.40 % cumulative eff=13.55 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=317113     all=380255     -- eff=83.39 % cumulative eff=11.30 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JESUp -------------------------------------
+Sum preWeights: 2774802.00
+Sum postWeights: 334262.00
+Total efficiency: 12.05%
+
+
+tW_Mu_JESUp_Loose nMuon>0: pass=945876     all=2805534    -- eff=33.71 % cumulative eff=33.71 %
+tW_Mu_JESUp_Muon[0]_pt>26 && abs(eta)<2.4: pass=662474     all=945876     -- eff=70.04 % cumulative eff=23.61 %
+tW_Mu_JESUp_Clean nJet>=4: pass=406822     all=662474     -- eff=61.41 % cumulative eff=14.50 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=338144     all=406822     -- eff=83.12 % cumulative eff=12.05 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JESDown -------------------------------------
+Sum preWeights: 2774802.00
+Sum postWeights: 293623.00
+Total efficiency: 10.58%
+
+
+tW_Mu_JESDown_Loose nMuon>0: pass=945876     all=2805534    -- eff=33.71 % cumulative eff=33.71 %
+tW_Mu_JESDown_Muon[0]_pt>26 && abs(eta)<2.4: pass=662474     all=945876     -- eff=70.04 % cumulative eff=23.61 %
+tW_Mu_JESDown_Clean nJet>=4: pass=355216     all=662474     -- eff=53.62 % cumulative eff=12.66 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=297079     all=355216     -- eff=83.63 % cumulative eff=10.59 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JERUp -------------------------------------
+Sum preWeights: 2774802.00
+Sum postWeights: 313826.00
+Total efficiency: 11.31%
+
+
+tW_Mu_JERUp_Loose nMuon>0: pass=945876     all=2805534    -- eff=33.71 % cumulative eff=33.71 %
+tW_Mu_JERUp_Muon[0]_pt>26 && abs(eta)<2.4: pass=662474     all=945876     -- eff=70.04 % cumulative eff=23.61 %
+tW_Mu_JERUp_Clean nJet>=4: pass=380755     all=662474     -- eff=57.47 % cumulative eff=13.57 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=317478     all=380755     -- eff=83.38 % cumulative eff=11.32 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JERDown -------------------------------------
+Sum preWeights: 2774802.00
+Sum postWeights: 313213.00
+Total efficiency: 11.29%
+
+
+tW_Mu_JERDown_Loose nMuon>0: pass=945876     all=2805534    -- eff=33.71 % cumulative eff=33.71 %
+tW_Mu_JERDown_Muon[0]_pt>26 && abs(eta)<2.4: pass=662474     all=945876     -- eff=70.04 % cumulative eff=23.61 %
+tW_Mu_JERDown_Clean nJet>=4: pass=379851     all=662474     -- eff=57.34 % cumulative eff=13.54 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=316863     all=379851     -- eff=83.42 % cumulative eff=11.29 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+##################################### WWJets ######################################
+
+ Number of bunches: 1
+
+------------------------------------- nominal -------------------------------------
+Sum preWeights: 2564439.00
+Sum postWeights: 17209.00
+Total efficiency: 0.67%
+
+btag_hfUp efficiency: 0.64%
+btag_hfDown efficiency: 0.71%
+btag_lfUp efficiency: 0.67%
+btag_lfDown efficiency: 0.67%
+btag_hfstats1Up efficiency: 0.67%
+btag_hfstats1Down efficiency: 0.67%
+btag_hfstats2Up efficiency: 0.67%
+btag_hfstats2Down efficiency: 0.67%
+btag_lfstats1Up efficiency: 0.67%
+btag_lfstats1Down efficiency: 0.67%
+btag_lfstats2Up efficiency: 0.67%
+btag_lfstats2Down efficiency: 0.68%
+btag_cferr1Up efficiency: 0.59%
+btag_cferr1Down efficiency: 0.79%
+btag_cferr2Up efficiency: 0.61%
+btag_cferr2Down efficiency: 0.74%
+ctag_ExtrapUp efficiency: 0.67%
+ctag_ExtrapDown efficiency: 0.67%
+ctag_InterpUp efficiency: 0.67%
+ctag_InterpDown efficiency: 0.67%
+ctag_LHEScaleWeight_muFUp efficiency: 0.67%
+ctag_LHEScaleWeight_muFDown efficiency: 0.67%
+ctag_LHEScaleWeight_muRUp efficiency: 0.67%
+ctag_LHEScaleWeight_muRDown efficiency: 0.67%
+ctag_PSWeightFSRUp efficiency: 0.67%
+ctag_PSWeightFSRDown efficiency: 0.67%
+ctag_PSWeightISRUp efficiency: 0.67%
+ctag_PSWeightISRDown efficiency: 0.67%
+ctag_PUWeightUp efficiency: 0.67%
+ctag_PUWeightDown efficiency: 0.67%
+ctag_StatUp efficiency: 0.67%
+ctag_StatDown efficiency: 0.67%
+ctag_XSec_BRUnc_DYJets_bUp efficiency: 0.67%
+ctag_XSec_BRUnc_DYJets_bDown efficiency: 0.67%
+ctag_XSec_BRUnc_DYJets_cUp efficiency: 0.67%
+ctag_XSec_BRUnc_DYJets_cDown efficiency: 0.67%
+ctag_jerUp efficiency: 0.67%
+ctag_jerDown efficiency: 0.67%
+ctag_jesTotalUp efficiency: 0.67%
+ctag_jesTotalDown efficiency: 0.67%
+
+WWJets_Mu_nominal_Loose nMuon>0: pass=1225649    all=4262977    -- eff=28.75 % cumulative eff=28.75 %
+WWJets_Mu_nominal_Muon[0]_pt>26 && abs(eta)<2.4: pass=830920     all=1225649    -- eff=67.79 % cumulative eff=19.49 %
+WWJets_Mu_nominal_Clean nJet>=4: pass=235717     all=830920     -- eff=28.37 % cumulative eff=5.53 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=33889      all=235717     -- eff=14.38 % cumulative eff=0.79 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JESUp -------------------------------------
+Sum preWeights: 2564439.00
+Sum postWeights: 20181.00
+Total efficiency: 0.79%
+
+
+WWJets_Mu_JESUp_Loose nMuon>0: pass=1225649    all=4262977    -- eff=28.75 % cumulative eff=28.75 %
+WWJets_Mu_JESUp_Muon[0]_pt>26 && abs(eta)<2.4: pass=830920     all=1225649    -- eff=67.79 % cumulative eff=19.49 %
+WWJets_Mu_JESUp_Clean nJet>=4: pass=277527     all=830920     -- eff=33.40 % cumulative eff=6.51 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=39695      all=277527     -- eff=14.30 % cumulative eff=0.93 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JESDown -------------------------------------
+Sum preWeights: 2564439.00
+Sum postWeights: 14890.00
+Total efficiency: 0.58%
+
+
+WWJets_Mu_JESDown_Loose nMuon>0: pass=1225649    all=4262977    -- eff=28.75 % cumulative eff=28.75 %
+WWJets_Mu_JESDown_Muon[0]_pt>26 && abs(eta)<2.4: pass=830920     all=1225649    -- eff=67.79 % cumulative eff=19.49 %
+WWJets_Mu_JESDown_Clean nJet>=4: pass=202895     all=830920     -- eff=24.42 % cumulative eff=4.76 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=29378      all=202895     -- eff=14.48 % cumulative eff=0.69 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JERUp -------------------------------------
+Sum preWeights: 2564439.00
+Sum postWeights: 17276.00
+Total efficiency: 0.67%
+
+
+WWJets_Mu_JERUp_Loose nMuon>0: pass=1225649    all=4262977    -- eff=28.75 % cumulative eff=28.75 %
+WWJets_Mu_JERUp_Muon[0]_pt>26 && abs(eta)<2.4: pass=830920     all=1225649    -- eff=67.79 % cumulative eff=19.49 %
+WWJets_Mu_JERUp_Clean nJet>=4: pass=237241     all=830920     -- eff=28.55 % cumulative eff=5.57 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=34077      all=237241     -- eff=14.36 % cumulative eff=0.80 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JERDown -------------------------------------
+Sum preWeights: 2564439.00
+Sum postWeights: 17115.00
+Total efficiency: 0.67%
+
+
+WWJets_Mu_JERDown_Loose nMuon>0: pass=1225649    all=4262977    -- eff=28.75 % cumulative eff=28.75 %
+WWJets_Mu_JERDown_Muon[0]_pt>26 && abs(eta)<2.4: pass=830920     all=1225649    -- eff=67.79 % cumulative eff=19.49 %
+WWJets_Mu_JERDown_Clean nJet>=4: pass=234514     all=830920     -- eff=28.22 % cumulative eff=5.50 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=33730      all=234514     -- eff=14.38 % cumulative eff=0.79 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Region: Electrons $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+##################################### tq ######################################
+
+ Number of bunches: 1
+
+------------------------------------- nominal -------------------------------------
+Sum preWeights: 4008517.00
+Sum postWeights: 152780.00
+Total efficiency: 3.81%
+
+btag_hfUp efficiency: 3.81%
+btag_hfDown efficiency: 3.81%
+btag_lfUp efficiency: 3.87%
+btag_lfDown efficiency: 3.75%
+btag_hfstats1Up efficiency: 3.80%
+btag_hfstats1Down efficiency: 3.82%
+btag_hfstats2Up efficiency: 3.81%
+btag_hfstats2Down efficiency: 3.81%
+btag_lfstats1Up efficiency: 3.81%
+btag_lfstats1Down efficiency: 3.81%
+btag_lfstats2Up efficiency: 3.81%
+btag_lfstats2Down efficiency: 3.81%
+btag_cferr1Up efficiency: 3.81%
+btag_cferr1Down efficiency: 3.82%
+btag_cferr2Up efficiency: 3.81%
+btag_cferr2Down efficiency: 3.82%
+ctag_ExtrapUp efficiency: 3.81%
+ctag_ExtrapDown efficiency: 3.81%
+ctag_InterpUp efficiency: 3.81%
+ctag_InterpDown efficiency: 3.81%
+ctag_LHEScaleWeight_muFUp efficiency: 3.81%
+ctag_LHEScaleWeight_muFDown efficiency: 3.81%
+ctag_LHEScaleWeight_muRUp efficiency: 3.81%
+ctag_LHEScaleWeight_muRDown efficiency: 3.81%
+ctag_PSWeightFSRUp efficiency: 3.81%
+ctag_PSWeightFSRDown efficiency: 3.81%
+ctag_PSWeightISRUp efficiency: 3.81%
+ctag_PSWeightISRDown efficiency: 3.81%
+ctag_PUWeightUp efficiency: 3.81%
+ctag_PUWeightDown efficiency: 3.81%
+ctag_StatUp efficiency: 3.81%
+ctag_StatDown efficiency: 3.81%
+ctag_XSec_BRUnc_DYJets_bUp efficiency: 3.81%
+ctag_XSec_BRUnc_DYJets_bDown efficiency: 3.81%
+ctag_XSec_BRUnc_DYJets_cUp efficiency: 3.81%
+ctag_XSec_BRUnc_DYJets_cDown efficiency: 3.81%
+ctag_jerUp efficiency: 3.81%
+ctag_jerDown efficiency: 3.81%
+ctag_jesTotalUp efficiency: 3.81%
+ctag_jesTotalDown efficiency: 3.81%
+
+tq_Ele_nominal_Loose nElectron>0: pass=1086650    all=4008517    -- eff=27.11 % cumulative eff=27.11 %
+tq_Ele_nominal_Electron[0]_pt>30 && abs(eta)<2.4: pass=607023     all=1086650    -- eff=55.86 % cumulative eff=15.14 %
+tq_Ele_nominal_Clean nJet>=4: pass=176335     all=607023     -- eff=29.05 % cumulative eff=4.40 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=152780     all=176335     -- eff=86.64 % cumulative eff=3.81 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JESUp -------------------------------------
+Sum preWeights: 4008517.00
+Sum postWeights: 176404.00
+Total efficiency: 4.40%
+
+
+tq_Ele_JESUp_Loose nElectron>0: pass=1086650    all=4008517    -- eff=27.11 % cumulative eff=27.11 %
+tq_Ele_JESUp_Electron[0]_pt>30 && abs(eta)<2.4: pass=607023     all=1086650    -- eff=55.86 % cumulative eff=15.14 %
+tq_Ele_JESUp_Clean nJet>=4: pass=205349     all=607023     -- eff=33.83 % cumulative eff=5.12 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=176404     all=205349     -- eff=85.90 % cumulative eff=4.40 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JESDown -------------------------------------
+Sum preWeights: 4008517.00
+Sum postWeights: 134237.00
+Total efficiency: 3.35%
+
+
+tq_Ele_JESDown_Loose nElectron>0: pass=1086650    all=4008517    -- eff=27.11 % cumulative eff=27.11 %
+tq_Ele_JESDown_Electron[0]_pt>30 && abs(eta)<2.4: pass=607023     all=1086650    -- eff=55.86 % cumulative eff=15.14 %
+tq_Ele_JESDown_Clean nJet>=4: pass=153715     all=607023     -- eff=25.32 % cumulative eff=3.83 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=134237     all=153715     -- eff=87.33 % cumulative eff=3.35 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JERUp -------------------------------------
+Sum preWeights: 4008517.00
+Sum postWeights: 153505.00
+Total efficiency: 3.83%
+
+
+tq_Ele_JERUp_Loose nElectron>0: pass=1086650    all=4008517    -- eff=27.11 % cumulative eff=27.11 %
+tq_Ele_JERUp_Electron[0]_pt>30 && abs(eta)<2.4: pass=607023     all=1086650    -- eff=55.86 % cumulative eff=15.14 %
+tq_Ele_JERUp_Clean nJet>=4: pass=177215     all=607023     -- eff=29.19 % cumulative eff=4.42 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=153502     all=177215     -- eff=86.62 % cumulative eff=3.83 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JERDown -------------------------------------
+Sum preWeights: 4008517.00
+Sum postWeights: 152299.00
+Total efficiency: 3.80%
+
+
+tq_Ele_JERDown_Loose nElectron>0: pass=1086650    all=4008517    -- eff=27.11 % cumulative eff=27.11 %
+tq_Ele_JERDown_Electron[0]_pt>30 && abs(eta)<2.4: pass=607023     all=1086650    -- eff=55.86 % cumulative eff=15.14 %
+tq_Ele_JERDown_Clean nJet>=4: pass=175721     all=607023     -- eff=28.95 % cumulative eff=4.38 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=152298     all=175721     -- eff=86.67 % cumulative eff=3.80 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+##################################### tW ######################################
+
+ Number of bunches: 1
+
+------------------------------------- nominal -------------------------------------
+Sum preWeights: 2774802.00
+Sum postWeights: 252543.00
+Total efficiency: 9.10%
+
+btag_hfUp efficiency: 9.09%
+btag_hfDown efficiency: 9.11%
+btag_lfUp efficiency: 9.26%
+btag_lfDown efficiency: 8.93%
+btag_hfstats1Up efficiency: 9.08%
+btag_hfstats1Down efficiency: 9.13%
+btag_hfstats2Up efficiency: 9.10%
+btag_hfstats2Down efficiency: 9.11%
+btag_lfstats1Up efficiency: 9.11%
+btag_lfstats1Down efficiency: 9.10%
+btag_lfstats2Up efficiency: 9.10%
+btag_lfstats2Down efficiency: 9.10%
+btag_cferr1Up efficiency: 9.06%
+btag_cferr1Down efficiency: 9.16%
+btag_cferr2Up efficiency: 9.07%
+btag_cferr2Down efficiency: 9.14%
+ctag_ExtrapUp efficiency: 9.10%
+ctag_ExtrapDown efficiency: 9.10%
+ctag_InterpUp efficiency: 9.10%
+ctag_InterpDown efficiency: 9.10%
+ctag_LHEScaleWeight_muFUp efficiency: 9.10%
+ctag_LHEScaleWeight_muFDown efficiency: 9.10%
+ctag_LHEScaleWeight_muRUp efficiency: 9.10%
+ctag_LHEScaleWeight_muRDown efficiency: 9.10%
+ctag_PSWeightFSRUp efficiency: 9.09%
+ctag_PSWeightFSRDown efficiency: 9.10%
+ctag_PSWeightISRUp efficiency: 9.10%
+ctag_PSWeightISRDown efficiency: 9.10%
+ctag_PUWeightUp efficiency: 9.10%
+ctag_PUWeightDown efficiency: 9.10%
+ctag_StatUp efficiency: 9.10%
+ctag_StatDown efficiency: 9.10%
+ctag_XSec_BRUnc_DYJets_bUp efficiency: 9.10%
+ctag_XSec_BRUnc_DYJets_bDown efficiency: 9.10%
+ctag_XSec_BRUnc_DYJets_cUp efficiency: 9.10%
+ctag_XSec_BRUnc_DYJets_cDown efficiency: 9.10%
+ctag_jerUp efficiency: 9.10%
+ctag_jerDown efficiency: 9.10%
+ctag_jesTotalUp efficiency: 9.10%
+ctag_jesTotalDown efficiency: 9.10%
+
+tW_Ele_nominal_Loose nElectron>0: pass=820574     all=2805534    -- eff=29.25 % cumulative eff=29.25 %
+tW_Ele_nominal_Electron[0]_pt>30 && abs(eta)<2.4: pass=532920     all=820574     -- eff=64.94 % cumulative eff=19.00 %
+tW_Ele_nominal_Clean nJet>=4: pass=306305     all=532920     -- eff=57.48 % cumulative eff=10.92 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=255449     all=306305     -- eff=83.40 % cumulative eff=9.11 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JESUp -------------------------------------
+Sum preWeights: 2774802.00
+Sum postWeights: 269204.00
+Total efficiency: 9.70%
+
+
+tW_Ele_JESUp_Loose nElectron>0: pass=820574     all=2805534    -- eff=29.25 % cumulative eff=29.25 %
+tW_Ele_JESUp_Electron[0]_pt>30 && abs(eta)<2.4: pass=532920     all=820574     -- eff=64.94 % cumulative eff=19.00 %
+tW_Ele_JESUp_Clean nJet>=4: pass=327653     all=532920     -- eff=61.48 % cumulative eff=11.68 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=272294     all=327653     -- eff=83.10 % cumulative eff=9.71 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JESDown -------------------------------------
+Sum preWeights: 2774802.00
+Sum postWeights: 236803.00
+Total efficiency: 8.53%
+
+
+tW_Ele_JESDown_Loose nElectron>0: pass=820574     all=2805534    -- eff=29.25 % cumulative eff=29.25 %
+tW_Ele_JESDown_Electron[0]_pt>30 && abs(eta)<2.4: pass=532920     all=820574     -- eff=64.94 % cumulative eff=19.00 %
+tW_Ele_JESDown_Clean nJet>=4: pass=286366     all=532920     -- eff=53.74 % cumulative eff=10.21 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=239535     all=286366     -- eff=83.65 % cumulative eff=8.54 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JERUp -------------------------------------
+Sum preWeights: 2774802.00
+Sum postWeights: 252843.00
+Total efficiency: 9.11%
+
+
+tW_Ele_JERUp_Loose nElectron>0: pass=820574     all=2805534    -- eff=29.25 % cumulative eff=29.25 %
+tW_Ele_JERUp_Electron[0]_pt>30 && abs(eta)<2.4: pass=532920     all=820574     -- eff=64.94 % cumulative eff=19.00 %
+tW_Ele_JERUp_Clean nJet>=4: pass=306769     all=532920     -- eff=57.56 % cumulative eff=10.93 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=255740     all=306769     -- eff=83.37 % cumulative eff=9.12 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JERDown -------------------------------------
+Sum preWeights: 2774802.00
+Sum postWeights: 252383.00
+Total efficiency: 9.10%
+
+
+tW_Ele_JERDown_Loose nElectron>0: pass=820574     all=2805534    -- eff=29.25 % cumulative eff=29.25 %
+tW_Ele_JERDown_Electron[0]_pt>30 && abs(eta)<2.4: pass=532920     all=820574     -- eff=64.94 % cumulative eff=19.00 %
+tW_Ele_JERDown_Clean nJet>=4: pass=306066     all=532920     -- eff=57.43 % cumulative eff=10.91 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=255300     all=306066     -- eff=83.41 % cumulative eff=9.10 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+##################################### WWJets ######################################
+
+ Number of bunches: 1
+
+------------------------------------- nominal -------------------------------------
+Sum preWeights: 2564439.00
+Sum postWeights: 13380.00
+Total efficiency: 0.52%
+
+btag_hfUp efficiency: 0.49%
+btag_hfDown efficiency: 0.55%
+btag_lfUp efficiency: 0.52%
+btag_lfDown efficiency: 0.52%
+btag_hfstats1Up efficiency: 0.52%
+btag_hfstats1Down efficiency: 0.52%
+btag_hfstats2Up efficiency: 0.52%
+btag_hfstats2Down efficiency: 0.52%
+btag_lfstats1Up efficiency: 0.52%
+btag_lfstats1Down efficiency: 0.52%
+btag_lfstats2Up efficiency: 0.52%
+btag_lfstats2Down efficiency: 0.53%
+btag_cferr1Up efficiency: 0.46%
+btag_cferr1Down efficiency: 0.62%
+btag_cferr2Up efficiency: 0.48%
+btag_cferr2Down efficiency: 0.58%
+ctag_ExtrapUp efficiency: 0.52%
+ctag_ExtrapDown efficiency: 0.52%
+ctag_InterpUp efficiency: 0.52%
+ctag_InterpDown efficiency: 0.52%
+ctag_LHEScaleWeight_muFUp efficiency: 0.52%
+ctag_LHEScaleWeight_muFDown efficiency: 0.52%
+ctag_LHEScaleWeight_muRUp efficiency: 0.52%
+ctag_LHEScaleWeight_muRDown efficiency: 0.52%
+ctag_PSWeightFSRUp efficiency: 0.52%
+ctag_PSWeightFSRDown efficiency: 0.52%
+ctag_PSWeightISRUp efficiency: 0.52%
+ctag_PSWeightISRDown efficiency: 0.52%
+ctag_PUWeightUp efficiency: 0.52%
+ctag_PUWeightDown efficiency: 0.52%
+ctag_StatUp efficiency: 0.52%
+ctag_StatDown efficiency: 0.52%
+ctag_XSec_BRUnc_DYJets_bUp efficiency: 0.52%
+ctag_XSec_BRUnc_DYJets_bDown efficiency: 0.52%
+ctag_XSec_BRUnc_DYJets_cUp efficiency: 0.52%
+ctag_XSec_BRUnc_DYJets_cDown efficiency: 0.52%
+ctag_jerUp efficiency: 0.52%
+ctag_jerDown efficiency: 0.52%
+ctag_jesTotalUp efficiency: 0.52%
+ctag_jesTotalDown efficiency: 0.52%
+
+WWJets_Ele_nominal_Loose nElectron>0: pass=1062344    all=4262977    -- eff=24.92 % cumulative eff=24.92 %
+WWJets_Ele_nominal_Electron[0]_pt>30 && abs(eta)<2.4: pass=652188     all=1062344    -- eff=61.39 % cumulative eff=15.30 %
+WWJets_Ele_nominal_Clean nJet>=4: pass=188449     all=652188     -- eff=28.89 % cumulative eff=4.42 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=26886      all=188449     -- eff=14.27 % cumulative eff=0.63 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JESUp -------------------------------------
+Sum preWeights: 2564439.00
+Sum postWeights: 15890.00
+Total efficiency: 0.62%
+
+
+WWJets_Ele_JESUp_Loose nElectron>0: pass=1062344    all=4262977    -- eff=24.92 % cumulative eff=24.92 %
+WWJets_Ele_JESUp_Electron[0]_pt>30 && abs(eta)<2.4: pass=652188     all=1062344    -- eff=61.39 % cumulative eff=15.30 %
+WWJets_Ele_JESUp_Clean nJet>=4: pass=221511     all=652188     -- eff=33.96 % cumulative eff=5.20 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=31586      all=221511     -- eff=14.26 % cumulative eff=0.74 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JESDown -------------------------------------
+Sum preWeights: 2564439.00
+Sum postWeights: 11635.00
+Total efficiency: 0.45%
+
+
+WWJets_Ele_JESDown_Loose nElectron>0: pass=1062344    all=4262977    -- eff=24.92 % cumulative eff=24.92 %
+WWJets_Ele_JESDown_Electron[0]_pt>30 && abs(eta)<2.4: pass=652188     all=1062344    -- eff=61.39 % cumulative eff=15.30 %
+WWJets_Ele_JESDown_Clean nJet>=4: pass=162884     all=652188     -- eff=24.98 % cumulative eff=3.82 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=23301      all=162884     -- eff=14.31 % cumulative eff=0.55 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JERUp -------------------------------------
+Sum preWeights: 2564439.00
+Sum postWeights: 13519.00
+Total efficiency: 0.53%
+
+
+WWJets_Ele_JERUp_Loose nElectron>0: pass=1062344    all=4262977    -- eff=24.92 % cumulative eff=24.92 %
+WWJets_Ele_JERUp_Electron[0]_pt>30 && abs(eta)<2.4: pass=652188     all=1062344    -- eff=61.39 % cumulative eff=15.30 %
+WWJets_Ele_JERUp_Clean nJet>=4: pass=189665     all=652188     -- eff=29.08 % cumulative eff=4.45 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=27065      all=189665     -- eff=14.27 % cumulative eff=0.63 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+------------------------------------- JERDown -------------------------------------
+Sum preWeights: 2564439.00
+Sum postWeights: 13333.00
+Total efficiency: 0.52%
+
+
+WWJets_Ele_JERDown_Loose nElectron>0: pass=1062344    all=4262977    -- eff=24.92 % cumulative eff=24.92 %
+WWJets_Ele_JERDown_Electron[0]_pt>30 && abs(eta)<2.4: pass=652188     all=1062344    -- eff=61.39 % cumulative eff=15.30 %
+WWJets_Ele_JERDown_Clean nJet>=4: pass=187552     all=652188     -- eff=28.76 % cumulative eff=4.40 %
+Max(Jet_btagDeepFlavB)>0.2793 (Medium): pass=26774      all=187552     -- eff=14.28 % cumulative eff=0.63 %
+
+Converting to torch tensors...
+
+Starting DNN evaluation...
+
+----------------------Building TH1---------------------
+
+--------------------------Done-------------------------

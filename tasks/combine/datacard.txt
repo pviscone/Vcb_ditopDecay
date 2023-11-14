@@ -1,0 +1,46 @@
+
+imax *
+jmax *
+kmax *
+---------------
+shapes * * cutted.root $CHANNEL/$PROCESS $CHANNEL/$PROCESS_syst_$SYSTEMATIC
+---------------
+bin    Muons    Muons    Muons    Muons    Muons    Muons    Muons    Muons    Muons    Muons    Electrons    Electrons    Electrons    Electrons    Electrons    Electrons    Electrons    Electrons    Electrons    Electrons    
+process    signalMu    signalTau    semiLeptMu    semiLeptTau    diLept    diHad    WJets    WWJets    tW    tq    signalEle    signalTau    semiLeptEle    semiLeptTau    diLept    diHad    WJets    WWJets    tW    tq    
+process    0    -1    1    2    3    4    5    6    7    8    -2    -3    9    10    11    12    13    14    15    16    
+rate    -1    -1    -1    -1    -1    -1    -1    -1    -1    -1    -1    -1    -1    -1    -1    -1    -1    -1    -1    -1    
+---------------
+btag_hf    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+btag_lf    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+btag_hfstats1    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+btag_hfstats2    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+btag_lfstats1    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+btag_lfstats2    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+JESFlavorQCD    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+JESRelativeBal    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+JESHF    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+JESBBEC1    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+JESEC2    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+JESAbsolute    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+JESAbsolute2018    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+JESHF2018    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+JESEC22018    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+JESRelativeSample2018    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+JESBBEC12018    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+JER    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+lumi    lnN   1.016    1.016    1.016    1.016    1.016    1.016    1.016    1.016    1.016    1.016    1.016    1.016    1.016    1.016    1.016    1.016    1.016    1.016    1.016    1.016    
+MuAcceptance    lnN   1.01    1.01    1.01    1.01    1.01    1.01    1.01    1.01    1.01    1.01    -    -    -    -    -    -    -    -    -    -    
+EleAcceptance    lnN   -    -    -    -    -    -    -    -    -    -    1.02    1.02    1.02    1.02    1.02    1.02    1.02    1.02    1.02    1.02    
+XSecTT    lnN   1.05    1.05    1.05    1.05    1.05    1.05    -    -    -    -    1.05    1.05    1.05    1.05    1.05    1.05    -    -    -    -    
+ctag_Interp    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+ctag_LHEScaleWeight_muF    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+ctag_LHEScaleWeight_muR    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+ctag_PSWeightISR    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+ctag_PUWeight    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+ctag_XSec_BRUnc_DYJets_b    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+ctag_XSec_BRUnc_DYJets_c    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+ctag_jer    shape   1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    
+btag    group    =    btag_hf    btag_lf    btag_hfstats1    btag_hfstats2    btag_lfstats1    btag_lfstats2    
+JERC    group    =    JESFlavorQCD    JESRelativeBal    JESHF    JESBBEC1    JESEC2    JESAbsolute    JESAbsolute2018    JESHF2018    JESEC22018    JESRelativeSample2018    JESBBEC12018    JER    
+norms    group    =    lumi    MuAcceptance    EleAcceptance    XSecTT    
+ctag    group    =    ctag_Interp    ctag_LHEScaleWeight_muF    ctag_LHEScaleWeight_muR    ctag_PSWeightISR    ctag_PUWeight    ctag_XSec_BRUnc_DYJets_b    ctag_XSec_BRUnc_DYJets_c    ctag_jer    

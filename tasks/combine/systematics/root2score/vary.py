@@ -10,10 +10,24 @@ ROOT.EnableImplicitMT(n_thread)
 include_path=os.path.join(os.path.dirname(__file__),"vary_utils.h")
 
 ROOT.gInterpreter.ProcessLine(f'#include "{include_path}"')
-ROOT.gInterpreter.Declare('auto JES = JERC->at("Summer19UL18_V5_MC_Total_AK4PFchs");')
+
 ROOT.gInterpreter.Declare('auto JER= JERC->at("Summer19UL18_JRV2_MC_ScaleFactor_AK4PFchs");')
 ROOT.gInterpreter.Declare('auto bTag=btagging->at("deepJet_shape");')
 ROOT.gInterpreter.Declare('auto cTag=ctagging->at("deepJet_shape");')
+
+
+ROOT.gInterpreter.Declare('auto JESFlavorQCD = JERC->at("Summer19UL18_V5_MC_Regrouped_FlavorQCD_AK4PFchs");')
+ROOT.gInterpreter.Declare('auto JESRelativeBal = JERC->at("Summer19UL18_V5_MC_Regrouped_RelativeBal_AK4PFchs");')
+ROOT.gInterpreter.Declare('auto JESHF = JERC->at("Summer19UL18_V5_MC_Regrouped_HF_AK4PFchs");')
+ROOT.gInterpreter.Declare('auto JESBBEC1 = JERC->at("Summer19UL18_V5_MC_Regrouped_BBEC1_AK4PFchs");')
+ROOT.gInterpreter.Declare('auto JESEC2 = JERC->at("Summer19UL18_V5_MC_Regrouped_EC2_AK4PFchs");')
+ROOT.gInterpreter.Declare('auto JESAbsolute = JERC->at("Summer19UL18_V5_MC_Regrouped_Absolute_AK4PFchs");')
+ROOT.gInterpreter.Declare('auto JESAbsolute2018 = JERC->at("Summer19UL18_V5_MC_Regrouped_Absolute_2018_AK4PFchs");')
+ROOT.gInterpreter.Declare('auto JESHF2018 = JERC->at("Summer19UL18_V5_MC_Regrouped_HF_2018_AK4PFchs");')
+ROOT.gInterpreter.Declare('auto JESEC22018 = JERC->at("Summer19UL18_V5_MC_Regrouped_EC2_2018_AK4PFchs");')
+ROOT.gInterpreter.Declare('auto JESRelativeSample2018 = JERC->at("Summer19UL18_V5_MC_Regrouped_RelativeSample_2018_AK4PFchs");')
+ROOT.gInterpreter.Declare('auto JESBBEC12018 = JERC->at("Summer19UL18_V5_MC_Regrouped_BBEC1_2018_AK4PFchs");')
+ROOT.gInterpreter.Declare('auto JESTotal = JERC->at("Summer19UL18_V5_MC_Regrouped_Total_AK4PFchs");')
 
 
 import copy
@@ -67,12 +81,79 @@ def vary(rdf_dict,weight_syst_list=[]):
 
         res[dataset]={"nominal":copy.copy(rdf_dict[dataset]),
                         
-                    "JESUp":loop_redefine(rdf_dict[dataset],("Jet_pt","(1+evaluate(JES,{Jet_eta,Jet_pt}))*Jet_pt")
-                                            ,("Jet_mass","(1+evaluate(JES,{Jet_eta,Jet_pt}))*Jet_mass")
+                    "JESFlavorQCDUp":loop_redefine(rdf_dict[dataset],("Jet_pt","(1+evaluate(JESFlavorQCD,{Jet_eta,Jet_pt}))*Jet_pt")
+                                            ,("Jet_mass","(1+evaluate(JESFlavorQCD,{Jet_eta,Jet_pt}))*Jet_mass")
                             ),
-                    "JESDown":loop_redefine(rdf_dict[dataset],("Jet_pt","(1-evaluate(JES,{Jet_eta,Jet_pt}))*Jet_pt")
-                                                ,("Jet_mass","(1-evaluate(JES,{Jet_eta,Jet_pt}))*Jet_mass")
+                    "JESFlavorQCDDown":loop_redefine(rdf_dict[dataset],("Jet_pt","(1-evaluate(JESFlavorQCD,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                ,("Jet_mass","(1-evaluate(JESFlavorQCD,{Jet_eta,Jet_pt}))*Jet_mass")
                             ),
+                    "JESRelativeBalUp":loop_redefine(rdf_dict[dataset],("Jet_pt","(1+evaluate(JESRelativeBal,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                ,("Jet_mass","(1+evaluate(JESRelativeBal,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                    "JESRelativeBalDown":loop_redefine(rdf_dict[dataset],("Jet_pt","(1-evaluate(JESRelativeBal,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                    ,("Jet_mass","(1-evaluate(JESRelativeBal,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                    "JESHFUp":loop_redefine(rdf_dict[dataset],("Jet_pt","(1+evaluate(JESHF,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                ,("Jet_mass","(1+evaluate(JESHF,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                    "JESHFDown":loop_redefine(rdf_dict[dataset],("Jet_pt","(1-evaluate(JESHF,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                    ,("Jet_mass","(1-evaluate(JESHF,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                    "JESBBEC1Up":loop_redefine(rdf_dict[dataset],("Jet_pt","(1+evaluate(JESBBEC1,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                ,("Jet_mass","(1+evaluate(JESBBEC1,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                    "JESBBEC1Down":loop_redefine(rdf_dict[dataset],("Jet_pt","(1-evaluate(JESBBEC1,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                    ,("Jet_mass","(1-evaluate(JESBBEC1,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                    "JESEC2Up":loop_redefine(rdf_dict[dataset],("Jet_pt","(1+evaluate(JESEC2,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                ,("Jet_mass","(1+evaluate(JESEC2,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                    "JESEC2Down":loop_redefine(rdf_dict[dataset],("Jet_pt","(1-evaluate(JESEC2,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                    ,("Jet_mass","(1-evaluate(JESEC2,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                    "JESAbsoluteUp":loop_redefine(rdf_dict[dataset],("Jet_pt","(1+evaluate(JESAbsolute,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                ,("Jet_mass","(1+evaluate(JESAbsolute,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                    "JESAbsoluteDown":loop_redefine(rdf_dict[dataset],("Jet_pt","(1-evaluate(JESAbsolute,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                    ,("Jet_mass","(1-evaluate(JESAbsolute,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                    "JESAbsolute2018Up":loop_redefine(rdf_dict[dataset],("Jet_pt","(1+evaluate(JESAbsolute2018,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                ,("Jet_mass","(1+evaluate(JESAbsolute2018,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                    "JESAbsolute2018Down":loop_redefine(rdf_dict[dataset],("Jet_pt","(1-evaluate(JESAbsolute2018,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                    ,("Jet_mass","(1-evaluate(JESAbsolute2018,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                    "JESHF2018Up":loop_redefine(rdf_dict[dataset],("Jet_pt","(1+evaluate(JESHF2018,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                ,("Jet_mass","(1+evaluate(JESHF2018,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                    "JESHF2018Down":loop_redefine(rdf_dict[dataset],("Jet_pt","(1-evaluate(JESHF2018,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                    ,("Jet_mass","(1-evaluate(JESHF2018,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                    "JESEC22018Up":loop_redefine(rdf_dict[dataset],("Jet_pt","(1+evaluate(JESEC22018,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                ,("Jet_mass","(1+evaluate(JESEC22018,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                    "JESEC22018Down":loop_redefine(rdf_dict[dataset],("Jet_pt","(1-evaluate(JESEC22018,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                    ,("Jet_mass","(1-evaluate(JESEC22018,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                    "JESRelativeSample2018Up":loop_redefine(rdf_dict[dataset],("Jet_pt","(1+evaluate(JESRelativeSample2018,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                ,("Jet_mass","(1+evaluate(JESRelativeSample2018,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                    "JESRelativeSample2018Down":loop_redefine(rdf_dict[dataset],("Jet_pt","(1-evaluate(JESRelativeSample2018,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                    ,("Jet_mass","(1-evaluate(JESRelativeSample2018,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                    "JESBBEC12018Up":loop_redefine(rdf_dict[dataset],("Jet_pt","(1+evaluate(JESBBEC12018,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                ,("Jet_mass","(1+evaluate(JESBBEC12018,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                    "JESBBEC12018Down":loop_redefine(rdf_dict[dataset],("Jet_pt","(1-evaluate(JESBBEC12018,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                    ,("Jet_mass","(1-evaluate(JESBBEC12018,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                    "JESTotalUp":loop_redefine(rdf_dict[dataset],("Jet_pt","(1+evaluate(JESTotal,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                ,("Jet_mass","(1+evaluate(JESTotal,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                    "JESTotalDown":loop_redefine(rdf_dict[dataset],("Jet_pt","(1-evaluate(JESTotal,{Jet_eta,Jet_pt}))*Jet_pt")
+                                                    ,("Jet_mass","(1-evaluate(JESTotal,{Jet_eta,Jet_pt}))*Jet_mass")
+                            ),
+                                        
                     "JERUp":loop_redefine(rdf_dict[dataset],("Jet_pt",'JetGen_pt+(originalJet_pt-JetGen_pt)*evaluate(JER,{Jet_eta},"up")/evaluate(JER,{Jet_eta},"nom")')
                                                 ,("Jet_mass",'JetGen_mass+(originalJet_mass-JetGen_mass)*evaluate(JER,{Jet_eta},"up")/evaluate(JER,{Jet_eta},"nom")')
                             ),
