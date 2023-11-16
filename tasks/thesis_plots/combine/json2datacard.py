@@ -97,21 +97,23 @@ if __name__=="__main__":
                     output.write(f'{systs_groups[group][syst]["value"]}\t')
             else:
                 procs=systs_groups[group][syst]["proc"]
+                tot_idxs=[]
                 for proc in procs:
                     idxs=[i for i in range(len(proc_order)) if proc_order[i] == proc]
-                    for i in range(n_tot):
-                        if i in idxs:
-                            output.write(f'{systs_groups[group][syst]["value"]}\t')
-                        else:
-                            output.write(f'-\t')
+                    tot_idxs=tot_idxs+idxs
+                for i in range(n_tot):
+                    if i in tot_idxs:
+                        output.write(f'{systs_groups[group][syst]["value"]}\t')
+                    else:
+                        output.write(f'-\t')
             output.write("\n")
-    '''    
+       
     for group in systs_groups:
         output.write(f"{group}\tgroup\t=\t")
         for syst in systs_groups[group]:
             output.write(f"{syst}\t")
         output.write("\n")
-    '''   
+    
 output.close()
         
 
