@@ -1,0 +1,563 @@
+Have POIs: ['r']
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+
+ --- MultiDimFit ---
+best fit parameter values and profile-likelihood uncertainties: 
+   r :    +1.000   -0.143/+0.158 (68%)
+Done in 0.01 min (cpu), 0.01 min (real)
+>> combine -M MultiDimFit -n _initialFit_Test --algo singles --redefineSignalPOIs r --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+Have POIs: ['r']
+Have parameters: 30
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+ <<< Combine >>> 
+>>> random number generator seed is 123456
+   Options for Robust Minimizer :: 
+        Tolerance  0.1
+        Strategy   0
+        Type,Algo  Minuit2,Migrad
+>>> method used is MultiDimFit
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+
+ --- MultiDimFit ---
+Parameter impacts: 
+  Parameter               :   Best-fit               r            
+  ctag_LHEScaleWeight_muR :   +0.000  -0.945/+0.947
+ --- MultiDimFit ---
+Parameter impacts: 
+  +0.010/-0.010
+Done in 0.01 min (cpu), 0.01 min (real)
+  Parameter     :   Best-fit               r            
+  btag_hfstats2 :   +0.000  -0.984/+0.984
+ --- MultiDimFit ---
+Parameter impacts: 
+  Parameter :   Best-fit               r            
+  JER       :   +0.000  -0.938/+0.938  -0.030/+0.030
+Done in 0.01 min (cpu), 0.01 min (real)
+  +0.005/-0.005
+Done in 0.01 min (cpu), 0.01 min (real)
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+
+ --- MultiDimFit ---
+Parameter impacts: 
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+
+ --- MultiDimFit ---
+Parameter impacts: 
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+  Parameter                :   Best-fit               r            
+  ctag_XSec_BRUnc_DYJets_b :   +0.000  -0.987/+0.987  Parameter             :   Best-fit               r            
+  JESRelativeSample2018 :   +0.000  -0.876/+0.868  +0.037/-0.038
+Done in 0.01 min (cpu), 0.01 min (real)
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+  -0.003/+0.003
+Done in 0.01 min (cpu), 0.01 min (real)
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+
+ --- MultiDimFit ---
+Parameter impacts: 
+  Parameter                :   Best-fit               r            
+  ctag_XSec_BRUnc_DYJets_c :   +0.000  -0.935/+0.935Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+  +0.001/-0.001
+Done in 0.01 min (cpu), 0.01 min (real)
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+
+ --- MultiDimFit ---
+Parameter impacts: 
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+  Parameter :   Best-fit               r            
+  btag_hf   :   +0.000  -0.574/+0.569Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+  +0.057/-0.052
+Done in 0.01 min (cpu), 0.01 min (real)
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+
+ --- MultiDimFit ---
+Parameter impacts: 
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+  Parameter   :   Best-fit               r            
+  JESAbsolute :   +0.000  -0.859/+0.867
+ --- MultiDimFit ---
+Parameter impacts: 
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+
+ --- MultiDimFit ---
+Parameter impacts: 
+  Parameter     :   Best-fit               r            
+  btag_lfstats2 :   +0.000  -0.970/+0.975  -0.028/+0.027
+Done in 0.01 min (cpu), 0.01 min (real)
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+
+ --- MultiDimFit ---
+Parameter impacts: 
+
+ --- MultiDimFit ---
+Parameter impacts: 
+  Parameter    :   Best-fit               r            
+  JESFlavorQCD :   +0.000  -0.922/+0.926Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+  Parameter       :   Best-fit               r            
+  JESAbsolute2018 :   +0.000  -0.966/+0.966SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+  +0.007/-0.008
+Done in 0.01 min (cpu), 0.01 min (real)
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+  -0.033/+0.033
+Done in 0.01 min (cpu), 0.01 min (real)
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+  Parameter :   Best-fit               r            
+  XSecTT    :   +0.000  -0.494/+0.494  +0.040/-0.039
+Done in 0.01 min (cpu), 0.01 min (real)
+  -0.009/+0.010
+Done in 0.01 min (cpu), 0.01 min (real)
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+
+ --- MultiDimFit ---
+Parameter impacts: 
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+  Parameter :   Best-fit               r            
+  JESEC2    :   +0.000  -0.991/+0.990
+ --- MultiDimFit ---
+Parameter impacts: 
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+
+ --- MultiDimFit ---
+Parameter impacts: 
+  Parameter      :   Best-fit               r            
+  JESRelativeBal :   +0.000  -0.945/+0.943  Parameter :   Best-fit               r            
+  JESHF     :   +0.000  -0.982/+0.981  +0.003/-0.004
+Done in 0.01 min (cpu), 0.01 min (real)
+Dataset data_obs not found.
+>>> 0 out of 2 channels masked
+
+SimNLL created with 2 channels, 0 generic constraints, 30 fast gaussian constraints, 0 fast poisson constraints, 0 fast group constraints, 
+  +0.010/-0.010
+Done in 0.01 min (cpu), 0.01 min (real)
+  +0.003/-0.002
+Done in 0.01 min (cpu), 0.01 min (real)
+
+ --- MultiDimFit ---
+Parameter impacts: 
+
+ --- MultiDimFit ---
+Parameter impacts: 
+  Parameter :   Best-fit               r            
+  JESBBEC1  :   +0.000  -0.975/+0.977  Parameter     :   Best-fit               r            
+  ctag_PUWeight :   +0.000  -0.947/+0.947
+ --- MultiDimFit ---
+Parameter impacts: 
+
+ --- MultiDimFit ---
+Parameter impacts: 
+
+ --- MultiDimFit ---
+Parameter impacts: 
+  Parameter :   Best-fit               r            
+  JESHF2018 :   +0.000  -0.992/+0.990  Parameter        :   Best-fit               r            
+  ctag_PSWeightISR :   +0.000  -0.994/+0.994  -0.016/+0.016
+Done in 0.01 min (cpu), 0.01 min (real)
+  Parameter    :   Best-fit               r            
+  MuAcceptance :   +0.000  -0.876/+0.876
+ --- MultiDimFit ---
+Parameter impacts: 
+  +0.013/-0.012
+Done in 0.01 min (cpu), 0.01 min (real)
+  Parameter     :   Best-fit               r            
+  btag_hfstats1 :   +0.000  -0.984/+0.984
+ --- MultiDimFit ---
+Parameter impacts: 
+  -0.001/+0.001
+Done in 0.01 min (cpu), 0.01 min (real)
+
+ --- MultiDimFit ---
+Parameter impacts: 
+
+ --- MultiDimFit ---
+Parameter impacts: 
+
+ --- MultiDimFit ---
+Parameter impacts: 
+  +0.001/-0.001
+Done in 0.01 min (cpu), 0.01 min (real)
+  Parameter     :   Best-fit               r            
+  btag_lfstats1 :   +0.000  -0.951/+0.951
+ --- MultiDimFit ---
+Parameter impacts: 
+  Parameter    :   Best-fit               r            
+  JESBBEC12018 :   +0.000  -0.986/+0.987  Parameter   :   Best-fit               r            
+  ctag_Interp :   +0.000  -0.850/+0.853  Parameter  :   Best-fit               r            
+  JESEC22018 :   +0.000  -0.986/+0.986
+ --- MultiDimFit ---
+Parameter impacts: 
+  Parameter     :   Best-fit               r            
+  EleAcceptance :   +0.000  -0.465/+0.464  +0.007/-0.008
+Done in 0.01 min (cpu), 0.01 min (real)
+
+ --- MultiDimFit ---
+Parameter impacts: 
+
+ --- MultiDimFit ---
+Parameter impacts: 
+  -0.007/+0.008
+Done in 0.01 min (cpu), 0.01 min (real)
+  +0.005/-0.005
+Done in 0.01 min (cpu), 0.01 min (real)
+  Parameter               :   Best-fit               r            
+  ctag_LHEScaleWeight_muF :   +0.000  -0.858/+0.856  +0.004/-0.004
+Done in 0.01 min (cpu), 0.01 min (real)
+  -0.002/+0.001
+Done in 0.01 min (cpu), 0.01 min (real)
+  -0.039/+0.036
+Done in 0.01 min (cpu), 0.01 min (real)
+  Parameter :   Best-fit               r            
+  btag_lf   :   +0.000  -0.792/+0.800  +0.067/-0.062
+Done in 0.01 min (cpu), 0.01 min (real)
+  -0.008/+0.008
+Done in 0.02 min (cpu), 0.02 min (real)
+  +0.024/-0.024
+Done in 0.01 min (cpu), 0.01 min (real)
+  Parameter :   Best-fit               r            
+  lumi      :   +0.000  -0.952/+0.952  +0.007/-0.007
+Done in 0.01 min (cpu), 0.01 min (real)
+
+ --- MultiDimFit ---
+Parameter impacts: 
+  Parameter :   Best-fit               r            
+  ctag_jer  :   +0.000  -0.426/+0.421  -0.058/+0.061
+Done in 0.01 min (cpu), 0.01 min (real)
+>> combine -M MultiDimFit -n _paramFit_Test_ctag_LHEScaleWeight_muR --algo impact --redefineSignalPOIs r -P ctag_LHEScaleWeight_muR --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_ctag_XSec_BRUnc_DYJets_b --algo impact --redefineSignalPOIs r -P ctag_XSec_BRUnc_DYJets_b --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_btag_hf --algo impact --redefineSignalPOIs r -P btag_hf --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_ctag_XSec_BRUnc_DYJets_c --algo impact --redefineSignalPOIs r -P ctag_XSec_BRUnc_DYJets_c --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_JER --algo impact --redefineSignalPOIs r -P JER --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_btag_lfstats2 --algo impact --redefineSignalPOIs r -P btag_lfstats2 --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_JESAbsolute --algo impact --redefineSignalPOIs r -P JESAbsolute --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_JESRelativeSample2018 --algo impact --redefineSignalPOIs r -P JESRelativeSample2018 --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_btag_hfstats2 --algo impact --redefineSignalPOIs r -P btag_hfstats2 --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_JESFlavorQCD --algo impact --redefineSignalPOIs r -P JESFlavorQCD --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_XSecTT --algo impact --redefineSignalPOIs r -P XSecTT --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_JESAbsolute2018 --algo impact --redefineSignalPOIs r -P JESAbsolute2018 --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_JESEC2 --algo impact --redefineSignalPOIs r -P JESEC2 --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_JESRelativeBal --algo impact --redefineSignalPOIs r -P JESRelativeBal --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_JESHF --algo impact --redefineSignalPOIs r -P JESHF --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_JESBBEC1 --algo impact --redefineSignalPOIs r -P JESBBEC1 --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_ctag_PUWeight --algo impact --redefineSignalPOIs r -P ctag_PUWeight --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_ctag_PSWeightISR --algo impact --redefineSignalPOIs r -P ctag_PSWeightISR --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_JESHF2018 --algo impact --redefineSignalPOIs r -P JESHF2018 --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_MuAcceptance --algo impact --redefineSignalPOIs r -P MuAcceptance --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_btag_lfstats1 --algo impact --redefineSignalPOIs r -P btag_lfstats1 --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_btag_hfstats1 --algo impact --redefineSignalPOIs r -P btag_hfstats1 --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_JESEC22018 --algo impact --redefineSignalPOIs r -P JESEC22018 --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_JESBBEC12018 --algo impact --redefineSignalPOIs r -P JESBBEC12018 --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_ctag_Interp --algo impact --redefineSignalPOIs r -P ctag_Interp --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_btag_lf --algo impact --redefineSignalPOIs r -P btag_lf --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_EleAcceptance --algo impact --redefineSignalPOIs r -P EleAcceptance --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_lumi --algo impact --redefineSignalPOIs r -P lumi --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_ctag_jer --algo impact --redefineSignalPOIs r -P ctag_jer --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+>> combine -M MultiDimFit -n _paramFit_Test_ctag_LHEScaleWeight_muF --algo impact --redefineSignalPOIs r -P ctag_LHEScaleWeight_muF --floatOtherPOIs 1 --saveInactivePOI 1 --robustFit 1 -t -1 --expectSignal=1 -m 125 -d Combined/datacard/workspace.root
+Have POIs: ['r']
+Have parameters: 30
+>> Doing page 0, have 30 parameters
