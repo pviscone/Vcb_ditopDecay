@@ -8,7 +8,7 @@ import mplhep
 mplhep.style.use("CMS")
 plt.rcParams['axes.axisbelow'] = True
 
-file_name="/scratchnvme/pviscone/Vcb_ditopDecay/tasks/combine/systematics/all_hist.root"
+file_name="/scratchnvme/pviscone/Vcb_ditopDecay/tasks/combine/systematics/hist.root"
 file=uproot.open(file_name)
 
 #%%
@@ -92,7 +92,7 @@ ax2.set_title("Muon Channel",loc="left",fontsize=22)
 ax2.set_ylabel(r"$\frac{S^2}{S+B}$")
 mplhep.cms.lumitext(f"Q={np.sum(Q('Muons')[1]):.2f}",ax=ax2)
 if save:
-    plt.savefig("stack_score_muons.png",bbox_inches='tight',dpi=1000)
+    plt.savefig("stack_score_muons.pdf",bbox_inches='tight')
 
 
 # %%
@@ -124,4 +124,4 @@ ax2.set_ylabel(r"$\frac{S^2}{S+B}$")
 ax2.set_title("Electron Channel",loc="left",fontsize=22)
 mplhep.cms.lumitext(f"$Q={np.sum(Q('Electrons')[1]):.2f}$",ax=ax2)
 if save:
-    plt.savefig("stack_score_electrons.png",bbox_inches='tight',dpi=1000)
+    plt.savefig("stack_score_electrons.pdf",bbox_inches='tight')

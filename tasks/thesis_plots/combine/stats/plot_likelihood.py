@@ -40,5 +40,5 @@ fig,ax=plt.subplots(1,1,figsize=(8,6))
 plot_like(muon,ax,label="Muon",color="dodgerblue")
 plot_like(electron,ax,label="Electron",color="red")
 plot_like(combined,ax,label="Combined",color="black")
-plt.savefig("stat_like.png",dpi=800,bbox_inches="tight")
+plt.savefig("stat_like.pdf",dpi=800,bbox_inches="tight")
 # %%

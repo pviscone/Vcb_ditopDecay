@@ -119,8 +119,8 @@ systs_to_smooth=[
 
 
 
-input_file="../systematics/all_hist.root"
-out="all_hist_smooth.root"
+input_file="../systematics/hist.root"
+out="hist_smooth.root"
 frac=0.4
 symm=True
 plot=True

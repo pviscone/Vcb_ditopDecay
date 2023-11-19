@@ -57,7 +57,7 @@
             }
 
         },
-        "JERC":{
+        "JESJER":{
             "JES":{
                 "type":"shape",
                 "proc":"all",
@@ -76,15 +76,20 @@
                 "proc": "all",
                 "value":1.016
             },
-            "XSecSemiLeptMu":{
+            "MuAcceptance ":{
                 "type":"lnN",
-                "proc":["semiLeptMu"],
-                "value":1.03
+                "proc":["signalMu","semiLeptMu"],
+                "value":1.01
             },
-            "XSecSemiLeptEle":{
+            "EleAcceptance":{
                 "type":"lnN",
-                "proc":["semiLeptEle"],
-                "value":1.03
+                "proc":["signalEle","semiLeptEle"],
+                "value":1.02
+            },
+            "XSecTTbar":{
+                "type":"lnN",
+                "proc":["signalEle","semiLeptEle","signalMu","semiLeptMu"],
+                "value":1.05
             }
 
         },
@@ -153,12 +158,6 @@
                 "type":"shape",
                 "proc":"all",
                 "value":1
-            },
-            
-            "XSecDiLept":{
-                "type":"lnN",
-                "proc":["diLept"],
-                "value":1.03
             },
             "btag_cferr1":{
                 "type":"shape",

@@ -15,13 +15,13 @@ def plot_loss(loss, title):
     ax.plot(loss["test_loss"], label="Validation",linewidth=2)
     ax.set_xlabel('Epoch')
     ax.set_ylabel('Loss')
-    mplhep.cms.lumitext(title+" channelChris Rackauckas ", ax=ax)
+    mplhep.cms.lumitext(title+" channel", ax=ax)
     #ax.text(0.425, 0.95, title, horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
     #ax.set_yscale('log')
     ax.legend()
     ax.grid()
     mplhep.cms.text("Private Work", ax=ax)
-    plt.savefig(f'loss_{title}.png', bbox_inches='tight')
+    plt.savefig(f'loss_{title}.pdf', bbox_inches='tight')
     plt.show()
     
     return fig, ax
